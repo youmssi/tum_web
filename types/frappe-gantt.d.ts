@@ -1,13 +1,7 @@
 // Ambient type declarations for `frappe-gantt` (v1.2.x ships no types of its own).
 // Covers the surface Tûm uses; extend as the Gantt feature (TUM-E06) grows.
 declare module "frappe-gantt" {
-  export type GanttViewMode =
-    | "Quarter Day"
-    | "Half Day"
-    | "Day"
-    | "Week"
-    | "Month"
-    | "Year";
+  export type GanttViewMode = "Quarter Day" | "Half Day" | "Day" | "Week" | "Month" | "Year";
 
   export interface GanttTask {
     id: string;

@@ -1,0 +1,13 @@
+export const ROUTES = {
+  HOME: "/",
+  LOGIN: "/login",
+  SIGNUP: "/signup",
+  DASHBOARD: "/dashboard",
+  PROJECTS: "/projects",
+  PROFILE: "/profile",
+} as const;
+
+export const AUTH_COOKIES = {
+  SESSION: "better-auth.session_token",
+  SESSION_SECURE: "__Secure-better-auth.session_token",
+} as const;

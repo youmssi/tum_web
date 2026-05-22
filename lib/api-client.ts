@@ -1,16 +1,53 @@
 import ky from "ky";
 
+import { ROUTES } from "@/lib/constants";
 import { env } from "@/lib/env";
 
-/**
- * Shared HTTP client for the Tûm backend API.
- *
- * Auth (Bearer JWT from Better Auth) and 401 refresh handling are added in
- * story TUM-E01-F03 via ky `hooks.beforeRequest` / `hooks.afterResponse`.
- */
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
+async function getJwt(): Promise<string | null> {
+  const now = Date.now();
+  if (cachedToken && cachedToken.expiresAt - now > 30_000) {
+    return cachedToken.value;
+  }
+
+  try {
+    const res = await fetch(`${env.betterAuthUrl}/api/auth/token`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { token?: string };
+    if (!data.token) return null;
+    cachedToken = { value: data.token, expiresAt: now + 55 * 60 * 1000 };
+    return data.token;
+  } catch {
+    return null;
+  }
+}
+
 export const api = ky.create({
-  // ky v2 renamed `prefixUrl` -> `prefix`.
   prefix: env.apiBaseUrl,
   retry: { limit: 1 },
   timeout: 20_000,
+  hooks: {
+    beforeRequest: [
+      async ({ request }) => {
+        const token = await getJwt();
+        if (token) {
+          request.headers.set("Authorization", `Bearer ${token}`);
+        }
+      },
+    ],
+    afterResponse: [
+      async ({ response }) => {
+        if (response.status === 401) {
+          cachedToken = null;
+          if (typeof window !== "undefined") {
+            window.location.href = ROUTES.LOGIN;
+          }
+        }
+      },
+    ],
+  },
 });
