@@ -67,6 +67,9 @@ export const taskApi = {
   update: (id: string, data: UpdateTaskPayload) =>
     api.patch(`api/tasks/${id}`, { json: data }).json<Task>(),
 
+  move: (id: string, data: { status: TaskStatus; afterTaskId?: string }) =>
+    api.patch(`api/tasks/${id}/move`, { json: data }).json<Task>(),
+
   remove: async (id: string) => {
     await api.delete(`api/tasks/${id}`);
   },

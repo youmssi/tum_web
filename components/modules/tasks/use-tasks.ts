@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { type CreateTaskPayload, type UpdateTaskPayload, taskApi } from "./task-api";
+import { type CreateTaskPayload, type TaskStatus, type UpdateTaskPayload, taskApi } from "./task-api";
 
 export const TASK_KEYS = {
   all: ["tasks"] as const,
@@ -42,6 +42,25 @@ export function useUpdateTask() {
     onSuccess: (updated) => {
       qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
       qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(updated.projectId) });
+    },
+  });
+}
+
+export function useMoveTask(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      status,
+      afterTaskId,
+    }: {
+      id: string;
+      status: TaskStatus;
+      afterTaskId?: string;
+    }) => taskApi.move(id, { status, afterTaskId }),
+    onSuccess: (updated) => {
+      qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
+      qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
     },
   });
 }

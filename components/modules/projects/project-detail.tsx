@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
+import { KanbanBoard } from "@/components/modules/board";
 import { TaskList } from "@/components/modules/tasks";
 import { useProject, useToggleArchive } from "./use-projects";
 
@@ -166,7 +167,7 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="board" className="mt-4">
-          <PlaceholderTab label="Kanban board" epic="E05" />
+          <KanbanBoard projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4">
