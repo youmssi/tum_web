@@ -15,5 +15,6 @@ export {
   useTask,
   useCreateTask,
   useUpdateTask,
+  useMoveTask,
   useDeleteTask,
 } from "./use-tasks";
