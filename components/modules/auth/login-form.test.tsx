@@ -3,11 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LoginForm } from "./login-form";
 
-// vi.mock is hoisted — variables used directly in the factory body must be declared
-// with vi.hoisted() so they exist before hoisting runs.
 const { mockSignIn, mockSocialSignIn } = vi.hoisted(() => ({
   mockSignIn: vi.fn(),
   mockSocialSignIn: vi.fn(),
+}));
+
+const { mockToastError } = vi.hoisted(() => ({
+  mockToastError: vi.fn(),
 }));
 
 const mockPush = vi.fn();
@@ -24,11 +26,16 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }));
 
+vi.mock("sonner", () => ({
+  toast: { error: mockToastError, success: vi.fn() },
+}));
+
 describe("LoginForm", () => {
   beforeEach(() => {
     mockPush.mockClear();
     mockSignIn.mockClear();
     mockSocialSignIn.mockClear();
+    mockToastError.mockClear();
   });
 
   it("renders email and password fields", () => {
@@ -62,7 +69,7 @@ describe("LoginForm", () => {
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith("/dashboard"));
   });
 
-  it("shows root error on API failure", async () => {
+  it("shows toast error on API failure", async () => {
     mockSignIn.mockResolvedValue({
       error: { message: "Invalid credentials" },
     });
@@ -76,7 +83,9 @@ describe("LoginForm", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
-    await waitFor(() => expect(screen.getByText("Invalid credentials")).toBeTruthy());
+    await waitFor(() =>
+      expect(mockToastError).toHaveBeenCalledWith("Invalid credentials"),
+    );
     expect(mockPush).not.toHaveBeenCalled();
   });
 });

@@ -24,6 +24,7 @@ components/modules/project/
 ```
 
 Rules of thumb:
+
 - Routes live in `app/` and stay thin — they import from modules.
 - Design-system primitives live in `components/ui/` (shadcn), not here.
 - Promote a component to `components/ui/` only when it is reused across modules.

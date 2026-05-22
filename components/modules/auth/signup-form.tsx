@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -17,17 +18,24 @@ import {
 } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
-const signupSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  email: z.string().email("Enter a valid email address."),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters.")
-    .max(72, "Password must be at most 72 characters."),
-});
+const signupSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters."),
+    email: z.string().email("Enter a valid email address."),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters.")
+      .max(72, "Password must be at most 72 characters."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
@@ -36,17 +44,15 @@ export function SignupForm() {
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
   const { isSubmitting } = form.formState;
 
-  async function onSubmit(values: SignupFormValues) {
+  async function onSubmit({ confirmPassword: _, ...values }: SignupFormValues) {
     const { error } = await authClient.signUp.email(values);
     if (error) {
-      form.setError("root", {
-        message: error.message ?? "Sign-up failed. Please try again.",
-      });
+      toast.error(error.message ?? "Sign-up failed. Please try again.");
       return;
     }
     setEmailSent(true);
@@ -128,10 +134,9 @@ export function SignupForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="signup-password">Password</FieldLabel>
-                  <Input
+                  <PasswordInput
                     {...field}
                     id="signup-password"
-                    type="password"
                     autoComplete="new-password"
                     aria-invalid={fieldState.invalid}
                     placeholder="Min. 8 characters"
@@ -142,9 +147,23 @@ export function SignupForm() {
               )}
             />
 
-            {form.formState.errors.root && (
-              <FieldError>{form.formState.errors.root.message}</FieldError>
-            )}
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="signup-confirm-password">Confirm password</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    id="signup-confirm-password"
+                    autoComplete="new-password"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Re-enter your password"
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
           </FieldGroup>
         </form>
       </CardContent>

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -35,15 +36,15 @@ export function ProfileForm() {
     }
   }, [session, form]);
 
-  const { isSubmitting, isSubmitSuccessful } = form.formState;
+  const { isSubmitting } = form.formState;
 
   async function onSubmit(values: ProfileFormValues) {
     const { error } = await authClient.updateUser(values);
     if (error) {
-      form.setError("root", {
-        message: error.message ?? "Failed to update profile.",
-      });
+      toast.error(error.message ?? "Failed to update profile.");
+      return;
     }
+    toast.success("Profile updated.");
   }
 
   async function handleSignOut() {
@@ -94,14 +95,6 @@ export function ProfileForm() {
                 </Field>
               )}
             />
-
-            {form.formState.errors.root && (
-              <FieldError>{form.formState.errors.root.message}</FieldError>
-            )}
-
-            {isSubmitSuccessful && !form.formState.errors.root && (
-              <p className="text-sm text-green-600">Profile updated.</p>
-            )}
           </FieldGroup>
         </form>
       </CardContent>

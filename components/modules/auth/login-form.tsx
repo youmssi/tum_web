@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -40,9 +42,7 @@ export function LoginForm() {
   async function onSubmit(values: LoginFormValues) {
     const { error } = await authClient.signIn.email(values);
     if (error) {
-      form.setError("root", {
-        message: error.message ?? "Sign-in failed. Please try again.",
-      });
+      toast.error(error.message ?? "Sign-in failed. Please try again.");
       return;
     }
     router.push(ROUTES.DASHBOARD);
@@ -87,10 +87,9 @@ export function LoginForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="login-password">Password</FieldLabel>
-                  <Input
+                  <PasswordInput
                     {...field}
                     id="login-password"
-                    type="password"
                     autoComplete="current-password"
                     aria-invalid={fieldState.invalid}
                     placeholder="••••••••"
@@ -99,10 +98,6 @@ export function LoginForm() {
                 </Field>
               )}
             />
-
-            {form.formState.errors.root && (
-              <FieldError>{form.formState.errors.root.message}</FieldError>
-            )}
           </FieldGroup>
         </form>
       </CardContent>

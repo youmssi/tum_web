@@ -2,16 +2,27 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { FolderKanbanIcon, LayoutDashboardIcon, LogOutIcon, UserIcon } from "lucide-react";
 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
 const NAV_ITEMS = [
-  { href: ROUTES.DASHBOARD, label: "Dashboard" },
-  { href: ROUTES.PROJECTS, label: "Projects" },
+  { href: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutDashboardIcon },
+  { href: ROUTES.PROJECTS, label: "Projects", icon: FolderKanbanIcon },
 ];
 
-export function AppNav() {
+export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -21,36 +32,58 @@ export function AppNav() {
   }
 
   return (
-    <nav className="flex flex-col flex-1 p-2 gap-1">
-      {NAV_ITEMS.map(({ href, label }) => (
-        <Link
-          key={href}
-          href={href}
-          className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent ${
-            pathname.startsWith(href) ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-          }`}
-        >
-          {label}
-        </Link>
-      ))}
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href={ROUTES.DASHBOARD}>
+                <span className="font-bold">Tûm</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-      <div className="mt-auto space-y-1">
-        <Link
-          href={ROUTES.PROFILE}
-          className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent ${
-            pathname === "/profile" ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-          }`}
-        >
-          Profile
-        </Link>
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="w-full rounded-md px-3 py-2 text-sm font-medium text-left text-muted-foreground hover:bg-accent transition-colors"
-        >
-          Sign out
-        </button>
-      </div>
-    </nav>
+      <SidebarContent>
+        <SidebarMenu>
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+            <SidebarMenuItem key={href}>
+              <SidebarMenuButton asChild isActive={pathname.startsWith(href)} tooltip={label}>
+                <Link href={href}>
+                  <Icon />
+                  <span>{label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === ROUTES.PROFILE}
+              tooltip="Profile"
+            >
+              <Link href={ROUTES.PROFILE}>
+                <UserIcon />
+                <span>Profile</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleSignOut} tooltip="Sign out">
+              <LogOutIcon />
+              <span>Sign out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   );
 }

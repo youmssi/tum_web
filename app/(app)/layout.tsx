@@ -1,18 +1,16 @@
-import Link from "next/link";
-
-import { AppNav } from "@/components/modules/shell/app-nav";
-import { ROUTES } from "@/lib/constants";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/modules/shell/app-nav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen overflow-hidden">
-      <aside className="w-60 shrink-0 border-r flex flex-col">
-        <div className="h-14 flex items-center px-4 border-b font-bold text-lg">
-          <Link href={ROUTES.DASHBOARD}>Tûm</Link>
-        </div>
-        <AppNav />
-      </aside>
-      <main className="flex-1 overflow-auto">{children}</main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+        </header>
+        <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
