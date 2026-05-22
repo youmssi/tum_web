@@ -26,6 +26,10 @@ async function getJwt(): Promise<string | null> {
   }
 }
 
+export function clearTokenCache() {
+  cachedToken = null;
+}
+
 export const api = ky.create({
   prefix: env.apiBaseUrl,
   retry: { limit: 1 },

@@ -5,6 +5,10 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   PROJECTS: "/projects",
   PROFILE: "/profile",
+  ONBOARDING: "/onboarding",
+  ORGANIZATION_MEMBERS: "/organization/members",
+  ORGANIZATION_SETTINGS: "/organization/settings",
+  INVITATIONS_ACCEPT: "/invitations/accept",
 } as const;
 
 export const AUTH_COOKIES = {

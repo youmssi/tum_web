@@ -42,7 +42,27 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    organization(),
+    organization({
+      sendInvitationEmail: async (data) => {
+        const url = `${process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/invitations/accept?token=${data.invitation.id}`;
+        await fetch(`${process.env.INTERNAL_API_URL ?? "http://localhost:8080"}/internal/email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Internal-Token": process.env.INTERNAL_SERVICE_TOKEN ?? "dev-internal-token",
+          },
+          body: JSON.stringify({
+            to: data.email,
+            template: "org-invitation",
+            context: {
+              organizationName: data.organization.name,
+              inviterName: data.inviter.user?.name ?? data.inviter.user?.email ?? "",
+              url,
+            },
+          }),
+        });
+      },
+    }),
     jwt({
       jwt: { expirationTime: "1h" },
       jwks: { keyPairConfig: { alg: "RS256" } },

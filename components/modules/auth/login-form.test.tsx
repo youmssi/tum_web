@@ -41,7 +41,7 @@ describe("LoginForm", () => {
   it("renders email and password fields", () => {
     render(<LoginForm />);
     expect(screen.getByLabelText(/email/i)).toBeTruthy();
-    expect(screen.getByLabelText(/password/i)).toBeTruthy();
+    expect(screen.getByLabelText("Password")).toBeTruthy();
   });
 
   it("shows validation errors when submitting empty form", async () => {
@@ -61,7 +61,7 @@ describe("LoginForm", () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: "user@test.com" },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText("Password"), {
       target: { value: "password123" },
     });
     fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
@@ -78,14 +78,12 @@ describe("LoginForm", () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: "user@test.com" },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText("Password"), {
       target: { value: "wrongpass" },
     });
     fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
-    await waitFor(() =>
-      expect(mockToastError).toHaveBeenCalledWith("Invalid credentials"),
-    );
+    await waitFor(() => expect(mockToastError).toHaveBeenCalledWith("Invalid credentials"));
     expect(mockPush).not.toHaveBeenCalled();
   });
 });

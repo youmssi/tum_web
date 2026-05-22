@@ -106,8 +106,6 @@ describe("SignupForm", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /create account/i }));
 
-    await waitFor(() =>
-      expect(mockToastError).toHaveBeenCalledWith("Email already in use"),
-    );
+    await waitFor(() => expect(mockToastError).toHaveBeenCalledWith("Email already in use"));
   });
 });
