@@ -15,6 +15,7 @@ export {
   useTask,
   useCreateTask,
   useUpdateTask,
+  useRescheduleTask,
   useMoveTask,
   useDeleteTask,
 } from "./use-tasks";

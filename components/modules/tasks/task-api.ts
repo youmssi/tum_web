@@ -70,6 +70,9 @@ export const taskApi = {
   move: (id: string, data: { status: TaskStatus; afterTaskId?: string }) =>
     api.patch(`api/tasks/${id}/move`, { json: data }).json<Task>(),
 
+  reschedule: (id: string, data: { startDate?: string | null; endDate?: string | null }) =>
+    api.patch(`api/tasks/${id}/schedule`, { json: data }).json<Task>(),
+
   remove: async (id: string) => {
     await api.delete(`api/tasks/${id}`);
   },

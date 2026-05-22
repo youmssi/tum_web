@@ -46,6 +46,25 @@ export function useUpdateTask() {
   });
 }
 
+export function useRescheduleTask(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      startDate,
+      endDate,
+    }: {
+      id: string;
+      startDate?: string | null;
+      endDate?: string | null;
+    }) => taskApi.reschedule(id, { startDate, endDate }),
+    onSuccess: (updated) => {
+      qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
+      qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
+    },
+  });
+}
+
 export function useMoveTask(projectId: string) {
   const qc = useQueryClient();
   return useMutation({

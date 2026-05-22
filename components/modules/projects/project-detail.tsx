@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
 import { KanbanBoard } from "@/components/modules/board";
+import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList } from "@/components/modules/tasks";
 import { useProject, useToggleArchive } from "./use-projects";
 
@@ -171,7 +172,7 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4">
-          <PlaceholderTab label="Gantt timeline" epic="E06" />
+          <ProjectTimeline projectId={project.id} />
         </TabsContent>
       </Tabs>
     </div>
