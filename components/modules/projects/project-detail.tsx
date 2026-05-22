@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
+import { TaskList } from "@/components/modules/tasks";
 import { useProject, useToggleArchive } from "./use-projects";
 
 function PlaceholderTab({ label, epic }: { label: string; epic: string }) {
@@ -161,7 +162,7 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="list" className="mt-4">
-          <PlaceholderTab label="Task list" epic="E04" />
+          <TaskList projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="board" className="mt-4">
