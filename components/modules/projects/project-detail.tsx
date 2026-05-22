@@ -22,7 +22,8 @@ import { ROUTES } from "@/lib/constants";
 import { ActivityFeed } from "@/components/modules/activity";
 import { KanbanBoard } from "@/components/modules/board";
 import { ProjectTimeline } from "@/components/modules/timeline";
-import { TaskList } from "@/components/modules/tasks";
+import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
+import { authClient } from "@/lib/auth-client";
 import { useProject, useToggleArchive } from "./use-projects";
 
 function PlaceholderTab({ label, epic }: { label: string; epic: string }) {
@@ -38,6 +39,8 @@ export function ProjectDetail({ id }: { id: string }) {
   const router = useRouter();
   const { data: project, isLoading } = useProject(id);
   const toggleArchive = useToggleArchive();
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  useRealtimeTasks(id, activeOrg?.id ?? null);
 
   async function handleToggleArchive() {
     if (!project) return;

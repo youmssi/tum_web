@@ -8,6 +8,7 @@ export const ROUTES = {
   ONBOARDING: "/onboarding",
   ORGANIZATION_MEMBERS: "/organization/members",
   ORGANIZATION_SETTINGS: "/organization/settings",
+  NOTIFICATION_PREFERENCES: "/notifications/preferences",
   INVITATIONS_ACCEPT: "/invitations/accept",
 } as const;
 
