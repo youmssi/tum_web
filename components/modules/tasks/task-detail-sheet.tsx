@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
+import { CommentThread } from "@/components/modules/comments";
 import {
   useCreateDependency,
   useDeleteDependency,
@@ -434,6 +435,10 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
             </div>
           );
         })()}
+
+        <Separator className="my-6" />
+
+        <CommentThread taskId={task.id} />
 
         <Separator className="my-6" />
 
