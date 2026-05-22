@@ -4,3 +4,5 @@ coverage
 pnpm-lock.yaml
 public
 *.tsbuildinfo
+# shadcn primitives — generated/external
+components/ui

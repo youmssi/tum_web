@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "coverage/**",
+    // shadcn primitives — generated/external, not linted
+    "components/ui/**",
   ]),
 ]);
 

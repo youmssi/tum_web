@@ -1,0 +1,133 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { authClient } from "@/lib/auth-client";
+import { ROUTES } from "@/lib/constants";
+
+const profileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters."),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
+export function ProfileForm() {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { name: "" },
+  });
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      form.reset({ name: session.user.name });
+    }
+  }, [session, form]);
+
+  const { isSubmitting, isSubmitSuccessful } = form.formState;
+
+  async function onSubmit(values: ProfileFormValues) {
+    const { error } = await authClient.updateUser(values);
+    if (error) {
+      form.setError("root", {
+        message: error.message ?? "Failed to update profile.",
+      });
+    }
+  }
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    router.push(ROUTES.LOGIN);
+  }
+
+  if (isPending) {
+    return (
+      <div className="space-y-3 p-6">
+        <div className="h-5 w-32 animate-pulse rounded bg-muted" />
+        <div className="h-8 w-full animate-pulse rounded bg-muted" />
+      </div>
+    );
+  }
+
+  return (
+    <Card className="w-full max-w-lg">
+      <CardHeader>
+        <CardTitle>Profile</CardTitle>
+        <CardDescription>
+          {session?.user?.email}
+          {session?.user?.emailVerified ? (
+            <span className="ml-2 text-xs text-green-600">Verified</span>
+          ) : (
+            <span className="ml-2 text-xs text-yellow-600">Not verified</span>
+          )}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent>
+        <form id="profile-form" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          <FieldGroup className="gap-4">
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="profile-name">Display name</FieldLabel>
+                  <Input
+                    {...field}
+                    id="profile-name"
+                    type="text"
+                    autoComplete="name"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            {form.formState.errors.root && (
+              <FieldError>{form.formState.errors.root.message}</FieldError>
+            )}
+
+            {isSubmitSuccessful && !form.formState.errors.root && (
+              <p className="text-sm text-green-600">Profile updated.</p>
+            )}
+          </FieldGroup>
+        </form>
+      </CardContent>
+
+      <CardContent className="pt-0">
+        <div className="flex items-center gap-2">
+          <Button type="submit" form="profile-form" disabled={isSubmitting}>
+            {isSubmitting ? "Saving…" : "Save changes"}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => form.reset()}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+        </div>
+      </CardContent>
+
+      <CardContent className="pt-0">
+        <Separator className="mb-4" />
+        <Button variant="outline" type="button" onClick={handleSignOut}>
+          Sign out
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
