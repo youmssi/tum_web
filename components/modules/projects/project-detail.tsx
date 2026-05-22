@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ActivityIcon,
   ArchiveIcon,
   ArchiveRestoreIcon,
   FolderKanbanIcon,
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
+import { ActivityFeed } from "@/components/modules/activity";
 import { KanbanBoard } from "@/components/modules/board";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList } from "@/components/modules/tasks";
@@ -134,6 +136,10 @@ export function ProjectDetail({ id }: { id: string }) {
             <CalendarRangeIcon className="size-4" />
             Timeline
           </TabsTrigger>
+          <TabsTrigger value="activity" className="gap-1.5">
+            <ActivityIcon className="size-4" />
+            Activity
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4">
@@ -173,6 +179,10 @@ export function ProjectDetail({ id }: { id: string }) {
 
         <TabsContent value="timeline" className="mt-4">
           <ProjectTimeline projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="activity" className="mt-4">
+          <ActivityFeed projectId={project.id} />
         </TabsContent>
       </Tabs>
     </div>
