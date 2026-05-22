@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { AUTH_COOKIES, ROUTES } from "@/lib/constants";
 
-const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.SIGNUP, "/api/auth"];
+const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.SIGNUP, "/api/auth", ROUTES.INVITATIONS_ACCEPT];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

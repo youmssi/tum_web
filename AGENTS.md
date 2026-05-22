@@ -53,9 +53,9 @@ lib/                      # cn(), shared clients/utils
 
 **Never** write `process.env.ANYTHING` outside of the two env files:
 
-| File | Scope | Contains |
-|---|---|---|
-| `lib/env.ts` | Client + Server | `NEXT_PUBLIC_*` vars only |
+| File                | Scope                                  | Contains                                 |
+| ------------------- | -------------------------------------- | ---------------------------------------- |
+| `lib/env.ts`        | Client + Server                        | `NEXT_PUBLIC_*` vars only                |
 | `lib/env.server.ts` | Server only (guarded by `server-only`) | DB, secrets, OAuth keys, internal tokens |
 
 Import `env` from `@/lib/env` in client or shared code; import `serverEnv` from `@/lib/env.server` in server-only code (`lib/auth.ts`, route handlers, Server Actions, Server Components).
