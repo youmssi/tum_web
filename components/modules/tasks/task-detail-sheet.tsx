@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2Icon, XIcon } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -39,13 +39,18 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
 import {
+  useCreateDependency,
+  useDeleteDependency,
+  useDependencies,
+} from "@/components/modules/timeline";
+import {
   PRIORITY_LABELS,
   STATUS_LABELS,
   type Task,
   type TaskPriority,
   type TaskStatus,
 } from "./task-api";
-import { useDeleteTask, useUpdateTask } from "./use-tasks";
+import { useDeleteTask, useUpdateTask, useTasks } from "./use-tasks";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required.").max(300),
@@ -71,6 +76,11 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   const deleteTask = useDeleteTask(projectId);
   const { data: activeOrg } = authClient.useActiveOrganization();
   const members = activeOrg?.members ?? [];
+  const { data: allTasks } = useTasks(projectId);
+  const { data: deps } = useDependencies(task?.id);
+  const createDep = useCreateDependency();
+  const deleteDep = useDeleteDependency();
+  const [newPredecessorId, setNewPredecessorId] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -340,6 +350,90 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
             />
           </FieldGroup>
         </form>
+
+        {task && (() => {
+          const predecessors = (deps ?? []).filter((d) => d.toTaskId === task.id);
+          const predecessorIds = new Set(predecessors.map((d) => d.fromTaskId));
+          const available = (allTasks ?? []).filter(
+            (t) => t.id !== task.id && !predecessorIds.has(t.id),
+          );
+
+          async function handleAddDep() {
+            if (!newPredecessorId || !task) return;
+            try {
+              await createDep.mutateAsync({
+                fromTaskId: newPredecessorId,
+                toTaskId: task.id,
+                type: "FINISH_TO_START",
+              });
+              setNewPredecessorId("");
+            } catch {
+              toast.error("Cannot add dependency — would create a cycle or already exists.");
+            }
+          }
+
+          return (
+            <div className="mt-6 space-y-3">
+              <p className="text-sm font-medium">Dependencies</p>
+              {predecessors.length > 0 && (
+                <div className="space-y-1">
+                  {predecessors.map((dep) => {
+                    const pred = allTasks?.find((t) => t.id === dep.fromTaskId);
+                    return (
+                      <div
+                        key={dep.id}
+                        className="flex items-center justify-between gap-2 rounded-md border px-3 py-2"
+                      >
+                        <span className="text-sm line-clamp-1">
+                          {pred?.title ?? dep.fromTaskId}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 size-6"
+                          disabled={deleteDep.isPending}
+                          onClick={() =>
+                            deleteDep.mutate({
+                              id: dep.id,
+                              fromTaskId: dep.fromTaskId,
+                              toTaskId: dep.toTaskId,
+                            })
+                          }
+                        >
+                          <XIcon className="size-3" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {available.length > 0 && (
+                <div className="flex gap-2">
+                  <Select value={newPredecessorId} onValueChange={setNewPredecessorId}>
+                    <SelectTrigger className="flex-1 text-sm">
+                      <SelectValue placeholder="Depends on…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {available.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!newPredecessorId || createDep.isPending}
+                    onClick={handleAddDep}
+                  >
+                    Add
+                  </Button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <Separator className="my-6" />
 
