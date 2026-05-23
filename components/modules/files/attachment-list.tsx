@@ -9,8 +9,10 @@ import { authClient } from "@/lib/auth-client";
 import { type FileTargetType, useDeleteFile, useDownloadUrl, useFiles } from "./use-files";
 
 function fileIcon(contentType: string) {
-  if (contentType.startsWith("image/")) return <ImageIcon className="size-4 shrink-0 text-muted-foreground" />;
-  if (contentType.includes("pdf") || contentType.includes("text")) return <FileTextIcon className="size-4 shrink-0 text-muted-foreground" />;
+  if (contentType.startsWith("image/"))
+    return <ImageIcon className="size-4 shrink-0 text-muted-foreground" />;
+  if (contentType.includes("pdf") || contentType.includes("text"))
+    return <FileTextIcon className="size-4 shrink-0 text-muted-foreground" />;
   return <FileIcon className="size-4 shrink-0 text-muted-foreground" />;
 }
 
@@ -21,13 +23,13 @@ function formatBytes(bytes: number): string {
 }
 
 interface AttachmentListProps {
-  targetType: FileTargetType;
-  targetId: string;
+  entityType: FileTargetType;
+  entityId: string;
 }
 
-export function AttachmentList({ targetType, targetId }: AttachmentListProps) {
-  const { data: files, isLoading } = useFiles(targetType, targetId);
-  const deleteFile = useDeleteFile(targetType, targetId);
+export function AttachmentList({ entityType, entityId }: AttachmentListProps) {
+  const { data: files, isLoading } = useFiles(entityType, entityId);
+  const deleteFile = useDeleteFile(entityType, entityId);
   const downloadUrl = useDownloadUrl();
   const { data: session } = authClient.useSession();
   const currentUserId = session?.user?.id;
@@ -69,14 +71,11 @@ export function AttachmentList({ targetType, targetId }: AttachmentListProps) {
   return (
     <div className="space-y-1.5">
       {available.map((file) => (
-        <div
-          key={file.id}
-          className="flex items-center gap-2 rounded-md border px-3 py-2"
-        >
+        <div key={file.id} className="flex items-center gap-2 rounded-md border px-3 py-2">
           {fileIcon(file.contentType)}
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium">{file.fileName}</p>
-            <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
+            <p className="text-xs text-muted-foreground">{formatBytes(file.sizeBytes)}</p>
           </div>
           <Button
             variant="ghost"

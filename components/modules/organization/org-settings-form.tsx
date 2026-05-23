@@ -75,8 +75,8 @@ export function OrgSettingsForm() {
         <div className="flex items-center gap-4">
           {activeOrg?.id && (
             <AvatarUpload
-              targetType="ORG"
-              targetId={activeOrg.id}
+              entityType="ORG_LOGO"
+              entityId={activeOrg.id}
               currentUrl={activeOrg.logo}
               initials={(activeOrg.name ?? "O").slice(0, 2).toUpperCase()}
               onUploaded={handleLogoUploaded}

@@ -9,19 +9,14 @@ import { type FileTargetType, useUploadFile } from "./use-files";
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 interface FileUploadProps {
-  targetType: FileTargetType;
-  targetId: string;
+  entityType: FileTargetType;
+  entityId: string;
   accept?: string;
   onSuccess?: () => void;
 }
 
-export function FileUpload({
-  targetType,
-  targetId,
-  accept = "*/*",
-  onSuccess,
-}: FileUploadProps) {
-  const upload = useUploadFile(targetType, targetId);
+export function FileUpload({ entityType, entityId, accept = "*/*", onSuccess }: FileUploadProps) {
+  const upload = useUploadFile(entityType, entityId);
   const [progress, setProgress] = useState<number | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,11 +59,16 @@ export function FileUpload({
       tabIndex={0}
       aria-label="Upload file"
       className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-4 text-center transition-colors ${
-        isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/30 hover:border-primary/50"
+        isDragOver
+          ? "border-primary bg-primary/5"
+          : "border-muted-foreground/30 hover:border-primary/50"
       } ${isUploading ? "pointer-events-none opacity-60" : ""}`}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
       onDragLeave={() => setIsDragOver(false)}
       onDrop={onDrop}
     >

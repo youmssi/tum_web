@@ -12,10 +12,9 @@ export interface Notification {
   recipientId: string;
   type: NotificationType;
   title: string;
-  body: string;
+  body: string | null;
   read: boolean;
-  targetId: string;
-  projectId: string;
+  targetId: string | null;
   createdAt: string;
 }
 
@@ -28,15 +27,13 @@ export interface NotificationPreference {
 export const notificationApi = {
   list: () => api.get("api/notifications").json<Notification[]>(),
 
-  markRead: (id: string) =>
-    api.patch(`api/notifications/${id}/read`).json<Notification>(),
+  markRead: (id: string) => api.patch(`api/notifications/${id}/read`).json<Notification>(),
 
   markAllRead: async () => {
     await api.patch("api/notifications/read-all");
   },
 
-  listPreferences: () =>
-    api.get("api/notifications/preferences").json<NotificationPreference[]>(),
+  listPreferences: () => api.get("api/notifications/preferences").json<NotificationPreference[]>(),
 
   updatePreference: (
     type: NotificationType,

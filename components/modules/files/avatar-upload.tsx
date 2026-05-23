@@ -11,16 +11,16 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 
 interface AvatarUploadProps {
-  targetType: Extract<FileTargetType, "PROFILE" | "ORG">;
-  targetId: string;
+  entityType: Extract<FileTargetType, "PROFILE" | "ORG_LOGO">;
+  entityId: string;
   currentUrl?: string | null;
   initials: string;
   onUploaded: (downloadUrl: string) => void;
 }
 
 export function AvatarUpload({
-  targetType,
-  targetId,
+  entityType,
+  entityId,
   currentUrl,
   initials,
   onUploaded,
@@ -37,15 +37,15 @@ export function AvatarUpload({
     setPreview(URL.createObjectURL(file));
     setIsUploading(true);
     try {
-      const { fileId, uploadUrl } = await fileApi.presign({
-        targetType,
-        targetId,
+      const { id, uploadUrl } = await fileApi.presign({
+        entityType,
+        entityId,
         fileName: file.name,
         contentType: file.type,
-        size: file.size,
+        sizeBytes: file.size,
       });
       await fileApi.uploadToPresignedUrl(uploadUrl, file, () => {});
-      const confirmed = await fileApi.confirm(fileId);
+      const confirmed = await fileApi.confirm(id);
       const { url } = await fileApi.downloadUrl(confirmed.id);
       onUploaded(url);
       toast.success("Photo updated.");

@@ -438,8 +438,8 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
 
         <div className="mt-6 space-y-3">
           <p className="text-sm font-medium">Attachments</p>
-          <AttachmentList targetType="TASK" targetId={task.id} />
-          <FileUpload targetType="TASK" targetId={task.id} />
+          <AttachmentList entityType="TASK" entityId={task.id} />
+          <FileUpload entityType="TASK" entityId={task.id} />
         </div>
 
         <Separator className="my-6" />

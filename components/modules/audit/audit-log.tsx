@@ -1,11 +1,10 @@
 "use client";
 
-import { ShieldAlertIcon, SearchIcon } from "lucide-react";
+import { ShieldAlertIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -38,7 +37,11 @@ function relativeTime(iso: string): string {
   const d = Math.floor(h / 24);
   return d < 7
     ? `${d}d ago`
-    : new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    : new Date(iso).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
 }
 
 export function AuditLog() {
@@ -49,32 +52,21 @@ export function AuditLog() {
     activeOrg?.members.find((m) => m.userId === session?.user?.id)?.role ?? "member";
   const canView = currentRole === "owner" || currentRole === "admin";
 
-  const [actorInput, setActorInput] = useState("");
   const [params, setParams] = useState<AuditParams>({ page: 1, pageSize: PAGE_SIZE });
 
   const { data, isLoading, isFetching } = useAuditLog(canView ? params : {});
 
-  function applyFilters() {
-    setParams((p) => ({ ...p, actor: actorInput || undefined, page: 1 }));
-  }
-
   function setAction(value: string) {
     setParams((p) => ({ ...p, action: value === "__all__" ? undefined : value, page: 1 }));
-  }
-
-  function setFrom(value: string) {
-    setParams((p) => ({ ...p, from: value || undefined, page: 1 }));
-  }
-
-  function setTo(value: string) {
-    setParams((p) => ({ ...p, to: value || undefined, page: 1 }));
   }
 
   if (!canView) {
     return (
       <div className="flex min-h-64 flex-col items-center justify-center gap-2">
         <ShieldAlertIcon className="size-8 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Only admins and owners can view the audit log.</p>
+        <p className="text-sm text-muted-foreground">
+          Only admins and owners can view the audit log.
+        </p>
       </div>
     );
   }
@@ -87,19 +79,6 @@ export function AuditLog() {
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
-        <div className="flex flex-1 gap-2 min-w-48">
-          <Input
-            placeholder="Filter by actor name or email"
-            value={actorInput}
-            onChange={(e) => setActorInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-            className="flex-1"
-          />
-          <Button variant="outline" size="icon" onClick={applyFilters}>
-            <SearchIcon className="size-4" />
-          </Button>
-        </div>
-
         <Select value={params.action ?? "__all__"} onValueChange={setAction}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="All actions" />
@@ -114,29 +93,11 @@ export function AuditLog() {
           </SelectContent>
         </Select>
 
-        <Input
-          type="date"
-          className="w-36"
-          value={params.from ?? ""}
-          onChange={(e) => setFrom(e.target.value)}
-          aria-label="From date"
-        />
-        <Input
-          type="date"
-          className="w-36"
-          value={params.to ?? ""}
-          onChange={(e) => setTo(e.target.value)}
-          aria-label="To date"
-        />
-
-        {(params.actor || params.action || params.from || params.to) && (
+        {params.action && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              setActorInput("");
-              setParams({ page: 1, pageSize: PAGE_SIZE });
-            }}
+            onClick={() => setParams({ page: 1, pageSize: PAGE_SIZE })}
           >
             Clear
           </Button>
@@ -171,8 +132,7 @@ export function AuditLog() {
               {entries.map((entry) => (
                 <TableRow key={entry.id}>
                   <TableCell>
-                    <p className="text-sm font-medium">{entry.actorName || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{entry.actorEmail}</p>
+                    <p className="max-w-32 truncate font-mono text-xs">{entry.actorId}</p>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs">
@@ -180,8 +140,8 @@ export function AuditLog() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <p className="max-w-40 truncate text-sm">{entry.targetName || entry.targetId}</p>
-                    <p className="text-xs text-muted-foreground">{entry.targetType}</p>
+                    <p className="max-w-40 truncate font-mono text-xs">{entry.entityId}</p>
+                    <p className="text-xs text-muted-foreground">{entry.entityType}</p>
                   </TableCell>
                   <TableCell>
                     <p className="max-w-48 truncate text-xs text-muted-foreground">
@@ -189,7 +149,10 @@ export function AuditLog() {
                     </p>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="text-xs text-muted-foreground" title={new Date(entry.createdAt).toLocaleString()}>
+                    <span
+                      className="text-xs text-muted-foreground"
+                      title={new Date(entry.createdAt).toLocaleString()}
+                    >
                       {relativeTime(entry.createdAt)}
                     </span>
                   </TableCell>
@@ -203,7 +166,9 @@ export function AuditLog() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Page {page} of {totalPages} · {data?.total ?? 0} entries</span>
+          <span>
+            Page {page} of {totalPages} · {data?.total ?? 0} entries
+          </span>
           <div className="flex gap-2">
             <Button
               variant="outline"

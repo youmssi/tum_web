@@ -73,8 +73,8 @@ export function ProfileForm() {
         <div className="flex items-center gap-4">
           {session?.user?.id && (
             <AvatarUpload
-              targetType="PROFILE"
-              targetId={session.user.id}
+              entityType="PROFILE"
+              entityId={session.user.id}
               currentUrl={session.user.image}
               initials={(session.user.name ?? session.user.email ?? "?").slice(0, 2).toUpperCase()}
               onUploaded={handleAvatarUploaded}

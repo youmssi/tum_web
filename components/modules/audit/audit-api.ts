@@ -1,42 +1,37 @@
 import { api } from "@/lib/api-client";
 
 export type AuditAction =
-  | "MEMBER_INVITED"
-  | "MEMBER_REMOVED"
-  | "MEMBER_ROLE_CHANGED"
-  | "PROJECT_CREATED"
-  | "PROJECT_ARCHIVED"
-  | "PROJECT_DELETED"
   | "TASK_CREATED"
-  | "TASK_DELETED"
-  | "COMMENT_DELETED"
-  | "ORG_SETTINGS_UPDATED";
+  | "TASK_STATUS_CHANGED"
+  | "TASK_ASSIGNED"
+  | "COMMENT_ADDED";
 
 export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
-  MEMBER_INVITED: "Member invited",
-  MEMBER_REMOVED: "Member removed",
-  MEMBER_ROLE_CHANGED: "Role changed",
-  PROJECT_CREATED: "Project created",
-  PROJECT_ARCHIVED: "Project archived",
-  PROJECT_DELETED: "Project deleted",
   TASK_CREATED: "Task created",
-  TASK_DELETED: "Task deleted",
-  COMMENT_DELETED: "Comment deleted",
-  ORG_SETTINGS_UPDATED: "Settings updated",
+  TASK_STATUS_CHANGED: "Status changed",
+  TASK_ASSIGNED: "Task assigned",
+  COMMENT_ADDED: "Comment added",
 };
 
 export interface AuditEntry {
   id: string;
-  organizationId: string;
   actorId: string;
-  actorName: string;
-  actorEmail: string;
   action: AuditAction;
-  targetType: string;
-  targetId: string;
-  targetName: string;
+  entityType: string;
+  entityId: string;
   detail: string | null;
   createdAt: string;
+}
+
+/** Spring Data PagedModel shape. */
+interface SpringPage<T> {
+  content: T[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
 }
 
 export interface AuditPage {
@@ -48,23 +43,31 @@ export interface AuditPage {
 }
 
 export interface AuditParams {
-  actor?: string;
+  entityType?: string;
+  entityId?: string;
   action?: string;
-  from?: string;
-  to?: string;
+  /** 1-indexed page number */
   page?: number;
   pageSize?: number;
 }
 
 export const auditApi = {
-  list: (params: AuditParams = {}) => {
+  list: async (params: AuditParams = {}): Promise<AuditPage> => {
     const searchParams: Record<string, string> = {};
-    if (params.actor) searchParams.actor = params.actor;
+    if (params.entityType) searchParams.entityType = params.entityType;
+    if (params.entityId) searchParams.entityId = params.entityId;
     if (params.action) searchParams.action = params.action;
-    if (params.from) searchParams.from = params.from;
-    if (params.to) searchParams.to = params.to;
-    if (params.page) searchParams.page = String(params.page);
-    if (params.pageSize) searchParams.pageSize = String(params.pageSize);
-    return api.get("api/audit", { searchParams }).json<AuditPage>();
+    // Spring Pageable is 0-indexed; frontend is 1-indexed
+    searchParams.page = String((params.page ?? 1) - 1);
+    searchParams.size = String(params.pageSize ?? 25);
+
+    const raw = await api.get("api/audit", { searchParams }).json<SpringPage<AuditEntry>>();
+    return {
+      entries: raw.content,
+      total: raw.page.totalElements,
+      page: raw.page.number + 1,
+      pageSize: raw.page.size,
+      totalPages: raw.page.totalPages,
+    };
   },
 };
