@@ -25,6 +25,7 @@ export const auth = betterAuth({
         },
         body: JSON.stringify({
           to: user.email,
+          subject: "Verify your email address",
           template: "verify-email",
           context: { url, name: user.name },
         }),
@@ -53,6 +54,7 @@ export const auth = betterAuth({
           },
           body: JSON.stringify({
             to: data.email,
+            subject: `You've been invited to join ${data.organization.name}`,
             template: "org-invitation",
             context: {
               organizationName: data.organization.name,

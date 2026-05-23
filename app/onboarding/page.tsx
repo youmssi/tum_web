@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { CreateOrgForm } from "@/components/modules/organization";
+import { OnboardingChoice } from "@/components/modules/organization";
 import { auth } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Create your organisation",
+  title: "Get started",
 };
 
 export default async function OnboardingPage() {
@@ -17,7 +17,7 @@ export default async function OnboardingPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
-      <CreateOrgForm />
+      <OnboardingChoice />
     </main>
   );
 }
