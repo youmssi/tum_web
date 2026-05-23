@@ -47,7 +47,7 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from "./task-api";
-import { useDeleteTask, useUpdateTask, useTasks } from "./use-tasks";
+import { useDeleteTask, useRescheduleTask, useUpdateTask, useTasks } from "./use-tasks";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required.").max(300),
@@ -55,6 +55,8 @@ const schema = z.object({
   status: z.enum(["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"]),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
   assigneeId: z.string().nullable(),
+  startDate: z.string().nullable(),
+  endDate: z.string().nullable(),
   dueDate: z.string().nullable(),
   labels: z.array(z.string()),
 });
@@ -70,6 +72,7 @@ interface TaskDetailSheetProps {
 
 export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDetailSheetProps) {
   const updateTask = useUpdateTask();
+  const rescheduleTask = useRescheduleTask(projectId);
   const deleteTask = useDeleteTask(projectId);
   const { data: activeOrg } = authClient.useActiveOrganization();
   const members = activeOrg?.members ?? [];
@@ -87,6 +90,8 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
       status: "TODO",
       priority: "MEDIUM",
       assigneeId: null,
+      startDate: null,
+      endDate: null,
       dueDate: null,
       labels: [],
     },
@@ -100,6 +105,8 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
         status: task.status,
         priority: task.priority,
         assigneeId: task.assigneeId ?? null,
+        startDate: task.startDate ?? null,
+        endDate: task.endDate ?? null,
         dueDate: task.dueDate ?? null,
         labels: task.labels ?? [],
       });
@@ -124,6 +131,20 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
       });
     } catch {
       toast.error("Failed to save task.");
+    }
+  }
+
+  async function handleReschedule() {
+    if (!task) return;
+    const { startDate, endDate } = form.getValues();
+    try {
+      await rescheduleTask.mutateAsync({
+        id: task.id,
+        startDate: startDate || null,
+        endDate: endDate || null,
+      });
+    } catch {
+      toast.error("Failed to save schedule.");
     }
   }
 
@@ -269,6 +290,47 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                 </Field>
               )}
             />
+
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                name="startDate"
+                control={form.control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel htmlFor="detail-start-date">Start date</FieldLabel>
+                    <Input
+                      {...field}
+                      id="detail-start-date"
+                      type="date"
+                      value={field.value ?? ""}
+                      onBlur={() => {
+                        field.onBlur();
+                        handleReschedule();
+                      }}
+                    />
+                  </Field>
+                )}
+              />
+              <Controller
+                name="endDate"
+                control={form.control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel htmlFor="detail-end-date">End date</FieldLabel>
+                    <Input
+                      {...field}
+                      id="detail-end-date"
+                      type="date"
+                      value={field.value ?? ""}
+                      onBlur={() => {
+                        field.onBlur();
+                        handleReschedule();
+                      }}
+                    />
+                  </Field>
+                )}
+              />
+            </div>
 
             <Controller
               name="dueDate"
