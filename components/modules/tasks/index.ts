@@ -1,4 +1,5 @@
 export { CreateTaskDialog } from "./create-task-dialog";
+export { useRealtimeTasks } from "./use-realtime-tasks";
 export { TaskDetailSheet } from "./task-detail-sheet";
 export { TaskList } from "./task-list";
 export type {
