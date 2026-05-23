@@ -12,6 +12,7 @@ export type {
 export { taskApi, STATUS_LABELS, PRIORITY_LABELS } from "./task-api";
 export {
   TASK_KEYS,
+  useMyTasks,
   useTasks,
   useTask,
   useCreateTask,

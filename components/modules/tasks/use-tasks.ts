@@ -4,9 +4,17 @@ import { type CreateTaskPayload, type TaskStatus, type UpdateTaskPayload, taskAp
 
 export const TASK_KEYS = {
   all: ["tasks"] as const,
+  myWork: ["tasks", "my-work"] as const,
   byProject: (projectId: string) => ["tasks", "project", projectId] as const,
   detail: (id: string) => ["tasks", id] as const,
 };
+
+export function useMyTasks() {
+  return useQuery({
+    queryKey: TASK_KEYS.myWork,
+    queryFn: taskApi.myWork,
+  });
+}
 
 export function useTasks(projectId: string) {
   return useQuery({
