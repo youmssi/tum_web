@@ -12,6 +12,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
+import { AvatarUpload } from "@/components/modules/files";
 
 const settingsSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(60),
@@ -52,6 +53,12 @@ export function OrgSettingsForm() {
     refetch();
   }
 
+  async function handleLogoUploaded(url: string) {
+    const { error } = await authClient.organization.update({ data: { logo: url } });
+    if (error) toast.error("Failed to update logo.");
+    else refetch();
+  }
+
   if (isPending) {
     return (
       <div className="space-y-3">
@@ -65,8 +72,21 @@ export function OrgSettingsForm() {
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <CardTitle>Organisation settings</CardTitle>
-        <CardDescription>Update your organisation name and URL slug.</CardDescription>
+        <div className="flex items-center gap-4">
+          {activeOrg?.id && (
+            <AvatarUpload
+              targetType="ORG"
+              targetId={activeOrg.id}
+              currentUrl={activeOrg.logo}
+              initials={(activeOrg.name ?? "O").slice(0, 2).toUpperCase()}
+              onUploaded={handleLogoUploaded}
+            />
+          )}
+          <div>
+            <CardTitle>Organisation settings</CardTitle>
+            <CardDescription>Update your organisation name and URL slug.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-4">

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
+import { AvatarUpload } from "@/components/modules/files";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -61,18 +62,36 @@ export function ProfileForm() {
     );
   }
 
+  async function handleAvatarUploaded(url: string) {
+    const { error } = await authClient.updateUser({ image: url });
+    if (error) toast.error("Failed to update avatar.");
+  }
+
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <CardTitle>Profile</CardTitle>
-        <CardDescription>
-          {session?.user?.email}
-          {session?.user?.emailVerified ? (
-            <span className="ml-2 text-xs text-green-600">Verified</span>
-          ) : (
-            <span className="ml-2 text-xs text-yellow-600">Not verified</span>
+        <div className="flex items-center gap-4">
+          {session?.user?.id && (
+            <AvatarUpload
+              targetType="PROFILE"
+              targetId={session.user.id}
+              currentUrl={session.user.image}
+              initials={(session.user.name ?? session.user.email ?? "?").slice(0, 2).toUpperCase()}
+              onUploaded={handleAvatarUploaded}
+            />
           )}
-        </CardDescription>
+          <div>
+            <CardTitle>Profile</CardTitle>
+            <CardDescription>
+              {session?.user?.email}
+              {session?.user?.emailVerified ? (
+                <span className="ml-2 text-xs text-green-600">Verified</span>
+              ) : (
+                <span className="ml-2 text-xs text-yellow-600">Not verified</span>
+              )}
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent>
