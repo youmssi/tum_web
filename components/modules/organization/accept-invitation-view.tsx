@@ -23,16 +23,13 @@ interface InvitationData {
 
 export function AcceptInvitationView({ token }: { token?: string }) {
   const router = useRouter();
-  const [status, setStatus] = useState<InvitationStatus>("loading");
+  const [status, setStatus] = useState<InvitationStatus>(() => (token ? "loading" : "invalid"));
   const [invitation, setInvitation] = useState<InvitationData | null>(null);
   const [isBusy, setIsBusy] = useState(false);
   const { data: session } = authClient.useSession();
 
   useEffect(() => {
-    if (!token) {
-      setStatus("invalid");
-      return;
-    }
+    if (!token) return;
     authClient.organization.getInvitation({ query: { id: token } }).then(({ data, error }) => {
       if (error || !data) {
         setStatus("invalid");

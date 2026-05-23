@@ -49,8 +49,8 @@ export function SignupForm() {
 
   const { isSubmitting } = form.formState;
 
-  async function onSubmit({ confirmPassword: _, ...values }: SignupFormValues) {
-    const { error } = await authClient.signUp.email(values);
+  async function onSubmit({ name, email, password }: SignupFormValues) {
+    const { error } = await authClient.signUp.email({ name, email, password });
     if (error) {
       toast.error(error.message ?? "Sign-up failed. Please try again.");
       return;

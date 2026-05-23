@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -41,7 +41,7 @@ export function CreateOrgForm() {
     defaultValues: { name: "", slug: "" },
   });
 
-  const nameValue = form.watch("name");
+  const nameValue = useWatch({ control: form.control, name: "name", defaultValue: "" });
 
   useEffect(() => {
     form.setValue("slug", toSlug(nameValue), { shouldValidate: false });

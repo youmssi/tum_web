@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { IMessage } from "@stomp/stompjs";
 
 import { stompManager } from "./stomp-client";
 import { env } from "./env";
 
-export function useStompSubscription(
-  topic: string | null,
-  onMessage: (msg: IMessage) => void,
-) {
+export function useStompSubscription(topic: string | null, onMessage: (msg: IMessage) => void) {
   const callbackRef = useRef(onMessage);
-  callbackRef.current = onMessage;
+  useLayoutEffect(() => {
+    callbackRef.current = onMessage;
+  });
 
   useEffect(() => {
     if (!topic) return;
