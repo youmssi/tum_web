@@ -15,6 +15,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <SidebarProvider>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
+      >
+        Skip to content
+      </a>
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
@@ -23,7 +29,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <NotificationCenter />
           </div>
         </header>
-        <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>
+        <main id="main-content" className="flex-1 overflow-auto p-4 md:p-6">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
