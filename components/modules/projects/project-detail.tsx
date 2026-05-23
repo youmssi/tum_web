@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
 import { ActivityFeed } from "@/components/modules/activity";
+import { ProjectDashboard } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
@@ -146,30 +147,7 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsList>
 
         <TabsContent value="overview" className="mt-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-xl border p-4">
-              <p className="text-xs text-muted-foreground">Status</p>
-              <p className="mt-1 text-sm font-medium">
-                {project.archived ? "Archived" : "Active"}
-              </p>
-            </div>
-            <div className="rounded-xl border p-4">
-              <p className="text-xs text-muted-foreground">Access</p>
-              <p className="mt-1 text-sm font-medium">
-                {project.memberRestricted ? "Members only" : "Org-wide"}
-              </p>
-            </div>
-            <div className="rounded-xl border p-4">
-              <p className="text-xs text-muted-foreground">Created</p>
-              <p className="mt-1 text-sm font-medium">
-                {new Date(project.createdAt).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-          </div>
+          <ProjectDashboard projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="list" className="mt-4">

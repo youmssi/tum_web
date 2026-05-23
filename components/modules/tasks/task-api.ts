@@ -73,6 +73,9 @@ export const taskApi = {
   reschedule: (id: string, data: { startDate?: string | null; endDate?: string | null }) =>
     api.patch(`api/tasks/${id}/schedule`, { json: data }).json<Task>(),
 
+  myWork: () =>
+    api.get("api/tasks", { searchParams: { assignee: "me" } }).json<Task[]>(),
+
   remove: async (id: string) => {
     await api.delete(`api/tasks/${id}`);
   },
