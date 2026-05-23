@@ -6,6 +6,7 @@ import {
   FolderKanbanIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  ShieldIcon,
   SettingsIcon,
   UserIcon,
   UsersIcon,
@@ -34,6 +35,11 @@ const NAV_ITEMS = [
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  const { data: session } = authClient.useSession();
+  const currentRole =
+    activeOrg?.members.find((m) => m.userId === session?.user?.id)?.role ?? "member";
+  const isAdmin = currentRole === "owner" || currentRole === "admin";
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -65,6 +71,20 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <SidebarMenu>
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.startsWith(ROUTES.ORGANIZATION_AUDIT)}
+                tooltip="Audit log"
+              >
+                <Link href={ROUTES.ORGANIZATION_AUDIT}>
+                  <ShieldIcon />
+                  <span>Audit log</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
