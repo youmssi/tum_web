@@ -1,22 +1,22 @@
 import { api } from "@/lib/api-client";
 
-export type FileTargetType = "TASK" | "COMMENT" | "PROFILE" | "ORG";
+export type FileTargetType = "TASK" | "COMMENT" | "PROFILE" | "ORG_LOGO";
 
 export interface AttachedFile {
   id: string;
   organizationId: string;
   ownerId: string;
-  targetType: FileTargetType;
-  targetId: string;
+  entityType: FileTargetType;
+  entityId: string;
   fileName: string;
   contentType: string;
-  size: number;
+  sizeBytes: number;
   status: "PENDING" | "AVAILABLE";
   createdAt: string;
 }
 
 interface PresignResponse {
-  fileId: string;
+  id: string;
   uploadUrl: string;
 }
 
@@ -26,17 +26,17 @@ interface DownloadUrlResponse {
 
 export const fileApi = {
   presign: (data: {
-    targetType: FileTargetType;
-    targetId: string;
+    entityType: FileTargetType;
+    entityId: string;
     fileName: string;
     contentType: string;
-    size: number;
+    sizeBytes: number;
   }) => api.post("api/files/presign", { json: data }).json<PresignResponse>(),
 
   confirm: (fileId: string) => api.post(`api/files/${fileId}/confirm`).json<AttachedFile>(),
 
-  listForTarget: (targetType: FileTargetType, targetId: string) =>
-    api.get("api/files", { searchParams: { targetType, targetId } }).json<AttachedFile[]>(),
+  listForEntity: (entityType: FileTargetType, entityId: string) =>
+    api.get("api/files", { searchParams: { entityType, entityId } }).json<AttachedFile[]>(),
 
   downloadUrl: (fileId: string) =>
     api.get(`api/files/${fileId}/download-url`).json<DownloadUrlResponse>(),
