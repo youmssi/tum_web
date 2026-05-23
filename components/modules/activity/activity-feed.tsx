@@ -5,7 +5,7 @@ import { ActivityIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
-import { useTasks } from "@/components/modules/tasks";
+import { STATUS_LABELS, type TaskStatus, useTasks } from "@/components/modules/tasks";
 import { type ActivityAction, type Activity } from "./activity-api";
 import { useActivity } from "./use-activity";
 
@@ -33,11 +33,13 @@ function ActivityItem({
   actorName,
   actorInitials,
   targetTitle,
+  detail,
 }: {
   entry: Activity;
   actorName: string;
   actorInitials: string;
   targetTitle: string;
+  detail: string | null;
 }) {
   return (
     <div className="flex gap-3">
@@ -49,9 +51,7 @@ function ActivityItem({
           <span className="font-medium">{actorName}</span>{" "}
           <span className="text-muted-foreground">{ACTION_VERB[entry.action]}</span>{" "}
           <span className="font-medium">{targetTitle}</span>
-          {entry.detail && (
-            <span className="text-muted-foreground"> · {entry.detail}</span>
-          )}
+          {detail && <span className="text-muted-foreground"> · {detail}</span>}
         </p>
         <p className="text-xs text-muted-foreground">{relativeTime(entry.createdAt)}</p>
       </div>
@@ -101,6 +101,18 @@ export function ActivityFeed({ projectId }: { projectId: string }) {
     );
   }
 
+  function resolvedDetail(entry: Activity): string | null {
+    if (!entry.detail) return null;
+    switch (entry.action) {
+      case "TASK_STATUS_CHANGED":
+        return STATUS_LABELS[entry.detail as TaskStatus] ?? entry.detail;
+      case "TASK_ASSIGNED":
+        return memberName(entry.detail);
+      default:
+        return null;
+    }
+  }
+
   return (
     <div className="space-y-4">
       {entries.map((entry) => {
@@ -112,6 +124,7 @@ export function ActivityFeed({ projectId }: { projectId: string }) {
             actorName={name}
             actorInitials={name.slice(0, 2).toUpperCase()}
             targetTitle={taskTitle(entry.targetId)}
+            detail={resolvedDetail(entry)}
           />
         );
       })}
