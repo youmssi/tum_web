@@ -2,6 +2,7 @@ import ky from "ky";
 
 import { ROUTES } from "@/lib/constants";
 import { env } from "@/lib/env";
+import { parseApiError } from "@/lib/api-error";
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
@@ -50,6 +51,10 @@ export const api = ky.create({
           if (typeof window !== "undefined") {
             window.location.href = ROUTES.LOGIN;
           }
+          return;
+        }
+        if (!response.ok) {
+          throw await parseApiError(response.clone());
         }
       },
     ],
