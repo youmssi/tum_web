@@ -56,8 +56,7 @@ export const PRIORITY_LABELS: Record<TaskPriority, string> = {
 };
 
 export const taskApi = {
-  listForProject: (projectId: string) =>
-    api.get(`api/projects/${projectId}/tasks`).json<Task[]>(),
+  listForProject: (projectId: string) => api.get(`api/projects/${projectId}/tasks`).json<Task[]>(),
 
   get: (id: string) => api.get(`api/tasks/${id}`).json<Task>(),
 
@@ -73,8 +72,12 @@ export const taskApi = {
   reschedule: (id: string, data: { startDate?: string | null; endDate?: string | null }) =>
     api.patch(`api/tasks/${id}/schedule`, { json: data }).json<Task>(),
 
-  myWork: () =>
-    api.get("api/tasks", { searchParams: { assignee: "me" } }).json<Task[]>(),
+  myWork: async (): Promise<Task[]> => {
+    const data = await api
+      .get("api/tasks", { searchParams: { assignee: "me" } })
+      .json<{ content: Task[] }>();
+    return data.content;
+  },
 
   remove: async (id: string) => {
     await api.delete(`api/tasks/${id}`);

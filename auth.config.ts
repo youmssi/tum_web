@@ -5,10 +5,12 @@ import { Pool } from "pg";
 // This file is the single source of truth for the Better Auth config.
 // It intentionally has no `server-only` import so the CLI can use it for migrations.
 // App code must import from `lib/auth.ts` (which re-exports with the server-only guard).
+
+// Shared pool so definePayload can query member roles without a second connection.
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
+  database: pool,
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
@@ -64,7 +66,29 @@ export const auth = betterAuth({
       },
     }),
     jwt({
-      jwt: { expirationTime: "1h" },
+      jwt: {
+        expirationTime: "1h",
+        definePayload: async ({ user, session }) => {
+          const orgId =
+            (session as unknown as { activeOrganizationId?: string }).activeOrganizationId ?? null;
+
+          let roles: string[] = [];
+          if (orgId) {
+            try {
+              const result = await pool.query<{ role: string }>(
+                'SELECT role FROM "member" WHERE user_id = $1 AND organization_id = $2 LIMIT 1',
+                [user.id, orgId],
+              );
+              const role = result.rows[0]?.role;
+              if (role) roles = [role];
+            } catch {
+              // non-fatal: roles stays empty, user gets no admin authority
+            }
+          }
+
+          return { org: orgId, roles };
+        },
+      },
       jwks: { keyPairConfig: { alg: "RS256" } },
     }),
   ],

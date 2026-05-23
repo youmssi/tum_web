@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { clearTokenCache } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -58,6 +59,7 @@ export function CreateOrgForm() {
       toast.error(error.message ?? "Failed to create organisation.");
       return;
     }
+    clearTokenCache();
     router.push(ROUTES.DASHBOARD);
     router.refresh();
   }
