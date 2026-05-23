@@ -39,6 +39,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
 import { CommentThread } from "@/components/modules/comments";
+import { AttachmentList, FileUpload } from "@/components/modules/files";
 import {
   useCreateDependency,
   useDeleteDependency,
@@ -435,6 +436,12 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
             </div>
           );
         })()}
+
+        <div className="mt-6 space-y-3">
+          <p className="text-sm font-medium">Attachments</p>
+          <AttachmentList targetType="TASK" targetId={task.id} />
+          <FileUpload targetType="TASK" targetId={task.id} />
+        </div>
 
         <Separator className="my-6" />
 
