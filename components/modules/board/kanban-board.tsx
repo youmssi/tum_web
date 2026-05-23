@@ -14,7 +14,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,9 +34,11 @@ type ColumnMap = Record<TaskStatus, string[]>;
 
 function buildColumns(tasks: Task[]): ColumnMap {
   const cols: ColumnMap = { TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] };
-  [...tasks].sort((a, b) => a.orderIndex - b.orderIndex).forEach((t) => {
-    cols[t.status].push(t.id);
-  });
+  [...tasks]
+    .sort((a, b) => a.orderIndex - b.orderIndex)
+    .forEach((t) => {
+      cols[t.status].push(t.id);
+    });
   return cols;
 }
 
@@ -45,27 +47,26 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
   const moveTask = useMoveTask(projectId);
 
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [cols, setCols] = useState<ColumnMap>({ TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] });
+
+  // Derive column layout from server data; keep drag mutations in separate state
+  // so server refreshes never clobber an in-progress drag.
+  const serverCols = useMemo(() => buildColumns(tasks ?? []), [tasks]);
+  const [dragCols, setDragCols] = useState<ColumnMap | null>(null);
+  const cols = activeId ? (dragCols ?? serverCols) : serverCols;
   const colsRef = useRef<ColumnMap>(cols);
+  useLayoutEffect(() => {
+    colsRef.current = cols;
+  });
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const updateCols = (next: ColumnMap) => {
     colsRef.current = next;
-    setCols(next);
+    setDragCols(next);
   };
 
-  useEffect(() => {
-    if (tasks && !activeId) {
-      updateCols(buildColumns(tasks));
-    }
-  }, [tasks, activeId]);
-
-  const taskMap = useMemo(
-    () => Object.fromEntries((tasks ?? []).map((t) => [t.id, t])),
-    [tasks],
-  );
+  const taskMap = useMemo(() => Object.fromEntries((tasks ?? []).map((t) => [t.id, t])), [tasks]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
@@ -109,7 +110,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
   async function onDragEnd({ active, over }: DragEndEvent) {
     setActiveId(null);
     if (!over) {
-      if (tasks) updateCols(buildColumns(tasks));
+      setDragCols(null);
       return;
     }
 
@@ -120,7 +121,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     const toCol = findContainer(overId);
 
     if (!fromCol) {
-      if (tasks) updateCols(buildColumns(tasks));
+      setDragCols(null);
       return;
     }
 
@@ -142,9 +143,10 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 
     try {
       await moveTask.mutateAsync({ id: activeId, status: fromCol, afterTaskId });
+      setDragCols(null);
     } catch {
       toast.error("Failed to move task.");
-      if (tasks) updateCols(buildColumns(tasks));
+      setDragCols(null);
     }
   }
 
@@ -185,9 +187,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
             />
           ))}
         </div>
-        <DragOverlay>
-          {activeTask && <TaskCard task={activeTask} isOverlay />}
-        </DragOverlay>
+        <DragOverlay>{activeTask && <TaskCard task={activeTask} isOverlay />}</DragOverlay>
       </DndContext>
 
       <TaskDetailSheet

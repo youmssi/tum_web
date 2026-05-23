@@ -27,15 +27,6 @@ import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
 import { authClient } from "@/lib/auth-client";
 import { useProject, useToggleArchive } from "./use-projects";
 
-function PlaceholderTab({ label, epic }: { label: string; epic: string }) {
-  return (
-    <div className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-      <p className="text-sm font-medium">{label}</p>
-      <p className="text-xs text-muted-foreground">Coming in {epic}</p>
-    </div>
-  );
-}
-
 export function ProjectDetail({ id }: { id: string }) {
   const router = useRouter();
   const { data: project, isLoading } = useProject(id);

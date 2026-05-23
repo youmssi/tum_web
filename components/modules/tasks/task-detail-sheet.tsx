@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2Icon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -30,12 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
 import { CommentThread } from "@/components/modules/comments";
@@ -144,7 +139,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   }
 
   const labelInputRef = useRef<HTMLInputElement>(null);
-  const labels = form.watch("labels");
+  const labels = useWatch({ control: form.control, name: "labels", defaultValue: [] });
 
   function addLabel(value: string) {
     const trimmed = value.trim();
@@ -153,7 +148,10 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   }
 
   function removeLabel(label: string) {
-    form.setValue("labels", labels.filter((l) => l !== label));
+    form.setValue(
+      "labels",
+      labels.filter((l) => l !== label),
+    );
   }
 
   if (!task) return null;
@@ -353,89 +351,90 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
           </FieldGroup>
         </form>
 
-        {task && (() => {
-          const predecessors = (deps ?? []).filter((d) => d.toTaskId === task.id);
-          const predecessorIds = new Set(predecessors.map((d) => d.fromTaskId));
-          const available = (allTasks ?? []).filter(
-            (t) => t.id !== task.id && !predecessorIds.has(t.id),
-          );
+        {task &&
+          (() => {
+            const predecessors = (deps ?? []).filter((d) => d.toTaskId === task.id);
+            const predecessorIds = new Set(predecessors.map((d) => d.fromTaskId));
+            const available = (allTasks ?? []).filter(
+              (t) => t.id !== task.id && !predecessorIds.has(t.id),
+            );
 
-          async function handleAddDep() {
-            if (!newPredecessorId || !task) return;
-            try {
-              await createDep.mutateAsync({
-                fromTaskId: newPredecessorId,
-                toTaskId: task.id,
-                type: "FINISH_TO_START",
-              });
-              setNewPredecessorId("");
-            } catch {
-              toast.error("Cannot add dependency — would create a cycle or already exists.");
+            async function handleAddDep() {
+              if (!newPredecessorId || !task) return;
+              try {
+                await createDep.mutateAsync({
+                  fromTaskId: newPredecessorId,
+                  toTaskId: task.id,
+                  type: "FINISH_TO_START",
+                });
+                setNewPredecessorId("");
+              } catch {
+                toast.error("Cannot add dependency — would create a cycle or already exists.");
+              }
             }
-          }
 
-          return (
-            <div className="mt-6 space-y-3">
-              <p className="text-sm font-medium">Dependencies</p>
-              {predecessors.length > 0 && (
-                <div className="space-y-1">
-                  {predecessors.map((dep) => {
-                    const pred = allTasks?.find((t) => t.id === dep.fromTaskId);
-                    return (
-                      <div
-                        key={dep.id}
-                        className="flex items-center justify-between gap-2 rounded-md border px-3 py-2"
-                      >
-                        <span className="text-sm line-clamp-1">
-                          {pred?.title ?? dep.fromTaskId}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 size-6"
-                          disabled={deleteDep.isPending}
-                          onClick={() =>
-                            deleteDep.mutate({
-                              id: dep.id,
-                              fromTaskId: dep.fromTaskId,
-                              toTaskId: dep.toTaskId,
-                            })
-                          }
+            return (
+              <div className="mt-6 space-y-3">
+                <p className="text-sm font-medium">Dependencies</p>
+                {predecessors.length > 0 && (
+                  <div className="space-y-1">
+                    {predecessors.map((dep) => {
+                      const pred = allTasks?.find((t) => t.id === dep.fromTaskId);
+                      return (
+                        <div
+                          key={dep.id}
+                          className="flex items-center justify-between gap-2 rounded-md border px-3 py-2"
                         >
-                          <XIcon className="size-3" />
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {available.length > 0 && (
-                <div className="flex gap-2">
-                  <Select value={newPredecessorId} onValueChange={setNewPredecessorId}>
-                    <SelectTrigger className="flex-1 text-sm">
-                      <SelectValue placeholder="Depends on…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {available.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>
-                          {t.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!newPredecessorId || createDep.isPending}
-                    onClick={handleAddDep}
-                  >
-                    Add
-                  </Button>
-                </div>
-              )}
-            </div>
-          );
-        })()}
+                          <span className="text-sm line-clamp-1">
+                            {pred?.title ?? dep.fromTaskId}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 size-6"
+                            disabled={deleteDep.isPending}
+                            onClick={() =>
+                              deleteDep.mutate({
+                                id: dep.id,
+                                fromTaskId: dep.fromTaskId,
+                                toTaskId: dep.toTaskId,
+                              })
+                            }
+                          >
+                            <XIcon className="size-3" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {available.length > 0 && (
+                  <div className="flex gap-2">
+                    <Select value={newPredecessorId} onValueChange={setNewPredecessorId}>
+                      <SelectTrigger className="flex-1 text-sm">
+                        <SelectValue placeholder="Depends on…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {available.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={!newPredecessorId || createDep.isPending}
+                      onClick={handleAddDep}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
         <div className="mt-6 space-y-3">
           <p className="text-sm font-medium">Attachments</p>

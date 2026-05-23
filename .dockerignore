@@ -1,0 +1,13 @@
+.git
+.gitignore
+.husky
+.next
+.env*
+!.env.example
+node_modules
+*.md
+*.log
+Dockerfile
+.dockerignore
+.github
+coverage
