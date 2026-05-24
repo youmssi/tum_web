@@ -28,7 +28,7 @@ export function OrgSwitcher() {
     const { error } = await authClient.organization.setActive({ organizationId: orgId });
     if (error) return;
     clearTokenCache();
-    router.refresh();
+    router.push(ROUTES.DASHBOARD);
   }
 
   if (isPending) {
