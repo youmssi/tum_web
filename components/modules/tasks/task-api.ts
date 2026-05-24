@@ -55,10 +55,24 @@ export const PRIORITY_LABELS: Record<TaskPriority, string> = {
   URGENT: "Urgent",
 };
 
+export type BulkAction = "UPDATE" | "DELETE";
+
+export interface BulkTaskPayload {
+  ids: string[];
+  action: BulkAction;
+  status?: TaskStatus;
+  assigneeId?: string;
+}
+
 export const taskApi = {
   listForProject: (projectId: string) => api.get(`api/projects/${projectId}/tasks`).json<Task[]>(),
 
   get: (id: string) => api.get(`api/tasks/${id}`).json<Task>(),
+
+  search: async (q: string): Promise<Task[]> => {
+    const data = await api.get("api/tasks", { searchParams: { q } }).json<{ content: Task[] }>();
+    return data.content;
+  },
 
   create: (projectId: string, data: CreateTaskPayload) =>
     api.post(`api/projects/${projectId}/tasks`, { json: data }).json<Task>(),
@@ -71,6 +85,10 @@ export const taskApi = {
 
   reschedule: (id: string, data: { startDate?: string | null; endDate?: string | null }) =>
     api.patch(`api/tasks/${id}/schedule`, { json: data }).json<Task>(),
+
+  bulk: async (data: BulkTaskPayload): Promise<void> => {
+    await api.patch("api/tasks/bulk", { json: data });
+  },
 
   myWork: async (): Promise<Task[]> => {
     const data = await api

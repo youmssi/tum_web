@@ -10,6 +10,7 @@ export type {
   UpdateTaskPayload,
 } from "./task-api";
 export { taskApi, STATUS_LABELS, PRIORITY_LABELS } from "./task-api";
+export type { BulkTaskPayload } from "./task-api";
 export {
   TASK_KEYS,
   useMyTasks,
@@ -20,4 +21,5 @@ export {
   useRescheduleTask,
   useMoveTask,
   useDeleteTask,
+  useBulkUpdateTasks,
 } from "./use-tasks";

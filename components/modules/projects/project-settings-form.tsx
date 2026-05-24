@@ -1,12 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2Icon } from "lucide-react";
+import { RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import { useTimelineColors } from "@/components/modules/timeline/timeline-colors-store";
 
 import {
   AlertDialog,
@@ -43,6 +45,8 @@ export function ProjectSettingsForm({ id }: { id: string }) {
   const { data: project, isLoading } = useProject(id);
   const updateProject = useUpdateProject(id);
   const deleteProject = useDeleteProject();
+  const { getConfig, setConfig, resetConfig } = useTimelineColors();
+  const colorConfig = getConfig(id);
 
   const form = useForm<SettingsValues>({
     resolver: zodResolver(settingsSchema),
@@ -63,7 +67,11 @@ export function ProjectSettingsForm({ id }: { id: string }) {
 
   async function onSubmit({ name, description, memberRestricted }: SettingsValues) {
     try {
-      await updateProject.mutateAsync({ name, description: description || undefined, memberRestricted });
+      await updateProject.mutateAsync({
+        name,
+        description: description || undefined,
+        memberRestricted,
+      });
       toast.success("Project settings saved.");
     } catch {
       toast.error("Failed to save settings.");
@@ -168,6 +176,104 @@ export function ProjectSettingsForm({ id }: { id: string }) {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      <Separator className="max-w-lg" />
+
+      <Card className="max-w-lg">
+        <CardHeader>
+          <CardTitle>Timeline colors</CardTitle>
+          <CardDescription>
+            Customize how Gantt bars are colored based on due-date proximity.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">On track</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colorConfig.onTrackColor}
+                  onChange={(e) => setConfig(id, { ...colorConfig, onTrackColor: e.target.value })}
+                  className="h-9 w-full cursor-pointer rounded-md border px-1 py-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Tasks with time to spare</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Near due</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colorConfig.nearDueColor}
+                  onChange={(e) => setConfig(id, { ...colorConfig, nearDueColor: e.target.value })}
+                  className="h-9 w-full cursor-pointer rounded-md border px-1 py-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Due within</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Overdue</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colorConfig.overdueColor}
+                  onChange={(e) => setConfig(id, { ...colorConfig, overdueColor: e.target.value })}
+                  className="h-9 w-full cursor-pointer rounded-md border px-1 py-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Past due date</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium">&ldquo;Near due&rdquo; threshold</label>
+            <input
+              type="number"
+              min={1}
+              max={14}
+              value={colorConfig.nearDueDays}
+              onChange={(e) =>
+                setConfig(id, {
+                  ...colorConfig,
+                  nearDueDays: Math.max(1, Math.min(14, Number(e.target.value))),
+                })
+              }
+              className="w-16 rounded-md border px-2 py-1 text-sm"
+            />
+            <span className="text-sm text-muted-foreground">days</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-3">
+              {[
+                { label: "On track", color: colorConfig.onTrackColor },
+                { label: "Near due", color: colorConfig.nearDueColor },
+                { label: "Overdue", color: colorConfig.overdueColor },
+              ].map(({ label, color }) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <span
+                    className="inline-block size-3 rounded-sm"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="ml-auto text-xs"
+              onClick={() => {
+                resetConfig(id);
+                toast.success("Colors reset to defaults.");
+              }}
+            >
+              <RotateCcwIcon className="mr-1 size-3" />
+              Reset defaults
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

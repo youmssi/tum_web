@@ -4,13 +4,14 @@ import { redirect } from "next/navigation";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/modules/shell/app-nav";
 import { NotificationCenter } from "@/components/modules/notifications";
+import { CommandPalette } from "@/components/modules/search/command-palette";
 import { auth } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.session.activeOrganizationId) {
-    redirect(ROUTES.ONBOARDING);
+    redirect(ROUTES.WORKSPACES);
   }
 
   return (
@@ -33,6 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </SidebarInset>
+      <CommandPalette />
     </SidebarProvider>
   );
 }

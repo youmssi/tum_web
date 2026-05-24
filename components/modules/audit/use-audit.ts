@@ -11,5 +11,6 @@ export function useAuditLog(params: AuditParams) {
     queryKey: AUDIT_KEYS.list(params),
     queryFn: () => auditApi.list(params),
     placeholderData: (prev) => prev,
+    retry: 1,
   });
 }

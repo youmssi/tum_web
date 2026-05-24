@@ -54,7 +54,7 @@ export function AuditLog() {
 
   const [params, setParams] = useState<AuditParams>({ page: 1, pageSize: PAGE_SIZE });
 
-  const { data, isLoading, isFetching } = useAuditLog(canView ? params : {});
+  const { data, isLoading, isFetching, isError, error } = useAuditLog(canView ? params : {});
 
   function setAction(value: string) {
     setParams((p) => ({ ...p, action: value === "__all__" ? undefined : value, page: 1 }));
@@ -110,6 +110,16 @@ export function AuditLog() {
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full" />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-destructive/40">
+          <ShieldAlertIcon className="size-8 text-destructive" />
+          <p className="text-sm font-medium text-destructive">Failed to load audit log</p>
+          <p className="text-xs text-muted-foreground">
+            {error instanceof Error
+              ? error.message
+              : "An unexpected error occurred. Check your permissions."}
+          </p>
         </div>
       ) : !entries.length ? (
         <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">

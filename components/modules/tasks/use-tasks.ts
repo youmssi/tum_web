@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { type CreateTaskPayload, type TaskStatus, type UpdateTaskPayload, taskApi } from "./task-api";
+import {
+  type BulkTaskPayload,
+  type CreateTaskPayload,
+  type TaskStatus,
+  type UpdateTaskPayload,
+  taskApi,
+} from "./task-api";
 
 export const TASK_KEYS = {
   all: ["tasks"] as const,
@@ -45,8 +51,7 @@ export function useCreateTask(projectId: string) {
 export function useUpdateTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTaskPayload }) =>
-      taskApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateTaskPayload }) => taskApi.update(id, data),
     onSuccess: (updated) => {
       qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
       qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(updated.projectId) });
@@ -98,6 +103,17 @@ export function useDeleteTask(projectId: string) {
     mutationFn: (id: string) => taskApi.remove(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
+    },
+  });
+}
+
+export function useBulkUpdateTasks(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: BulkTaskPayload) => taskApi.bulk(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
+      qc.invalidateQueries({ queryKey: TASK_KEYS.all });
     },
   });
 }
