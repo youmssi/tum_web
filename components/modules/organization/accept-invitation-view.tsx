@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { clearTokenCache } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
@@ -24,6 +25,7 @@ interface InvitationData {
 export function AcceptInvitationView({ token }: { token?: string }) {
   const router = useRouter();
   const [status, setStatus] = useState<InvitationStatus>(() => (token ? "loading" : "invalid"));
+  const [pasteInput, setPasteInput] = useState("");
   const [invitation, setInvitation] = useState<InvitationData | null>(null);
   const [isBusy, setIsBusy] = useState(false);
   const { data: session } = authClient.useSession();
@@ -45,6 +47,20 @@ export function AcceptInvitationView({ token }: { token?: string }) {
       setStatus("ready");
     });
   }, [token]);
+
+  function handlePasteSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const input = pasteInput.trim();
+    if (!input) return;
+    let extracted = input;
+    try {
+      const url = new URL(input);
+      extracted = url.searchParams.get("token") ?? input;
+    } catch {
+      // not a URL — use raw value as token
+    }
+    router.push(`${ROUTES.INVITATIONS_ACCEPT}?token=${encodeURIComponent(extracted)}`);
+  }
 
   async function handleAccept() {
     if (!token) return;
@@ -95,6 +111,41 @@ export function AcceptInvitationView({ token }: { token?: string }) {
   }
 
   if (status === "invalid") {
+    if (!token) {
+      return (
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Pending invitations</CardTitle>
+            <CardDescription>
+              Paste the invitation link from your email to accept or decline it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handlePasteSubmit} className="space-y-3">
+              <Input
+                autoFocus
+                placeholder="https://…/invitations/accept?token=…"
+                value={pasteInput}
+                onChange={(e) => setPasteInput(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <Button type="submit" disabled={!pasteInput.trim()} className="flex-1">
+                  Continue
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push(ROUTES.WORKSPACES)}
+                >
+                  Back
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      );
+    }
+
     return (
       <Card className="w-full max-w-md text-center">
         <CardHeader>

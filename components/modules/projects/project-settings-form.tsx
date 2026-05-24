@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RotateCcwIcon, Trash2Icon } from "lucide-react";
+import { ArrowLeftIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -102,6 +103,12 @@ export function ProjectSettingsForm({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div>
+        <Button variant="ghost" size="sm" className="-ml-2 mb-2 text-muted-foreground" asChild>
+          <Link href={`/projects/${id}`}>
+            <ArrowLeftIcon className="mr-1 size-4" />
+            Back to project
+          </Link>
+        </Button>
         <h1 className="text-xl font-semibold">Project settings</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage settings for <span className="font-medium">{project?.name}</span>.

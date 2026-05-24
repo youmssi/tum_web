@@ -4,6 +4,7 @@ import {
   ActivityIcon,
   ArchiveIcon,
   ArchiveRestoreIcon,
+  ArrowLeftIcon,
   FolderKanbanIcon,
   LayoutListIcon,
   SlidersHorizontalIcon,
@@ -69,6 +70,14 @@ export function ProjectDetail({ id }: { id: string }) {
 
   return (
     <div className="space-y-6">
+      <div>
+        <Button variant="ghost" size="sm" className="-ml-2 mb-2 text-muted-foreground" asChild>
+          <Link href={ROUTES.PROJECTS}>
+            <ArrowLeftIcon className="mr-1 size-4" />
+            Projects
+          </Link>
+        </Button>
+      </div>
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">

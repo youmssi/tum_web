@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { clearTokenCache } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -24,6 +25,7 @@ export function WorkspacePicker() {
       setActivating(null);
       return;
     }
+    clearTokenCache();
     router.push(ROUTES.DASHBOARD);
   }
 

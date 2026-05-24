@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 export default async function OnboardingPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect(ROUTES.LOGIN);
-  if (session.session.activeOrganizationId) redirect(ROUTES.DASHBOARD);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
