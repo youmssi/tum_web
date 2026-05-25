@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { clearTokenCache } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
+import { clearOrgCache } from "@/lib/org-switch";
 
 type UserInvitation = {
   id: string;
@@ -63,7 +63,7 @@ function InvitationInbox() {
       (data as { member?: { organizationId?: string } })?.member?.organizationId ??
       inv.organizationId;
     if (orgId) await authClient.organization.setActive({ organizationId: orgId });
-    clearTokenCache();
+    clearOrgCache();
     router.push(ROUTES.DASHBOARD);
   }
 
@@ -246,7 +246,7 @@ export function AcceptInvitationView({ token }: { token?: string }) {
       (data as { member?: { organizationId?: string } })?.member?.organizationId ??
       invitation?.organizationId;
     if (orgId) await authClient.organization.setActive({ organizationId: orgId });
-    clearTokenCache();
+    clearOrgCache();
     router.push(ROUTES.DASHBOARD);
   }
 

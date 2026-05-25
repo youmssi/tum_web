@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { clearTokenCache } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
+import { clearOrgCache } from "@/lib/org-switch";
 
 export function OrgSwitcher() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export function OrgSwitcher() {
     if (orgId === activeOrg?.id) return;
     const { error } = await authClient.organization.setActive({ organizationId: orgId });
     if (error) return;
-    clearTokenCache();
+    clearOrgCache();
     router.push(ROUTES.DASHBOARD);
   }
 
