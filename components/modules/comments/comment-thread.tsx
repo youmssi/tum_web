@@ -32,6 +32,7 @@ interface CommentInputProps {
 function CommentInput({ taskId, members }: CommentInputProps) {
   const [content, setContent] = useState("");
   const [mention, setMention] = useState<{ query: string; start: number } | null>(null);
+  const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const createComment = useCreateComment(taskId);
 
@@ -43,11 +44,16 @@ function CommentInput({ taskId, members }: CommentInputProps) {
     setMention(match ? { query: match[1], start: cursor - match[0].length } : null);
   }
 
-  function insertMention(name: string) {
+  function insertMention(member: {
+    userId: string;
+    user?: { name?: string | null; email?: string } | null;
+  }) {
     if (!mention || !textareaRef.current) return;
+    const name = member.user?.name ?? member.user?.email ?? member.userId;
     const cursor = textareaRef.current.selectionStart;
     const after = content.slice(cursor);
     setContent(`${content.slice(0, mention.start)}@${name} ${after}`);
+    setMentionedUserIds((prev) => (prev.includes(member.userId) ? prev : [...prev, member.userId]));
     setMention(null);
     textareaRef.current.focus();
   }
@@ -56,9 +62,10 @@ function CommentInput({ taskId, members }: CommentInputProps) {
     const trimmed = content.trim();
     if (!trimmed) return;
     try {
-      await createComment.mutateAsync(trimmed);
+      await createComment.mutateAsync({ content: trimmed, mentionedUserIds });
       setContent("");
       setMention(null);
+      setMentionedUserIds([]);
     } catch {
       toast.error("Failed to post comment.");
     }
@@ -95,7 +102,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
                 className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  insertMention(m.user?.name ?? m.user?.email ?? m.userId);
+                  insertMention(m);
                 }}
               >
                 <Avatar className="size-5">

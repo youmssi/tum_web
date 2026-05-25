@@ -4,6 +4,8 @@ import { CalendarRangeIcon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { useTimelineColors } from "./timeline-colors-store";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,9 +33,20 @@ function formatDate(d: Date): string {
   return d.toISOString().split("T")[0];
 }
 
+function taskColorClass(task: Task, nearDueDays: number): string {
+  if (!task.endDate || task.status === "DONE") return "tum-on-track";
+  const end = new Date(task.endDate).getTime();
+  const now = Date.now();
+  if (end < now) return "tum-overdue";
+  if (end - now < nearDueDays * 86400000) return "tum-near-due";
+  return "tum-on-track";
+}
+
 export function ProjectTimeline({ projectId }: { projectId: string }) {
   const { data: tasks, isLoading } = useTasks(projectId);
   const reschedule = useRescheduleTask(projectId);
+  const { getConfig } = useTimelineColors();
+  const colors = getConfig(projectId);
   const [viewMode, setViewMode] = useState<GanttViewMode>("Week");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -80,8 +93,9 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         end: t.endDate!,
         progress: STATUS_PROGRESS[t.status],
         dependencies: depMap[t.id]?.join(",") ?? "",
+        custom_class: taskColorClass(t, colors.nearDueDays),
       })),
-    [scheduledTasks, depMap],
+    [scheduledTasks, depMap, colors.nearDueDays],
   );
 
   const handleDateChange = useCallback(
@@ -121,17 +135,44 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        {VIEW_MODES.map((mode) => (
-          <Button
-            key={mode}
-            variant={viewMode === mode ? "default" : "outline"}
-            size="sm"
-            onClick={() => setViewMode(mode)}
-          >
-            {mode}
-          </Button>
-        ))}
+      {/* Inject dynamic color CSS for frappe-gantt custom classes */}
+      <style>{`
+        .tum-on-track .bar { fill: ${colors.onTrackColor} !important; }
+        .tum-on-track .bar-progress { fill: color-mix(in srgb, ${colors.onTrackColor} 70%, black) !important; }
+        .tum-near-due .bar { fill: ${colors.nearDueColor} !important; }
+        .tum-near-due .bar-progress { fill: color-mix(in srgb, ${colors.nearDueColor} 70%, black) !important; }
+        .tum-overdue .bar { fill: ${colors.overdueColor} !important; }
+        .tum-overdue .bar-progress { fill: color-mix(in srgb, ${colors.overdueColor} 70%, black) !important; }
+      `}</style>
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {VIEW_MODES.map((mode) => (
+            <Button
+              key={mode}
+              variant={viewMode === mode ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode(mode)}
+            >
+              {mode}
+            </Button>
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          {[
+            { label: "On track", color: colors.onTrackColor },
+            { label: "Near due", color: colors.nearDueColor },
+            { label: "Overdue", color: colors.overdueColor },
+          ].map(({ label, color }) => (
+            <div key={label} className="flex items-center gap-1">
+              <span
+                className="inline-block size-2.5 rounded-sm"
+                style={{ backgroundColor: color }}
+              />
+              <span className="text-xs text-muted-foreground">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {ganttTasks.length > 0 ? (

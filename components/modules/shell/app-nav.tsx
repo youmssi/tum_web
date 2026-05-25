@@ -55,7 +55,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarMenu>
+        <SidebarMenu className="gap-1">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
             <SidebarMenuItem key={href}>
               <SidebarMenuButton asChild isActive={pathname.startsWith(href)} tooltip={label}>
@@ -70,7 +70,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarMenu>
+        <SidebarMenu className="gap-1">
           {isAdmin && (
             <SidebarMenuItem>
               <SidebarMenuButton

@@ -22,7 +22,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { authClient } from "@/lib/auth-client";
-import { AUDIT_ACTION_LABELS, type AuditAction, type AuditParams } from "./audit-api";
+import { STATUS_LABELS } from "@/components/modules/tasks";
+import {
+  AUDIT_ACTION_LABELS,
+  type AuditAction,
+  type AuditEntry,
+  type AuditParams,
+} from "./audit-api";
 import { useAuditLog } from "./use-audit";
 
 const PAGE_SIZE = 25;
@@ -44,17 +50,43 @@ function relativeTime(iso: string): string {
       });
 }
 
+type OrgMember = NonNullable<
+  ReturnType<typeof authClient.useActiveOrganization>["data"]
+>["members"][number];
+
+function resolveMember(userId: string, members: OrgMember[]): string {
+  const m = members.find((mem) => mem.userId === userId);
+  return m?.user?.name ?? m?.user?.email ?? userId.slice(0, 8) + "…";
+}
+
+function renderDetail(entry: AuditEntry, members: OrgMember[]): string {
+  switch (entry.action) {
+    case "TASK_CREATED":
+      return entry.detail ?? "—";
+    case "TASK_STATUS_CHANGED":
+      return entry.detail
+        ? (STATUS_LABELS[entry.detail as keyof typeof STATUS_LABELS] ?? entry.detail)
+        : "—";
+    case "TASK_ASSIGNED":
+      return entry.detail ? resolveMember(entry.detail, members) : "Unassigned";
+    case "COMMENT_ADDED":
+      return "—";
+    default:
+      return entry.detail ?? "—";
+  }
+}
+
 export function AuditLog() {
   const { data: activeOrg } = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
+  const members = activeOrg?.members ?? [];
 
-  const currentRole =
-    activeOrg?.members.find((m) => m.userId === session?.user?.id)?.role ?? "member";
+  const currentRole = members.find((m) => m.userId === session?.user?.id)?.role ?? "member";
   const canView = currentRole === "owner" || currentRole === "admin";
 
   const [params, setParams] = useState<AuditParams>({ page: 1, pageSize: PAGE_SIZE });
 
-  const { data, isLoading, isFetching } = useAuditLog(canView ? params : {});
+  const { data, isLoading, isFetching, isError, error } = useAuditLog(canView ? params : {});
 
   function setAction(value: string) {
     setParams((p) => ({ ...p, action: value === "__all__" ? undefined : value, page: 1 }));
@@ -73,6 +105,7 @@ export function AuditLog() {
 
   const entries = data?.entries ?? [];
   const totalPages = data?.totalPages ?? 1;
+  const total = data?.total ?? 0;
   const page = params.page ?? 1;
 
   return (
@@ -111,6 +144,16 @@ export function AuditLog() {
             <Skeleton key={i} className="h-12 w-full" />
           ))}
         </div>
+      ) : isError ? (
+        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-destructive/40">
+          <ShieldAlertIcon className="size-8 text-destructive" />
+          <p className="text-sm font-medium text-destructive">Failed to load audit log</p>
+          <p className="text-xs text-muted-foreground">
+            {error instanceof Error
+              ? error.message
+              : "An unexpected error occurred. Check your permissions."}
+          </p>
+        </div>
       ) : !entries.length ? (
         <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
           <ShieldAlertIcon className="size-8 text-muted-foreground" />
@@ -121,9 +164,8 @@ export function AuditLog() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Actor</TableHead>
+                <TableHead>Who</TableHead>
                 <TableHead>Action</TableHead>
-                <TableHead>Target</TableHead>
                 <TableHead>Detail</TableHead>
                 <TableHead className="text-right">When</TableHead>
               </TableRow>
@@ -132,7 +174,9 @@ export function AuditLog() {
               {entries.map((entry) => (
                 <TableRow key={entry.id}>
                   <TableCell>
-                    <p className="max-w-32 truncate font-mono text-xs">{entry.actorId}</p>
+                    <p className="max-w-36 truncate text-sm font-medium">
+                      {resolveMember(entry.actorId, members)}
+                    </p>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs">
@@ -140,12 +184,8 @@ export function AuditLog() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <p className="max-w-40 truncate font-mono text-xs">{entry.entityId}</p>
-                    <p className="text-xs text-muted-foreground">{entry.entityType}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p className="max-w-48 truncate text-xs text-muted-foreground">
-                      {entry.detail ?? "—"}
+                    <p className="max-w-64 truncate text-sm text-muted-foreground">
+                      {renderDetail(entry, members)}
                     </p>
                   </TableCell>
                   <TableCell className="text-right">
@@ -163,11 +203,13 @@ export function AuditLog() {
         </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination — always visible once data has loaded */}
+      {!isLoading && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>
-            Page {page} of {totalPages} · {data?.total ?? 0} entries
+            {total > 0
+              ? `Page ${page} of ${totalPages} · ${total} ${total === 1 ? "entry" : "entries"}`
+              : "0 entries"}
           </span>
           <div className="flex gap-2">
             <Button

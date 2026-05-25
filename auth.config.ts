@@ -46,6 +46,7 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
+      requireEmailVerificationOnInvitation: false,
       sendInvitationEmail: async (data) => {
         const url = `${process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/invitations/accept?token=${data.invitation.id}`;
         await fetch(`${process.env.INTERNAL_API_URL ?? "http://localhost:8080"}/internal/email`, {
@@ -78,7 +79,7 @@ export const auth = betterAuth({
           if (orgId) {
             try {
               const result = await pool.query<{ role: string }>(
-                'SELECT role FROM "member" WHERE user_id = $1 AND organization_id = $2 LIMIT 1',
+                'SELECT role FROM member WHERE "userId" = $1 AND "organizationId" = $2 LIMIT 1',
                 [user.id, orgId],
               );
               const role = result.rows[0]?.role;

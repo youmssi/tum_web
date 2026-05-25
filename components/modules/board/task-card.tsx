@@ -2,21 +2,57 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVerticalIcon } from "lucide-react";
+import { CalendarIcon, GripVerticalIcon, UserIcon } from "lucide-react";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PRIORITY_LABELS, type Task, type TaskPriority } from "@/components/modules/tasks";
+import { authClient } from "@/lib/auth-client";
 
-const PRIORITY_VARIANTS: Record<
-  TaskPriority,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  LOW: "secondary",
-  MEDIUM: "outline",
-  HIGH: "default",
-  URGENT: "destructive",
+const PRIORITY_VARIANTS: Record<TaskPriority, "default" | "secondary" | "destructive" | "outline"> =
+  {
+    LOW: "secondary",
+    MEDIUM: "outline",
+    HIGH: "default",
+    URGENT: "destructive",
+  };
+
+const PRIORITY_DOT: Record<TaskPriority, string> = {
+  LOW: "bg-slate-400",
+  MEDIUM: "bg-blue-400",
+  HIGH: "bg-orange-400",
+  URGENT: "bg-red-500",
 };
+
+function isDueSoon(dueDate: string | null): boolean {
+  if (!dueDate) return false;
+  const diff = new Date(dueDate).getTime() - Date.now();
+  return diff > 0 && diff < 3 * 24 * 60 * 60 * 1000;
+}
+
+function isOverdue(dueDate: string | null, status: Task["status"]): boolean {
+  if (!dueDate || status === "DONE") return false;
+  return new Date(dueDate).getTime() < Date.now();
+}
+
+function AssigneeAvatar({ userId }: { userId: string | null }) {
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  if (!userId) {
+    return (
+      <div className="flex size-5 items-center justify-center rounded-full border border-dashed border-muted-foreground/40">
+        <UserIcon className="size-3 text-muted-foreground/40" />
+      </div>
+    );
+  }
+  const member = activeOrg?.members?.find((m) => m.userId === userId);
+  const initials = (member?.user?.name ?? userId).slice(0, 2).toUpperCase();
+  return (
+    <Avatar className="size-5">
+      <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
+    </Avatar>
+  );
+}
 
 interface TaskCardProps {
   task: Task;
@@ -34,51 +70,86 @@ export function TaskCard({ task, isOverlay, onClick }: TaskCardProps) {
     transition,
   };
 
+  const overdue = isOverdue(task.dueDate, task.status);
+  const dueSoon = isDueSoon(task.dueDate);
+
   return (
     <div ref={setNodeRef} style={style} className={isDragging && !isOverlay ? "opacity-40" : ""}>
       <Card
-        className={`select-none ${
-          isOverlay ? "ring-2 ring-ring shadow-lg rotate-1 cursor-grabbing" : "cursor-pointer hover:shadow-sm"
+        className={`group select-none py-0 transition-shadow ${
+          isOverlay
+            ? "rotate-1 cursor-grabbing shadow-xl ring-2 ring-primary"
+            : "cursor-pointer hover:shadow-md"
         }`}
         onClick={() => !isDragging && onClick?.(task)}
       >
-        <CardContent className="p-3 space-y-2">
-          <div className="flex items-start gap-2">
-            <button
-              {...attributes}
-              {...listeners}
-              className="mt-0.5 shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
-              onClick={(e) => e.stopPropagation()}
-              aria-label="Drag to reorder"
-            >
-              <GripVerticalIcon className="size-4" />
-            </button>
-            <p className="text-sm font-medium leading-snug line-clamp-2 flex-1">{task.title}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-1 pl-6">
-            <Badge variant={PRIORITY_VARIANTS[task.priority]} className="text-xs">
-              {PRIORITY_LABELS[task.priority]}
-            </Badge>
-            {task.labels.slice(0, 2).map((l) => (
-              <Badge key={l} variant="secondary" className="text-xs">
-                {l}
-              </Badge>
-            ))}
-            {task.labels.length > 2 && (
-              <Badge variant="secondary" className="text-xs">
-                +{task.labels.length - 2}
-              </Badge>
+        <CardContent className="p-0">
+          {/* Priority bar */}
+          <div
+            className={`h-0.5 w-full rounded-t-[calc(var(--radius)-1px)] ${PRIORITY_DOT[task.priority]}`}
+          />
+
+          <div className="space-y-2 p-3">
+            {/* Labels */}
+            {task.labels.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {task.labels.slice(0, 3).map((l) => (
+                  <Badge key={l} variant="secondary" className="px-1.5 py-0 text-[10px]">
+                    {l}
+                  </Badge>
+                ))}
+                {task.labels.length > 3 && (
+                  <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                    +{task.labels.length - 3}
+                  </Badge>
+                )}
+              </div>
             )}
+
+            {/* Title + drag handle */}
+            <div className="flex items-start gap-1.5">
+              <button
+                {...attributes}
+                {...listeners}
+                className="mt-0.5 shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground/0 transition-colors hover:text-muted-foreground group-hover:text-muted-foreground/60"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Drag to reorder"
+              >
+                <GripVerticalIcon className="size-3.5" />
+              </button>
+              <p className="flex-1 text-sm font-medium leading-snug line-clamp-2">{task.title}</p>
+            </div>
+
+            {/* Footer: due date + priority + assignee */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={PRIORITY_VARIANTS[task.priority]}
+                  className="px-1.5 py-0 text-[10px]"
+                >
+                  {PRIORITY_LABELS[task.priority]}
+                </Badge>
+                {task.dueDate && (
+                  <span
+                    className={`flex items-center gap-0.5 text-[10px] font-medium ${
+                      overdue
+                        ? "text-destructive"
+                        : dueSoon
+                          ? "text-orange-500"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    <CalendarIcon className="size-3" />
+                    {new Date(task.dueDate).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                )}
+              </div>
+              <AssigneeAvatar userId={task.assigneeId} />
+            </div>
           </div>
-          {task.dueDate && (
-            <p className="pl-6 text-xs text-muted-foreground">
-              Due{" "}
-              {new Date(task.dueDate).toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-            </p>
-          )}
         </CardContent>
       </Card>
     </div>

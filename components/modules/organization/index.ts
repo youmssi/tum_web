@@ -5,3 +5,4 @@ export { InviteMemberDialog } from "./invite-member-dialog";
 export { MemberList } from "./member-list";
 export { OrgSettingsForm } from "./org-settings-form";
 export { OrgSwitcher } from "./org-switcher";
+export { WorkspacePicker } from "./workspace-picker";

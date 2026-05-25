@@ -17,7 +17,8 @@ export function useComments(taskId: string | undefined) {
 export function useCreateComment(taskId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (content: string) => commentApi.create(taskId, content),
+    mutationFn: ({ content, mentionedUserIds }: { content: string; mentionedUserIds?: string[] }) =>
+      commentApi.create(taskId, content, mentionedUserIds),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: COMMENT_KEYS.forTask(taskId) });
     },

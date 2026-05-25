@@ -18,6 +18,7 @@ interface ProjectDashboardResponse {
   byPriority: Record<string, number>;
   overdueCount: number;
   completionPct: number;
+  completionTrend?: TrendPoint[];
 }
 
 export const analyticsApi = {
@@ -29,7 +30,7 @@ export const analyticsApi = {
       totalTasks: data.totalTasks,
       completedTasks: data.byStatus?.DONE ?? 0,
       overdueTasks: data.overdueCount,
-      completionTrend: [],
+      completionTrend: data.completionTrend ?? [],
     };
   },
 };
