@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type BulkTaskPayload,
   type CreateTaskPayload,
+  type Task,
   type TaskStatus,
   type UpdateTaskPayload,
   taskApi,
@@ -102,6 +103,52 @@ export function useDeleteTask(projectId: string) {
   return useMutation({
     mutationFn: (id: string) => taskApi.remove(id),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
+    },
+  });
+}
+
+export function useUpdateProgress(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ task, progress }: { task: Task; progress: number }) =>
+      taskApi.update(task.id, {
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        assigneeId: task.assigneeId,
+        dueDate: task.dueDate,
+        labels: task.labels,
+        orderIndex: task.orderIndex,
+        progress,
+        milestone: task.milestone,
+      }),
+    onSuccess: (updated) => {
+      qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
+      qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
+    },
+  });
+}
+
+export function useToggleMilestone(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (task: Task) =>
+      taskApi.update(task.id, {
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        assigneeId: task.assigneeId,
+        dueDate: task.dueDate,
+        labels: task.labels,
+        orderIndex: task.orderIndex,
+        progress: task.progress,
+        milestone: !task.milestone,
+      }),
+    onSuccess: (updated) => {
+      qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
       qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
     },
   });

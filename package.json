@@ -32,6 +32,7 @@
     "date-fns": "^4.2.1",
     "embla-carousel-react": "^8.6.0",
     "frappe-gantt": "^1.2.2",
+    "html2canvas": "^1.4.1",
     "input-otp": "^1.4.2",
     "ky": "^2.0.2",
     "lucide-react": "^1.16.0",
