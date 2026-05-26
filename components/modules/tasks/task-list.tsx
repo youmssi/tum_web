@@ -265,32 +265,48 @@ export function TaskList({ projectId }: { projectId: string }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <select
-            className="text-sm border rounded-md px-2 py-1 bg-background"
+          <Select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as TaskStatus | "ALL")}
-            aria-label="Filter by status"
+            onValueChange={(v) => {
+              setStatusFilter(v as TaskStatus | "ALL");
+              table.setPageIndex(0);
+            }}
           >
-            <option value="ALL">All statuses</option>
-            {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
-          <select
-            className="text-sm border rounded-md px-2 py-1 bg-background"
+            <SelectTrigger className="h-8 w-36 text-xs">
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL" className="text-xs">
+                All statuses
+              </SelectItem>
+              {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
+                <SelectItem key={s} value={s} className="text-xs">
+                  {STATUS_LABELS[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
             value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value as TaskPriority | "ALL")}
-            aria-label="Filter by priority"
+            onValueChange={(v) => {
+              setPriorityFilter(v as TaskPriority | "ALL");
+              table.setPageIndex(0);
+            }}
           >
-            <option value="ALL">All priorities</option>
-            {(Object.keys(PRIORITY_LABELS) as TaskPriority[]).map((p) => (
-              <option key={p} value={p}>
-                {PRIORITY_LABELS[p]}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-8 w-36 text-xs">
+              <SelectValue placeholder="All priorities" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL" className="text-xs">
+                All priorities
+              </SelectItem>
+              {(Object.keys(PRIORITY_LABELS) as TaskPriority[]).map((p) => (
+                <SelectItem key={p} value={p} className="text-xs">
+                  {PRIORITY_LABELS[p]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <CreateTaskDialog projectId={projectId} />
       </div>
@@ -405,32 +421,31 @@ export function TaskList({ projectId }: { projectId: string }) {
             </Table>
           </div>
 
-          {table.getPageCount() > 1 && (
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} ·{" "}
-                {filtered.length} tasks
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
-                >
-                  Next
-                </Button>
-              </div>
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>
+              {filtered.length > 0
+                ? `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()} · ${filtered.length} task${filtered.length !== 1 ? "s" : ""}`
+                : "0 tasks"}
+            </span>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!table.getCanPreviousPage()}
+                onClick={() => table.previousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!table.getCanNextPage()}
+                onClick={() => table.nextPage()}
+              >
+                Next
+              </Button>
             </div>
-          )}
+          </div>
         </>
       )}
 

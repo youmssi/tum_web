@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon, ChevronRightIcon, DiamondIcon, Trash2Icon } from "lucide-react";
-import { useRef, useState } from "react";
+import { type RefObject, useRef, useState } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,9 @@ interface Props {
   onDateChange: (task: Task, field: "start" | "end", date: string | null) => void;
   linkMode: boolean;
   linkSourceId: string | null;
+  /** Forwarded to the inner scrollable div for synchronized scroll with the Gantt panel. */
+  leftScrollRef?: RefObject<HTMLDivElement | null>;
+  onScroll?: () => void;
 }
 
 function resolveAssignee(
@@ -267,6 +270,8 @@ export function TimelineLeftPanel({
   onDateChange,
   linkMode,
   linkSourceId,
+  leftScrollRef,
+  onScroll,
 }: Props) {
   const { data: activeOrg } = authClient.useActiveOrganization();
   const members = activeOrg?.members ?? [];
@@ -281,8 +286,8 @@ export function TimelineLeftPanel({
   const unscheduled = tasks.filter((t) => !scheduledTaskIds.has(t.id));
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Column header */}
+    <div className="flex h-full flex-col overflow-hidden border-r">
+      {/* Column header — sticky, not part of the scroll area */}
       <div
         className="flex shrink-0 items-center gap-1 border-b bg-muted/30 px-2 text-[11px] font-medium text-muted-foreground"
         style={{ height: GANTT_ROW_HEIGHT }}
@@ -296,8 +301,8 @@ export function TimelineLeftPanel({
         <span className="w-10 shrink-0 text-center">%</span>
       </div>
 
-      {/* Scheduled tasks */}
-      <div className="overflow-y-auto">
+      {/* Scrollable task rows — ref forwarded for synchronized scroll */}
+      <div ref={leftScrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto">
         {scheduled.map((task) => (
           <TaskRow
             key={task.id}

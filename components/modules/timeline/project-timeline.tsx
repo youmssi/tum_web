@@ -289,62 +289,68 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border tum-gantt-print" ref={ganttContainerRef}>
-          <ResizablePanelGroup orientation="horizontal" className="min-h-[400px]">
-            {/* Left panel */}
-            <ResizablePanel defaultSize={28} minSize={18} maxSize={45}>
-              <div
-                ref={leftScrollRef}
+        /*
+         * Explicit height is required for react-resizable-panels to work.
+         * Without it, h-full on PanelGroup resolves to `auto` and the drag
+         * handle has no bounded height to resize within.
+         */
+        <div
+          className="overflow-hidden rounded-xl border tum-gantt-print"
+          ref={ganttContainerRef}
+          style={{ height: "calc(100svh - 18rem)", minHeight: "520px" }}
+        >
+          <ResizablePanelGroup orientation="horizontal" className="h-full">
+            {/* Left panel — task list */}
+            <ResizablePanel defaultSize={28} minSize={18} maxSize={45} className="flex flex-col">
+              {/* Sticky column headers */}
+              <TimelineLeftPanel
+                tasks={tasks ?? []}
+                scheduledTaskIds={scheduledTaskIds}
+                allDeps={allDeps ?? []}
+                expandedTaskId={expandedTaskId}
+                onExpandToggle={(id) => setExpandedTaskId((prev) => (prev === id ? null : id))}
+                onOpenTask={(task) => {
+                  setSelectedTask(task);
+                  setSheetOpen(true);
+                }}
+                onProgressChange={(task, progress) =>
+                  updateProgress
+                    .mutateAsync({ task, progress })
+                    .catch(() => toast.error("Failed to update progress."))
+                }
+                onMilestoneToggle={(task) =>
+                  toggleMilestone
+                    .mutateAsync(task)
+                    .catch(() => toast.error("Failed to toggle milestone."))
+                }
+                onDeleteDependency={(dep) =>
+                  deleteDependency
+                    .mutateAsync({
+                      id: dep.id,
+                      fromTaskId: dep.fromTaskId,
+                      toTaskId: dep.toTaskId,
+                    })
+                    .catch(() => toast.error("Failed to remove dependency."))
+                }
+                onDateChange={(task, field, date) =>
+                  reschedule
+                    .mutateAsync({
+                      id: task.id,
+                      startDate: field === "start" ? date : task.startDate,
+                      endDate: field === "end" ? date : task.endDate,
+                    })
+                    .catch(() => toast.error("Failed to update date."))
+                }
+                linkMode={linkMode}
+                linkSourceId={linkSource}
+                leftScrollRef={leftScrollRef}
                 onScroll={onLeftScroll}
-                className="h-full overflow-y-auto border-r"
-              >
-                <TimelineLeftPanel
-                  tasks={tasks ?? []}
-                  scheduledTaskIds={scheduledTaskIds}
-                  allDeps={allDeps ?? []}
-                  expandedTaskId={expandedTaskId}
-                  onExpandToggle={(id) => setExpandedTaskId((prev) => (prev === id ? null : id))}
-                  onOpenTask={(task) => {
-                    setSelectedTask(task);
-                    setSheetOpen(true);
-                  }}
-                  onProgressChange={(task, progress) =>
-                    updateProgress
-                      .mutateAsync({ task, progress })
-                      .catch(() => toast.error("Failed to update progress."))
-                  }
-                  onMilestoneToggle={(task) =>
-                    toggleMilestone
-                      .mutateAsync(task)
-                      .catch(() => toast.error("Failed to toggle milestone."))
-                  }
-                  onDeleteDependency={(dep) =>
-                    deleteDependency
-                      .mutateAsync({
-                        id: dep.id,
-                        fromTaskId: dep.fromTaskId,
-                        toTaskId: dep.toTaskId,
-                      })
-                      .catch(() => toast.error("Failed to remove dependency."))
-                  }
-                  onDateChange={(task, field, date) =>
-                    reschedule
-                      .mutateAsync({
-                        id: task.id,
-                        startDate: field === "start" ? date : task.startDate,
-                        endDate: field === "end" ? date : task.endDate,
-                      })
-                      .catch(() => toast.error("Failed to update date."))
-                  }
-                  linkMode={linkMode}
-                  linkSourceId={linkSource}
-                />
-              </div>
+              />
             </ResizablePanel>
 
             <ResizableHandle withHandle />
 
-            {/* Right panel — Gantt */}
+            {/* Right panel — Gantt bars */}
             <ResizablePanel defaultSize={72}>
               <div ref={rightScrollRef} onScroll={onRightScroll} className="h-full overflow-auto">
                 {ganttTasks.length > 0 ? (
