@@ -15,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   type Task,
@@ -42,6 +41,11 @@ const GANTT_OPTIONS = {
   padding: 12,
   readonly_progress: false,
 } as const;
+
+// Default left-panel pixel width — wide enough for all columns (title + dates + progress)
+const LEFT_PANEL_DEFAULT = 340;
+const LEFT_PANEL_MIN = 240;
+const LEFT_PANEL_MAX = 600;
 
 function formatDate(d: Date): string {
   return d.toISOString().split("T")[0];
@@ -97,6 +101,27 @@ export function ProjectTimeline({
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+
+  // Pixel-based left panel width — adapts to content, no percentage constraints
+  const [leftWidth, setLeftWidth] = useState(LEFT_PANEL_DEFAULT);
+  const dragRef = useRef<{ startX: number; startW: number } | null>(null);
+
+  function handleDragStart(e: React.PointerEvent<HTMLDivElement>) {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragRef.current = { startX: e.clientX, startW: leftWidth };
+  }
+
+  function handleDragMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (!dragRef.current) return;
+    const delta = e.clientX - dragRef.current.startX;
+    setLeftWidth(
+      Math.max(LEFT_PANEL_MIN, Math.min(LEFT_PANEL_MAX, dragRef.current.startW + delta)),
+    );
+  }
+
+  function handleDragEnd() {
+    dragRef.current = null;
+  }
 
   const leftScrollRef = useRef<HTMLDivElement>(null);
   const rightScrollRef = useRef<HTMLDivElement>(null);
@@ -244,7 +269,7 @@ export function ProjectTimeline({
     }
   }
 
-  // Synchronized vertical scroll
+  // Synchronized vertical scroll between left task list and right Gantt panel
   const syncingRef = useRef(false);
 
   function onLeftScroll() {
@@ -276,7 +301,7 @@ export function ProjectTimeline({
   return (
     <div
       className={cn(
-        "w-full min-w-0 space-y-4",
+        "space-y-3",
         isFocused && "fixed inset-0 z-50 flex flex-col overflow-hidden bg-background p-4",
       )}
     >
@@ -317,96 +342,119 @@ export function ProjectTimeline({
         </div>
       ) : (
         /*
-         * Explicit height is required for react-resizable-panels to work.
-         * Without it, h-full on PanelGroup resolves to `auto` and the drag
-         * handle has no bounded height to resize within.
+         * Height strategy:
+         *   normal  — fills the visible viewport below all page chrome (header +
+         *             project header + tabs + toolbar ≈ 22rem), capped with min-h.
+         *   focused — flex-1 inside the fixed full-screen overlay (set on outer div).
+         *
+         * Width strategy:
+         *   Left panel — pixel-based (340 px default), clamped [240, 600], resized
+         *                via a pointer-capture drag handle. No percentage constraints.
+         *   Right panel — flex-1 min-w-0: takes ALL remaining container width and
+         *                 scrolls horizontally for the Gantt SVG.
          */
         <div
           className={cn(
-            "overflow-hidden rounded-xl border",
-            isFocused ? "flex-1 min-h-0" : "h-[560px]",
+            "flex w-full overflow-hidden rounded-xl border",
+            isFocused ? "flex-1 min-h-0" : "h-[calc(100svh-22rem)] min-h-96",
           )}
           ref={ganttContainerRef}
         >
-          <ResizablePanelGroup orientation="horizontal" className="h-full">
-            {/* Left panel — task list. v4: sizes must be strings with % */}
-            <ResizablePanel defaultSize="30%" minSize="18%" maxSize="50%" className="flex flex-col">
-              {/* Sticky column headers */}
-              <TimelineLeftPanel
-                tasks={tasks ?? []}
-                scheduledTaskIds={scheduledTaskIds}
-                allDeps={allDeps ?? []}
-                expandedTaskId={expandedTaskId}
-                onExpandToggle={(id) => setExpandedTaskId((prev) => (prev === id ? null : id))}
-                onOpenTask={(task) => {
-                  setSelectedTask(task);
-                  setSheetOpen(true);
-                }}
-                onProgressChange={(task, progress) =>
-                  updateProgress
-                    .mutateAsync({ task, progress })
-                    .catch(() => toast.error("Failed to update progress."))
-                }
-                onMilestoneToggle={(task) =>
-                  toggleMilestone
-                    .mutateAsync(task)
-                    .catch(() => toast.error("Failed to toggle milestone."))
-                }
-                onDeleteDependency={(dep) =>
-                  deleteDependency
-                    .mutateAsync({
-                      id: dep.id,
-                      fromTaskId: dep.fromTaskId,
-                      toTaskId: dep.toTaskId,
-                    })
-                    .catch(() => toast.error("Failed to remove dependency."))
-                }
-                onDateChange={(task, field, date) =>
-                  reschedule
-                    .mutateAsync({
-                      id: task.id,
-                      startDate: field === "start" ? date : task.startDate,
-                      endDate: field === "end" ? date : task.endDate,
-                    })
-                    .catch(() => toast.error("Failed to update date."))
-                }
-                linkMode={linkMode}
-                linkSourceId={linkSource}
-                leftScrollRef={leftScrollRef}
-                onScroll={onLeftScroll}
+          {/* Left panel — task list, pixel width */}
+          <div
+            className="flex flex-col overflow-hidden"
+            style={{ width: leftWidth, minWidth: LEFT_PANEL_MIN, flexShrink: 0 }}
+          >
+            <TimelineLeftPanel
+              tasks={tasks ?? []}
+              scheduledTaskIds={scheduledTaskIds}
+              allDeps={allDeps ?? []}
+              expandedTaskId={expandedTaskId}
+              onExpandToggle={(id) => setExpandedTaskId((prev) => (prev === id ? null : id))}
+              onOpenTask={(task) => {
+                setSelectedTask(task);
+                setSheetOpen(true);
+              }}
+              onProgressChange={(task, progress) =>
+                updateProgress
+                  .mutateAsync({ task, progress })
+                  .catch(() => toast.error("Failed to update progress."))
+              }
+              onMilestoneToggle={(task) =>
+                toggleMilestone
+                  .mutateAsync(task)
+                  .catch(() => toast.error("Failed to toggle milestone."))
+              }
+              onDeleteDependency={(dep) =>
+                deleteDependency
+                  .mutateAsync({
+                    id: dep.id,
+                    fromTaskId: dep.fromTaskId,
+                    toTaskId: dep.toTaskId,
+                  })
+                  .catch(() => toast.error("Failed to remove dependency."))
+              }
+              onDateChange={(task, field, date) =>
+                reschedule
+                  .mutateAsync({
+                    id: task.id,
+                    startDate: field === "start" ? date : task.startDate,
+                    endDate: field === "end" ? date : task.endDate,
+                  })
+                  .catch(() => toast.error("Failed to update date."))
+              }
+              linkMode={linkMode}
+              linkSourceId={linkSource}
+              leftScrollRef={leftScrollRef}
+              onScroll={onLeftScroll}
+            />
+          </div>
+
+          {/* Drag handle — pointer-capture resize, no global listeners needed */}
+          <div
+            className="relative w-1 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-primary/40 active:bg-primary/70 touch-none select-none"
+            onPointerDown={handleDragStart}
+            onPointerMove={handleDragMove}
+            onPointerUp={handleDragEnd}
+            onPointerCancel={handleDragEnd}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize panels"
+          >
+            {/* Visual grip dots */}
+            <div className="absolute inset-y-0 left-1/2 flex -translate-x-1/2 flex-col items-center justify-center gap-1 opacity-40">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="size-0.5 rounded-full bg-foreground" />
+              ))}
+            </div>
+          </div>
+
+          {/* Right panel — Gantt bars, scrollable in both directions */}
+          <div
+            ref={rightScrollRef}
+            onScroll={onRightScroll}
+            className="flex-1 min-w-0 overflow-auto"
+          >
+            {ganttTasks.length > 0 ? (
+              <GanttChart
+                tasks={ganttTasks}
+                viewMode={viewMode}
+                onClick={handleGanttClick}
+                onDateChange={handleDateChange}
+                onProgressChange={handleProgressChange}
+                options={GANTT_OPTIONS}
               />
-            </ResizablePanel>
-
-            <ResizableHandle withHandle />
-
-            {/* Right panel — Gantt bars */}
-            <ResizablePanel defaultSize="70%">
-              <div ref={rightScrollRef} onScroll={onRightScroll} className="h-full overflow-auto">
-                {ganttTasks.length > 0 ? (
-                  <GanttChart
-                    tasks={ganttTasks}
-                    viewMode={viewMode}
-                    onClick={handleGanttClick}
-                    onDateChange={handleDateChange}
-                    onProgressChange={handleProgressChange}
-                    options={GANTT_OPTIONS}
-                  />
-                ) : (
-                  <div
-                    className="flex items-center justify-center text-sm text-muted-foreground"
-                    style={{
-                      height: Math.max(
-                        200,
-                        (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT,
-                      ),
-                    }}
-                  >
-                    Add start &amp; end dates to tasks to see bars here.
-                  </div>
-                )}
+            ) : (
+              <div
+                className="flex items-center justify-center text-sm text-muted-foreground"
+                style={{
+                  height: Math.max(200, (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT),
+                }}
+              >
+                Add start &amp; end dates to tasks to see bars here.
               </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            )}
+          </div>
         </div>
       )}
 
