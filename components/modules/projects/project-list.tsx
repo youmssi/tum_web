@@ -13,6 +13,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { ImportProjectDialog } from "@/components/modules/import";
 import { CreateProjectDialog } from "./create-project-dialog";
 import { ProjectCard } from "./project-card";
 import { useProjects } from "./use-projects";
@@ -28,15 +29,14 @@ export function ProjectList() {
           <h1 className="text-xl font-semibold">Projects</h1>
           <p className="text-sm text-muted-foreground">All projects in your organisation.</p>
         </div>
-        <CreateProjectDialog />
+        <div className="flex items-center gap-2">
+          <ImportProjectDialog />
+          <CreateProjectDialog />
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <Switch
-          id="show-archived"
-          checked={includeArchived}
-          onCheckedChange={setIncludeArchived}
-        />
+        <Switch id="show-archived" checked={includeArchived} onCheckedChange={setIncludeArchived} />
         <label htmlFor="show-archived" className="text-sm cursor-pointer">
           Show archived
         </label>
@@ -55,9 +55,7 @@ export function ProjectList() {
               <FolderKanbanIcon />
             </EmptyMedia>
             <EmptyTitle>No projects yet</EmptyTitle>
-            <EmptyDescription>
-              Create your first project to start tracking work.
-            </EmptyDescription>
+            <EmptyDescription>Create your first project to start tracking work.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <CreateProjectDialog />

@@ -19,6 +19,7 @@ export interface Task {
   orderIndex: number;
   progress: number;
   milestone: boolean;
+  parentTaskId: string | null;
   createdAt: string;
   updatedAt: string;
 }
