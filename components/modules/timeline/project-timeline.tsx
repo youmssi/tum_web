@@ -42,8 +42,6 @@ const GANTT_OPTIONS = {
   readonly_progress: false,
 } as const;
 
-// Default left-panel pixel width — wide enough for all columns (title + dates + progress)
-const LEFT_PANEL_DEFAULT = 340;
 const LEFT_PANEL_MIN = 240;
 const LEFT_PANEL_MAX = 600;
 
@@ -102,13 +100,16 @@ export function ProjectTimeline({
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Pixel-based left panel width — adapts to content, no percentage constraints
-  const [leftWidth, setLeftWidth] = useState(LEFT_PANEL_DEFAULT);
+  // Left panel width — "28%" initially (adapts to any viewport), pixel value after user drags.
+  const [leftWidth, setLeftWidth] = useState<number | string>("28%");
   const dragRef = useRef<{ startX: number; startW: number } | null>(null);
 
   function handleDragStart(e: React.PointerEvent<HTMLDivElement>) {
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragRef.current = { startX: e.clientX, startW: leftWidth };
+    // Read actual rendered width so dragging starts from the right pixel position
+    const leftEl = e.currentTarget.previousElementSibling as HTMLElement | null;
+    const currentW = leftEl?.offsetWidth ?? LEFT_PANEL_MIN;
+    dragRef.current = { startX: e.clientX, startW: currentW };
   }
 
   function handleDragMove(e: React.PointerEvent<HTMLDivElement>) {
@@ -360,10 +361,15 @@ export function ProjectTimeline({
           )}
           ref={ganttContainerRef}
         >
-          {/* Left panel — task list, pixel width */}
+          {/* Left panel — adaptive width: 28% of container initially, pixel value after drag */}
           <div
             className="flex flex-col overflow-hidden"
-            style={{ width: leftWidth, minWidth: LEFT_PANEL_MIN, flexShrink: 0 }}
+            style={{
+              width: leftWidth,
+              minWidth: LEFT_PANEL_MIN,
+              maxWidth: LEFT_PANEL_MAX,
+              flexShrink: 0,
+            }}
           >
             <TimelineLeftPanel
               tasks={tasks ?? []}
@@ -410,13 +416,14 @@ export function ProjectTimeline({
             />
           </div>
 
-          {/* Drag handle — pointer-capture resize, no global listeners needed */}
+          {/* Drag handle — pointer-capture resize; double-click resets to adaptive 28% */}
           <div
             className="relative w-1 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-primary/40 active:bg-primary/70 touch-none select-none"
             onPointerDown={handleDragStart}
             onPointerMove={handleDragMove}
             onPointerUp={handleDragEnd}
             onPointerCancel={handleDragEnd}
+            onDoubleClick={() => setLeftWidth("28%")}
             role="separator"
             aria-orientation="vertical"
             aria-label="Resize panels"
