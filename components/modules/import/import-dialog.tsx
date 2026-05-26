@@ -76,7 +76,7 @@ function WarningsPanel({
           )}
         </Button>
       </div>
-      <ScrollArea className="max-h-28 px-3 pb-2">
+      <div className="max-h-28 overflow-y-auto px-3 pb-2">
         <ul className="space-y-1 text-xs text-amber-700 dark:text-amber-400">
           {warnings.map((w, i) => (
             <li key={i} className="flex gap-1.5">
@@ -85,7 +85,7 @@ function WarningsPanel({
             </li>
           ))}
         </ul>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
