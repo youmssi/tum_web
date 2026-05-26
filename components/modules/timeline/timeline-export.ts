@@ -5,12 +5,15 @@
  * container as rendered, with all computed CSS correctly inlined. This fixes
  * the black-rectangle issue caused by getComputedStyle on detached clones.
  *
+ * html-to-image is browser-only and must be imported dynamically so Next.js
+ * server-side module analysis never tries to evaluate it.
+ *
  * PDF: opens a minimal print window so the browser's native print dialog
  * gets clean content (the parent page's chrome is excluded).
  */
-import { toPng } from "html-to-image";
 
 export async function exportGanttPng(container: HTMLElement, filename = "gantt"): Promise<void> {
+  const { toPng } = await import("html-to-image");
   const dataUrl = await toPng(container, {
     backgroundColor: "#ffffff",
     pixelRatio: 2,
