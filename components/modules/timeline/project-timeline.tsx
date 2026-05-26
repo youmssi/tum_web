@@ -2,6 +2,7 @@
 
 import { CalendarRangeIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -66,7 +67,18 @@ const DEP_TYPE_OPTIONS: { value: DependencyType; label: string }[] = [
   { value: "START_TO_FINISH", label: "Start → Finish" },
 ];
 
-export function ProjectTimeline({ projectId }: { projectId: string }) {
+function parseLocalDate(s: string): Date {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function ProjectTimeline({
+  projectId,
+  dateRange,
+}: {
+  projectId: string;
+  dateRange?: DateRange;
+}) {
   const { data: tasks, isLoading } = useTasks(projectId);
   const reschedule = useRescheduleTask(projectId);
   const updateProgress = useUpdateProgress(projectId);
@@ -130,10 +142,17 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
     return map;
   }, [allDeps]);
 
-  const scheduledTasks = useMemo(
-    () => (tasks ?? []).filter((t) => t.startDate && t.endDate),
-    [tasks],
-  );
+  const scheduledTasks = useMemo(() => {
+    return (tasks ?? []).filter((t) => {
+      if (!t.startDate || !t.endDate) return false;
+      if (!dateRange?.from && !dateRange?.to) return true;
+      const start = parseLocalDate(t.startDate);
+      const end = parseLocalDate(t.endDate);
+      if (dateRange.to && start > dateRange.to) return false;
+      if (dateRange.from && end < dateRange.from) return false;
+      return true;
+    });
+  }, [tasks, dateRange]);
 
   const scheduledTaskIds = useMemo(
     () => new Set(scheduledTasks.map((t) => t.id)),
@@ -257,7 +276,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   return (
     <div
       className={cn(
-        "space-y-4",
+        "w-full min-w-0 space-y-4",
         isFocused && "fixed inset-0 z-50 flex flex-col overflow-hidden bg-background p-4",
       )}
     >

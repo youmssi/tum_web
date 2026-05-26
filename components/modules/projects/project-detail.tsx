@@ -5,18 +5,24 @@ import {
   ArchiveIcon,
   ArchiveRestoreIcon,
   ArrowLeftIcon,
+  CalendarRangeIcon,
   FolderKanbanIcon,
   LayoutListIcon,
   SlidersHorizontalIcon,
   SquareKanbanIcon,
-  CalendarRangeIcon,
+  XIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { format } from "date-fns";
+import { type DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
@@ -34,6 +40,9 @@ export function ProjectDetail({ id }: { id: string }) {
   const toggleArchive = useToggleArchive();
   const { data: activeOrg } = authClient.useActiveOrganization();
   useRealtimeTasks(id, activeOrg?.id ?? null);
+
+  const [activeTab, setActiveTab] = useState("overview");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   async function handleToggleArchive() {
     if (!project) return;
@@ -94,7 +103,47 @@ export function ProjectDetail({ id }: { id: string }) {
           )}
         </div>
 
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {activeTab === "timeline" && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <CalendarRangeIcon className="size-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "MMM d")} – {format(dateRange.to, "MMM d")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "MMM d")
+                    )
+                  ) : (
+                    "Date range"
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+          )}
+          {activeTab === "timeline" && dateRange && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-muted-foreground"
+              onClick={() => setDateRange(undefined)}
+              title="Clear date filter"
+            >
+              <XIcon className="size-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -122,7 +171,7 @@ export function ProjectDetail({ id }: { id: string }) {
         </div>
       </div>
 
-      <Tabs defaultValue="overview">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview" className="gap-1.5">
             <FolderKanbanIcon className="size-4" />
@@ -159,7 +208,7 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4">
-          <ProjectTimeline projectId={project.id} />
+          <ProjectTimeline projectId={project.id} dateRange={dateRange} />
         </TabsContent>
 
         <TabsContent value="activity" className="mt-4">

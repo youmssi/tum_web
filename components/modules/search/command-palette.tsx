@@ -67,7 +67,9 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={handleOpenChange} title="Search tasks">
-      <Command>
+      {/* shouldFilter=false: we use server-side search; cmdk's built-in filter
+          matches against value={task.id} (a UUID) which only hits hex chars */}
+      <Command shouldFilter={false}>
         <CommandInput placeholder="Search tasks by title…" value={query} onValueChange={setQuery} />
         <CommandList>
           {!hasQuery ? (
