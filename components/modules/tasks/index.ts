@@ -22,4 +22,6 @@ export {
   useMoveTask,
   useDeleteTask,
   useBulkUpdateTasks,
+  useUpdateProgress,
+  useToggleMilestone,
 } from "./use-tasks";

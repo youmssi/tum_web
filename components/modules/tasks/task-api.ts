@@ -17,6 +17,8 @@ export interface Task {
   endDate: string | null;
   labels: string[];
   orderIndex: number;
+  progress: number;
+  milestone: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,6 +41,8 @@ export interface UpdateTaskPayload {
   dueDate?: string | null;
   labels?: string[] | null;
   orderIndex?: number | null;
+  progress?: number | null;
+  milestone?: boolean | null;
 }
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
