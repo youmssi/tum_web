@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 import { AppSidebar } from "@/components/modules/shell/app-nav";
 import { NotificationCenter } from "@/components/modules/notifications";
 import { ThemeToggle } from "@/components/modules/shell/theme-toggle";

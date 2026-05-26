@@ -67,7 +67,7 @@ const plans = [
       "OEM / white-label option",
     ],
     cta: "Contact sales",
-    href: "mailto:enterprise@tum.so",
+    href: "mailto:mrvin100mail@gmail.com",
     external: true,
     popular: false,
   },
