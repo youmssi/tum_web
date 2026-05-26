@@ -1,6 +1,13 @@
 "use client";
 
-import { DownloadIcon, FileTextIcon, ImageIcon, LinkIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  FileTextIcon,
+  ImageIcon,
+  LinkIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+} from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { type GanttViewMode } from "./gantt-chart";
 import { exportGanttPdf, exportGanttPng } from "./timeline-export";
 
@@ -22,6 +30,8 @@ interface TimelineToolbarProps {
   colors: { onTrackColor: string; nearDueColor: string; overdueColor: string };
   ganttContainerRef: React.RefObject<HTMLDivElement | null>;
   projectName?: string;
+  isFocused: boolean;
+  onFocusToggle: () => void;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -34,6 +44,8 @@ export function TimelineToolbar({
   colors,
   ganttContainerRef,
   projectName = "gantt",
+  isFocused,
+  onFocusToggle,
 }: TimelineToolbarProps) {
   const exporting = useRef(false);
 
@@ -43,10 +55,14 @@ export function TimelineToolbar({
     try {
       await exportGanttPng(ganttContainerRef.current, projectName);
     } catch {
-      toast.error("Failed to export PNG.");
+      toast.error("Failed to export PNG. Ensure the chart has rendered.");
     } finally {
       exporting.current = false;
     }
+  }
+
+  function handleExportPdf() {
+    exportGanttPdf(ganttContainerRef.current, projectName);
   }
 
   return (
@@ -95,6 +111,28 @@ export function TimelineToolbar({
           {linkMode ? "Cancel linking" : "Link tasks"}
         </Button>
 
+        {/* Focus mode toggle */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isFocused ? "default" : "outline"}
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={onFocusToggle}
+              aria-label={isFocused ? "Exit focus mode" : "Enter focus mode"}
+            >
+              {isFocused ? (
+                <Minimize2Icon className="size-3.5" />
+              ) : (
+                <Maximize2Icon className="size-3.5" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isFocused ? "Exit focus mode (Esc)" : "Focus mode — full view"}
+          </TooltipContent>
+        </Tooltip>
+
         {/* Export */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -108,7 +146,7 @@ export function TimelineToolbar({
               <ImageIcon className="size-4" />
               Download PNG
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={exportGanttPdf} className="gap-2">
+            <DropdownMenuItem onClick={handleExportPdf} className="gap-2">
               <FileTextIcon className="size-4" />
               Print / Save as PDF
             </DropdownMenuItem>

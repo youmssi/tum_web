@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
 
-import { OnboardingChoice } from "@/components/modules/organization";
+import { CreateOrgForm } from "@/components/modules/organization";
 import { auth } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Get started",
+  title: "Create your workspace",
 };
 
 export default async function OnboardingPage() {
@@ -16,7 +18,22 @@ export default async function OnboardingPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
-      <OnboardingChoice />
+      <div className="w-full max-w-md space-y-2">
+        <Link
+          href={ROUTES.WORKSPACES}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeftIcon className="size-3.5" />
+          Back to workspaces
+        </Link>
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold">Create your workspace</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Set up your organisation to get started with Tûm.
+          </p>
+        </div>
+        <CreateOrgForm />
+      </div>
     </main>
   );
 }

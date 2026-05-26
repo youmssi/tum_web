@@ -41,7 +41,9 @@ function StatCard({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-        <Icon className={`size-4 ${highlight && value > 0 ? "text-destructive" : "text-muted-foreground"}`} />
+        <Icon
+          className={`size-4 ${highlight && value > 0 ? "text-destructive" : "text-muted-foreground"}`}
+        />
       </CardHeader>
       <CardContent>
         <p className={`text-2xl font-bold ${highlight && value > 0 ? "text-destructive" : ""}`}>
@@ -64,7 +66,9 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
 
   const statusCounts = useMemo(() => {
     const counts: Record<TaskStatus, number> = { TODO: 0, IN_PROGRESS: 0, IN_REVIEW: 0, DONE: 0 };
-    (tasks ?? []).forEach((t) => { counts[t.status]++; });
+    (tasks ?? []).forEach((t) => {
+      counts[t.status]++;
+    });
     return counts;
   }, [tasks]);
 
@@ -84,11 +88,15 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
     [metrics],
   );
 
+  const hasTrendData = trendData.some((p) => p.completed > 0);
+
   if (tasksLoading) {
     return (
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-3">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
+          ))}
         </div>
         <Skeleton className="h-40 rounded-xl" />
         <Skeleton className="h-52 rounded-xl" />
@@ -117,7 +125,9 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
               <div key={status} className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{STATUS_LABELS[status]}</span>
-                  <span>{count} ({pct}%)</span>
+                  <span>
+                    {count} ({pct}%)
+                  </span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
@@ -139,9 +149,9 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
         <CardContent>
           {metricsLoading ? (
             <Skeleton className="h-40 w-full" />
-          ) : !trendData.length ? (
+          ) : !hasTrendData ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              No trend data yet. Complete tasks to see progress.
+              No completions in the last 30 days. Mark tasks as done to see the trend.
             </p>
           ) : (
             <ResponsiveContainer width="100%" height={160}>
@@ -171,7 +181,7 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
           <CardTitle className="text-sm font-medium">Recent activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <ActivityFeed projectId={projectId} />
+          <ActivityFeed projectId={projectId} limit={10} />
         </CardContent>
       </Card>
     </div>

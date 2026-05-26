@@ -2,6 +2,8 @@
 
 import { CalendarRangeIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   type Task,
@@ -41,6 +42,9 @@ const GANTT_OPTIONS = {
   readonly_progress: false,
 } as const;
 
+const LEFT_PANEL_MIN = 240;
+const LEFT_PANEL_MAX = 600;
+
 function formatDate(d: Date): string {
   return d.toISOString().split("T")[0];
 }
@@ -65,7 +69,18 @@ const DEP_TYPE_OPTIONS: { value: DependencyType; label: string }[] = [
   { value: "START_TO_FINISH", label: "Start → Finish" },
 ];
 
-export function ProjectTimeline({ projectId }: { projectId: string }) {
+function parseLocalDate(s: string): Date {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function ProjectTimeline({
+  projectId,
+  dateRange,
+}: {
+  projectId: string;
+  dateRange?: DateRange;
+}) {
   const { data: tasks, isLoading } = useTasks(projectId);
   const reschedule = useRescheduleTask(projectId);
   const updateProgress = useUpdateProgress(projectId);
@@ -83,22 +98,51 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   const [linkTarget, setLinkTarget] = useState<string | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Left panel width — "28%" initially (adapts to any viewport), pixel value after user drags.
+  const [leftWidth, setLeftWidth] = useState<number | string>("28%");
+  const dragRef = useRef<{ startX: number; startW: number } | null>(null);
+
+  function handleDragStart(e: React.PointerEvent<HTMLDivElement>) {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    // Read actual rendered width so dragging starts from the right pixel position
+    const leftEl = e.currentTarget.previousElementSibling as HTMLElement | null;
+    const currentW = leftEl?.offsetWidth ?? LEFT_PANEL_MIN;
+    dragRef.current = { startX: e.clientX, startW: currentW };
+  }
+
+  function handleDragMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (!dragRef.current) return;
+    const delta = e.clientX - dragRef.current.startX;
+    setLeftWidth(
+      Math.max(LEFT_PANEL_MIN, Math.min(LEFT_PANEL_MAX, dragRef.current.startW + delta)),
+    );
+  }
+
+  function handleDragEnd() {
+    dragRef.current = null;
+  }
 
   const leftScrollRef = useRef<HTMLDivElement>(null);
   const rightScrollRef = useRef<HTMLDivElement>(null);
   const ganttContainerRef = useRef<HTMLDivElement>(null);
 
-  // Dismiss link mode on Escape
+  // Dismiss link mode and focus mode on Escape
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && linkMode) {
-        setLinkMode(false);
-        setLinkSource(null);
+      if (e.key === "Escape") {
+        if (isFocused) {
+          setIsFocused(false);
+        } else if (linkMode) {
+          setLinkMode(false);
+          setLinkSource(null);
+        }
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [linkMode]);
+  }, [linkMode, isFocused]);
 
   const { data: allDeps } = useQuery({
     queryKey: DEP_KEYS.forProject(projectId),
@@ -124,10 +168,17 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
     return map;
   }, [allDeps]);
 
-  const scheduledTasks = useMemo(
-    () => (tasks ?? []).filter((t) => t.startDate && t.endDate),
-    [tasks],
-  );
+  const scheduledTasks = useMemo(() => {
+    return (tasks ?? []).filter((t) => {
+      if (!t.startDate || !t.endDate) return false;
+      if (!dateRange?.from && !dateRange?.to) return true;
+      const start = parseLocalDate(t.startDate);
+      const end = parseLocalDate(t.endDate);
+      if (dateRange.to && start > dateRange.to) return false;
+      if (dateRange.from && end < dateRange.from) return false;
+      return true;
+    });
+  }, [tasks, dateRange]);
 
   const scheduledTaskIds = useMemo(
     () => new Set(scheduledTasks.map((t) => t.id)),
@@ -147,7 +198,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         end,
         progress: t.progress,
         dependencies: depMap[t.id]?.join(",") ?? "",
-        custom_class: t.milestone ? `${colorClass} tum-milestone` : colorClass,
+        custom_class: t.milestone ? `${colorClass}-milestone` : colorClass,
       };
     });
   }, [scheduledTasks, depMap, colors.nearDueDays]);
@@ -219,7 +270,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
     }
   }
 
-  // Synchronized vertical scroll
+  // Synchronized vertical scroll between left task list and right Gantt panel
   const syncingRef = useRef(false);
 
   function onLeftScroll() {
@@ -249,7 +300,12 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   const linkTargetTask = tasks?.find((t) => t.id === linkTarget);
 
   return (
-    <div className="space-y-4">
+    <div
+      className={cn(
+        "space-y-3",
+        isFocused && "fixed inset-0 z-50 flex flex-col overflow-hidden bg-background p-4",
+      )}
+    >
       {/* Dynamic color CSS for Frappe Gantt custom classes */}
       <style>{`
         .tum-on-track .bar { fill: ${colors.onTrackColor} !important; }
@@ -258,15 +314,10 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         .tum-near-due .bar-progress { fill: color-mix(in srgb, ${colors.nearDueColor} 70%, black) !important; }
         .tum-overdue .bar { fill: ${colors.overdueColor} !important; }
         .tum-overdue .bar-progress { fill: color-mix(in srgb, ${colors.overdueColor} 70%, black) !important; }
-        .tum-milestone .bar {
-          clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important;
-          rx: 0 !important;
-        }
+        .tum-on-track-milestone .bar { fill: ${colors.onTrackColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
+        .tum-near-due-milestone .bar { fill: ${colors.nearDueColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
+        .tum-overdue-milestone .bar { fill: ${colors.overdueColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
         .gantt-container { cursor: ${linkMode ? "crosshair" : "default"}; }
-        @media print {
-          body > * { display: none !important; }
-          .tum-gantt-print { display: block !important; }
-        }
       `}</style>
 
       <TimelineToolbar
@@ -279,6 +330,8 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         }}
         colors={colors}
         ganttContainerRef={ganttContainerRef}
+        isFocused={isFocused}
+        onFocusToggle={() => setIsFocused((f) => !f)}
       />
 
       {ganttTasks.length === 0 && (tasks ?? []).length === 0 ? (
@@ -289,89 +342,126 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border tum-gantt-print" ref={ganttContainerRef}>
-          <ResizablePanelGroup orientation="horizontal" className="min-h-[400px]">
-            {/* Left panel */}
-            <ResizablePanel defaultSize={28} minSize={18} maxSize={45}>
+        /*
+         * Height strategy:
+         *   normal  — fills the visible viewport below all page chrome (header +
+         *             project header + tabs + toolbar ≈ 22rem), capped with min-h.
+         *   focused — flex-1 inside the fixed full-screen overlay (set on outer div).
+         *
+         * Width strategy:
+         *   Left panel — pixel-based (340 px default), clamped [240, 600], resized
+         *                via a pointer-capture drag handle. No percentage constraints.
+         *   Right panel — flex-1 min-w-0: takes ALL remaining container width and
+         *                 scrolls horizontally for the Gantt SVG.
+         */
+        <div
+          className={cn(
+            "flex w-full overflow-hidden rounded-xl border",
+            isFocused ? "flex-1 min-h-0" : "h-[calc(100svh-22rem)] min-h-96",
+          )}
+          ref={ganttContainerRef}
+        >
+          {/* Left panel — adaptive width: 28% of container initially, pixel value after drag */}
+          <div
+            className="flex flex-col overflow-hidden"
+            style={{
+              width: leftWidth,
+              minWidth: LEFT_PANEL_MIN,
+              maxWidth: LEFT_PANEL_MAX,
+              flexShrink: 0,
+            }}
+          >
+            <TimelineLeftPanel
+              tasks={tasks ?? []}
+              scheduledTaskIds={scheduledTaskIds}
+              allDeps={allDeps ?? []}
+              expandedTaskId={expandedTaskId}
+              onExpandToggle={(id) => setExpandedTaskId((prev) => (prev === id ? null : id))}
+              onOpenTask={(task) => {
+                setSelectedTask(task);
+                setSheetOpen(true);
+              }}
+              onProgressChange={(task, progress) =>
+                updateProgress
+                  .mutateAsync({ task, progress })
+                  .catch(() => toast.error("Failed to update progress."))
+              }
+              onMilestoneToggle={(task) =>
+                toggleMilestone
+                  .mutateAsync(task)
+                  .catch(() => toast.error("Failed to toggle milestone."))
+              }
+              onDeleteDependency={(dep) =>
+                deleteDependency
+                  .mutateAsync({
+                    id: dep.id,
+                    fromTaskId: dep.fromTaskId,
+                    toTaskId: dep.toTaskId,
+                  })
+                  .catch(() => toast.error("Failed to remove dependency."))
+              }
+              onDateChange={(task, field, date) =>
+                reschedule
+                  .mutateAsync({
+                    id: task.id,
+                    startDate: field === "start" ? date : task.startDate,
+                    endDate: field === "end" ? date : task.endDate,
+                  })
+                  .catch(() => toast.error("Failed to update date."))
+              }
+              linkMode={linkMode}
+              linkSourceId={linkSource}
+              leftScrollRef={leftScrollRef}
+              onScroll={onLeftScroll}
+            />
+          </div>
+
+          {/* Drag handle — pointer-capture resize; double-click resets to adaptive 28% */}
+          <div
+            className="relative w-1 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-primary/40 active:bg-primary/70 touch-none select-none"
+            onPointerDown={handleDragStart}
+            onPointerMove={handleDragMove}
+            onPointerUp={handleDragEnd}
+            onPointerCancel={handleDragEnd}
+            onDoubleClick={() => setLeftWidth("28%")}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize panels"
+          >
+            {/* Visual grip dots */}
+            <div className="absolute inset-y-0 left-1/2 flex -translate-x-1/2 flex-col items-center justify-center gap-1 opacity-40">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="size-0.5 rounded-full bg-foreground" />
+              ))}
+            </div>
+          </div>
+
+          {/* Right panel — Gantt bars, scrollable in both directions */}
+          <div
+            ref={rightScrollRef}
+            onScroll={onRightScroll}
+            className="flex-1 min-w-0 overflow-auto"
+          >
+            {ganttTasks.length > 0 ? (
+              <GanttChart
+                tasks={ganttTasks}
+                viewMode={viewMode}
+                onClick={handleGanttClick}
+                onDateChange={handleDateChange}
+                onProgressChange={handleProgressChange}
+                options={GANTT_OPTIONS}
+              />
+            ) : (
               <div
-                ref={leftScrollRef}
-                onScroll={onLeftScroll}
-                className="h-full overflow-y-auto border-r"
+                className="flex items-center justify-center text-sm text-muted-foreground"
+                style={{
+                  height: Math.max(200, (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT),
+                }}
               >
-                <TimelineLeftPanel
-                  tasks={tasks ?? []}
-                  scheduledTaskIds={scheduledTaskIds}
-                  allDeps={allDeps ?? []}
-                  expandedTaskId={expandedTaskId}
-                  onExpandToggle={(id) => setExpandedTaskId((prev) => (prev === id ? null : id))}
-                  onOpenTask={(task) => {
-                    setSelectedTask(task);
-                    setSheetOpen(true);
-                  }}
-                  onProgressChange={(task, progress) =>
-                    updateProgress
-                      .mutateAsync({ task, progress })
-                      .catch(() => toast.error("Failed to update progress."))
-                  }
-                  onMilestoneToggle={(task) =>
-                    toggleMilestone
-                      .mutateAsync(task)
-                      .catch(() => toast.error("Failed to toggle milestone."))
-                  }
-                  onDeleteDependency={(dep) =>
-                    deleteDependency
-                      .mutateAsync({
-                        id: dep.id,
-                        fromTaskId: dep.fromTaskId,
-                        toTaskId: dep.toTaskId,
-                      })
-                      .catch(() => toast.error("Failed to remove dependency."))
-                  }
-                  onDateChange={(task, field, date) =>
-                    reschedule
-                      .mutateAsync({
-                        id: task.id,
-                        startDate: field === "start" ? date : task.startDate,
-                        endDate: field === "end" ? date : task.endDate,
-                      })
-                      .catch(() => toast.error("Failed to update date."))
-                  }
-                  linkMode={linkMode}
-                  linkSourceId={linkSource}
-                />
+                Add start &amp; end dates to tasks to see bars here.
               </div>
-            </ResizablePanel>
-
-            <ResizableHandle withHandle />
-
-            {/* Right panel — Gantt */}
-            <ResizablePanel defaultSize={72}>
-              <div ref={rightScrollRef} onScroll={onRightScroll} className="h-full overflow-auto">
-                {ganttTasks.length > 0 ? (
-                  <GanttChart
-                    tasks={ganttTasks}
-                    viewMode={viewMode}
-                    onClick={handleGanttClick}
-                    onDateChange={handleDateChange}
-                    onProgressChange={handleProgressChange}
-                    options={GANTT_OPTIONS}
-                  />
-                ) : (
-                  <div
-                    className="flex items-center justify-center text-sm text-muted-foreground"
-                    style={{
-                      height: Math.max(
-                        200,
-                        (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT,
-                      ),
-                    }}
-                  >
-                    Add start &amp; end dates to tasks to see bars here.
-                  </div>
-                )}
-              </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            )}
+          </div>
         </div>
       )}
 
