@@ -161,9 +161,12 @@ function TaskRow({
           </Tooltip>
         </TooltipProvider>
 
-        {/* Title */}
-        <span className="min-w-0 flex-1 truncate font-medium" title={task.title}>
-          {task.title}
+        {/* Subtask indent + title */}
+        <span className="min-w-0 flex-1 truncate" title={task.title}>
+          {task.parentTaskId && <span className="mr-1 text-muted-foreground/50">↳</span>}
+          <span className={task.parentTaskId ? "text-muted-foreground" : "font-medium"}>
+            {task.title}
+          </span>
         </span>
 
         {/* Assignee avatar */}
@@ -301,8 +304,12 @@ export function TimelineLeftPanel({
         <span className="w-10 shrink-0 text-center">%</span>
       </div>
 
-      {/* Scrollable task rows — ref forwarded for synchronized scroll */}
-      <div ref={leftScrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto">
+      {/*
+       * Synced scroll — ONLY scheduled tasks mirror Gantt row positions.
+       * Unscheduled tasks are rendered below in a separate non-synced section
+       * so that copying scrollTop between left and right panels stays correct.
+       */}
+      <div ref={leftScrollRef} onScroll={onScroll} className="flex-1 min-h-0 overflow-y-scroll">
         {scheduled.map((task) => (
           <TaskRow
             key={task.id}
@@ -321,13 +328,15 @@ export function TimelineLeftPanel({
             isLinkSource={linkSourceId === task.id}
           />
         ))}
+      </div>
 
-        {/* Unscheduled tasks section */}
-        {unscheduled.length > 0 && (
-          <>
-            <div className="border-b bg-muted/20 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
-              Unscheduled ({unscheduled.length})
-            </div>
+      {/* Unscheduled tasks — outside synced scroll, independent section */}
+      {unscheduled.length > 0 && (
+        <div className="shrink-0 border-t" style={{ maxHeight: "28%" }}>
+          <div className="sticky top-0 z-10 border-b bg-muted/40 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+            Unscheduled · {unscheduled.length}
+          </div>
+          <div className="overflow-y-auto" style={{ maxHeight: "calc(100% - 24px)" }}>
             {unscheduled.map((task) => (
               <TaskRow
                 key={task.id}
@@ -346,9 +355,9 @@ export function TimelineLeftPanel({
                 isLinkSource={linkSourceId === task.id}
               />
             ))}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

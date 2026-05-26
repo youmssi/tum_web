@@ -76,9 +76,11 @@ function parseLocalDate(s: string): Date {
 
 export function ProjectTimeline({
   projectId,
+  projectName,
   dateRange,
 }: {
   projectId: string;
+  projectName?: string;
   dateRange?: DateRange;
 }) {
   const { data: tasks, isLoading } = useTasks(projectId);
@@ -329,9 +331,9 @@ export function ProjectTimeline({
           if (!active) setLinkSource(null);
         }}
         colors={colors}
-        ganttContainerRef={ganttContainerRef}
         tasks={tasks ?? []}
         allDeps={allDeps ?? []}
+        projectName={projectName}
         isFocused={isFocused}
         onFocusToggle={() => setIsFocused((f) => !f)}
       />
