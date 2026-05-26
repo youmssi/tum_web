@@ -330,6 +330,8 @@ export function ProjectTimeline({
         }}
         colors={colors}
         ganttContainerRef={ganttContainerRef}
+        tasks={tasks ?? []}
+        allDeps={allDeps ?? []}
         isFocused={isFocused}
         onFocusToggle={() => setIsFocused((f) => !f)}
       />
