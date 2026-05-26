@@ -1,90 +1,86 @@
 /**
- * Gantt chart export utilities.
+ * Gantt export — XLSX only.
  *
- * PNG: uses html-to-image (MIT, 2M+ weekly downloads) to capture the Gantt
- * container as rendered, with all computed CSS correctly inlined. This fixes
- * the black-rectangle issue caused by getComputedStyle on detached clones.
+ * Exports all project tasks in the same column layout as the import template,
+ * enabling a clean round-trip: export → share / edit offline → re-import.
  *
- * html-to-image is browser-only and must be imported dynamically so Next.js
- * server-side module analysis never tries to evaluate it.
- *
- * PDF: opens a minimal print window so the browser's native print dialog
- * gets clean content (the parent page's chrome is excluded).
+ * Uses the already-installed `xlsx` (SheetJS, Apache 2.0) via dynamic import
+ * so the ~1 MB bundle is only loaded when the user clicks Export.
  */
+import type { Task } from "@/components/modules/tasks";
+import type { Dependency } from "./dependency-api";
 
-export async function exportGanttPng(container: HTMLElement, filename = "gantt"): Promise<void> {
-  const { toPng } = await import("html-to-image");
-  const dataUrl = await toPng(container, {
-    backgroundColor: "#ffffff",
-    pixelRatio: 2,
-    skipFonts: true,
-  });
+export async function exportGanttXlsx(
+  tasks: Task[],
+  allDeps: Dependency[],
+  projectName = "project",
+): Promise<void> {
+  const xlsx = await import("xlsx");
 
-  const link = document.createElement("a");
-  link.download = `${filename}.png`;
-  link.href = dataUrl;
-  link.click();
-}
+  // Build lookup maps
+  const titleById = new Map(tasks.map((t) => [t.id, t.title]));
 
-function findGanttSvg(container: HTMLElement): SVGSVGElement | null {
-  return container.querySelector<SVGSVGElement>("svg.gantt");
-}
-
-function inlineComputedFills(originalSvg: SVGSVGElement, svgClone: SVGSVGElement): void {
-  const originalEls = Array.from(originalSvg.querySelectorAll<SVGElement>("[class]"));
-  const clonedEls = Array.from(svgClone.querySelectorAll<SVGElement>("[class]"));
-  originalEls.forEach((orig, i) => {
-    const clone = clonedEls[i];
-    if (!clone) return;
-    const computed = window.getComputedStyle(orig);
-    const fill = computed.fill;
-    if (fill && fill !== "none") clone.style.fill = fill;
-    const stroke = computed.stroke;
-    if (stroke && stroke !== "none") clone.style.stroke = stroke;
-  });
-}
-
-export function exportGanttPdf(container: HTMLElement | null, filename = "gantt"): void {
-  const svg = container ? findGanttSvg(container) : null;
-
-  if (!svg) {
-    window.print();
-    return;
+  // depends_on: for each task, which task IDs point TO it (fromTaskId → toTaskId)
+  const depsTo = new Map<string, string[]>();
+  for (const dep of allDeps) {
+    const list = depsTo.get(dep.toTaskId) ?? [];
+    list.push(dep.fromTaskId);
+    depsTo.set(dep.toTaskId, list);
   }
 
-  const svgClone = svg.cloneNode(true) as SVGSVGElement;
-  svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  inlineComputedFills(svg, svgClone);
+  // Headers — identical to the import template so the file is re-importable
+  const headers = [
+    "project_name",
+    "project_description",
+    "title",
+    "description",
+    "parent_task",
+    "start_date",
+    "end_date",
+    "status",
+    "priority",
+    "progress",
+    "milestone",
+    "depends_on",
+  ];
 
-  const serializer = new XMLSerializer();
-  const svgStr = serializer.serializeToString(svgClone);
+  const rows: (string | number | boolean)[][] = [headers];
 
-  const printWindow = window.open("", "_blank", "width=1200,height=800");
-  if (!printWindow) {
-    window.print();
-    return;
-  }
+  tasks.forEach((task, idx) => {
+    const parentTitle = task.parentTaskId ? (titleById.get(task.parentTaskId) ?? "") : "";
+    const depTitles = (depsTo.get(task.id) ?? [])
+      .map((id) => titleById.get(id) ?? "")
+      .filter(Boolean)
+      .join(",");
 
-  printWindow.document.write(`<!DOCTYPE html>
-<html>
-<head>
-  <title>${filename}</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #fff; display: flex; justify-content: center; align-items: flex-start; }
-    svg { max-width: 100%; height: auto; }
-    @page { size: landscape; margin: 1cm; }
-  </style>
-</head>
-<body>
-  ${svgStr}
-  <script>
-    window.onload = function () {
-      window.print();
-      window.onafterprint = function () { window.close(); };
-    };
-  </script>
-</body>
-</html>`);
-  printWindow.document.close();
+    rows.push([
+      idx === 0 ? projectName : "", // project_name — only on first row
+      "", // project_description — left blank (not stored per-task)
+      task.title,
+      task.description ?? "",
+      parentTitle,
+      task.startDate ?? "",
+      task.endDate ?? "",
+      task.status,
+      task.priority,
+      task.progress,
+      task.milestone ? "TRUE" : "FALSE",
+      depTitles,
+    ]);
+  });
+
+  const ws = xlsx.utils.aoa_to_sheet(rows);
+
+  // Column widths
+  const colWidths = [20, 24, 36, 36, 30, 12, 12, 14, 10, 10, 10, 30];
+  ws["!cols"] = colWidths.map((wch) => ({ wch }));
+
+  const wb = xlsx.utils.book_new();
+  xlsx.utils.book_append_sheet(wb, ws, "Tasks");
+
+  const safeFilename = projectName
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+  xlsx.writeFile(wb, `${safeFilename}-gantt.xlsx`);
 }

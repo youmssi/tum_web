@@ -1,26 +1,15 @@
 "use client";
 
-import {
-  DownloadIcon,
-  FileTextIcon,
-  ImageIcon,
-  LinkIcon,
-  Maximize2Icon,
-  Minimize2Icon,
-} from "lucide-react";
+import { DownloadIcon, LinkIcon, Maximize2Icon, Minimize2Icon, TableIcon } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { type Task } from "@/components/modules/tasks";
 import { type GanttViewMode } from "./gantt-chart";
-import { exportGanttPdf, exportGanttPng } from "./timeline-export";
+import { type Dependency } from "./dependency-api";
+import { exportGanttXlsx } from "./timeline-export";
 
 interface TimelineToolbarProps {
   viewMode: GanttViewMode;
@@ -29,6 +18,8 @@ interface TimelineToolbarProps {
   onLinkModeChange: (active: boolean) => void;
   colors: { onTrackColor: string; nearDueColor: string; overdueColor: string };
   ganttContainerRef: React.RefObject<HTMLDivElement | null>;
+  tasks: Task[];
+  allDeps: Dependency[];
   projectName?: string;
   isFocused: boolean;
   onFocusToggle: () => void;
@@ -42,27 +33,24 @@ export function TimelineToolbar({
   linkMode,
   onLinkModeChange,
   colors,
-  ganttContainerRef,
-  projectName = "gantt",
+  tasks,
+  allDeps,
+  projectName = "project",
   isFocused,
   onFocusToggle,
 }: TimelineToolbarProps) {
   const exporting = useRef(false);
 
-  async function handleExportPng() {
-    if (exporting.current || !ganttContainerRef.current) return;
+  async function handleExportXlsx() {
+    if (exporting.current) return;
     exporting.current = true;
     try {
-      await exportGanttPng(ganttContainerRef.current, projectName);
+      await exportGanttXlsx(tasks, allDeps, projectName);
     } catch {
-      toast.error("Failed to export PNG. Ensure the chart has rendered.");
+      toast.error("Failed to export XLSX.");
     } finally {
       exporting.current = false;
     }
-  }
-
-  function handleExportPdf() {
-    exportGanttPdf(ganttContainerRef.current, projectName);
   }
 
   return (
@@ -133,25 +121,19 @@ export function TimelineToolbar({
           </TooltipContent>
         </Tooltip>
 
-        {/* Export */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5">
+        {/* Export XLSX */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={handleExportXlsx}>
+              <TableIcon className="size-3.5" />
               <DownloadIcon className="size-3.5" />
-              Export
+              Export XLSX
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleExportPng} className="gap-2">
-              <ImageIcon className="size-4" />
-              Download PNG
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportPdf} className="gap-2">
-              <FileTextIcon className="size-4" />
-              Print / Save as PDF
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            Download all tasks as an Excel file (re-importable)
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
