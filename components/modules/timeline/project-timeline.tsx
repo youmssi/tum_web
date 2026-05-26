@@ -75,6 +75,12 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   const { getConfig } = useTimelineColors();
   const colors = getConfig(projectId);
 
+  // Content-aware height: expands with tasks, capped at viewport.
+  const panelHeight = useMemo(() => {
+    const count = tasks?.length ?? 0;
+    return Math.max(400, (count + 4) * GANTT_ROW_HEIGHT);
+  }, [tasks]);
+
   const [viewMode, setViewMode] = useState<GanttViewMode>("Week");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -263,10 +269,6 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
           rx: 0 !important;
         }
         .gantt-container { cursor: ${linkMode ? "crosshair" : "default"}; }
-        @media print {
-          body > * { display: none !important; }
-          .tum-gantt-print { display: block !important; }
-        }
       `}</style>
 
       <TimelineToolbar
@@ -295,13 +297,16 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
          * handle has no bounded height to resize within.
          */
         <div
-          className="overflow-hidden rounded-xl border tum-gantt-print"
+          className="overflow-hidden rounded-xl border"
           ref={ganttContainerRef}
-          style={{ height: "calc(100svh - 18rem)", minHeight: "520px" }}
+          style={{
+            height: `min(calc(100svh - 18rem), ${panelHeight}px)`,
+            minHeight: "400px",
+          }}
         >
           <ResizablePanelGroup orientation="horizontal" className="h-full">
-            {/* Left panel — task list */}
-            <ResizablePanel defaultSize={28} minSize={18} maxSize={45} className="flex flex-col">
+            {/* Left panel — task list. v4: sizes must be strings with % */}
+            <ResizablePanel defaultSize="30%" minSize="18%" maxSize="50%" className="flex flex-col">
               {/* Sticky column headers */}
               <TimelineLeftPanel
                 tasks={tasks ?? []}
@@ -351,7 +356,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
             <ResizableHandle withHandle />
 
             {/* Right panel — Gantt bars */}
-            <ResizablePanel defaultSize={72}>
+            <ResizablePanel defaultSize="70%">
               <div ref={rightScrollRef} onScroll={onRightScroll} className="h-full overflow-auto">
                 {ganttTasks.length > 0 ? (
                   <GanttChart

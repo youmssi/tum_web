@@ -43,10 +43,14 @@ export function TimelineToolbar({
     try {
       await exportGanttPng(ganttContainerRef.current, projectName);
     } catch {
-      toast.error("Failed to export PNG.");
+      toast.error("Failed to export PNG. Ensure the chart has rendered.");
     } finally {
       exporting.current = false;
     }
+  }
+
+  function handleExportPdf() {
+    exportGanttPdf(ganttContainerRef.current, projectName);
   }
 
   return (
@@ -108,7 +112,7 @@ export function TimelineToolbar({
               <ImageIcon className="size-4" />
               Download PNG
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={exportGanttPdf} className="gap-2">
+            <DropdownMenuItem onClick={handleExportPdf} className="gap-2">
               <FileTextIcon className="size-4" />
               Print / Save as PDF
             </DropdownMenuItem>
