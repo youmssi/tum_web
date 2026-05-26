@@ -2,61 +2,73 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
 const plans = [
   {
-    name: "Free",
-    description: "For individuals and small teams",
+    name: "Community",
+    description: "Self-hosted, forever free",
     monthly: 0,
     annual: 0,
+    badge: null,
     features: [
-      "Up to 3 projects",
-      "5 team members",
-      "Gantt timeline view",
-      "Task comments & @mentions",
-      "Activity feed",
+      "Unlimited projects & tasks",
+      "Unlimited team members",
+      "Gantt timeline & Kanban board",
+      "Task dependencies",
+      "Activity feed & @mentions",
+      "REST API access",
+      "Docker Compose deploy",
+      "Community forum support",
     ],
-    cta: "Start free",
-    href: ROUTES.SIGNUP,
+    cta: "Self-host for free",
+    href: "https://github.com/youmssi/tum_infra",
+    external: true,
     popular: false,
   },
   {
     name: "Pro",
-    description: "For growing teams",
-    monthly: 15,
-    annual: 12,
+    description: "Tûm Cloud, managed for you",
+    monthly: 12,
+    annual: 10,
+    badge: "Most popular",
     features: [
-      "Unlimited projects",
-      "Unlimited members",
-      "Everything in Free",
-      "Custom statuses & labels",
-      "Priority support",
+      "Everything in Community",
+      "Tûm Cloud hosting (zero ops)",
+      "Advanced analytics & trends",
       "Export PNG / PDF",
-      "Advanced analytics",
+      "30-day execution history",
+      "Email support",
+      "Automatic updates",
+      "99.9% uptime SLA",
     ],
-    cta: "Start trial",
+    cta: "Start 14-day trial",
     href: ROUTES.SIGNUP,
+    external: false,
     popular: true,
   },
   {
     name: "Enterprise",
-    description: "For large organisations",
+    description: "For large or regulated teams",
     monthly: null,
     annual: null,
+    badge: null,
     features: [
       "Everything in Pro",
-      "SSO & SCIM provisioning",
-      "Audit logs",
-      "SLA guarantee",
+      "SSO (SAML / LDAP)",
+      "Full audit logs",
+      "Custom data residency",
       "Dedicated onboarding",
-      "Custom contracts",
+      "SLA with priority support",
+      "Custom contracts & invoicing",
+      "OEM / white-label option",
     ],
-    cta: "Contact us",
-    href: "mailto:hello@tum.so",
+    cta: "Contact sales",
+    href: "mailto:enterprise@tum.so",
+    external: true,
     popular: false,
   },
 ];
@@ -73,14 +85,17 @@ export function PricingSection() {
             Pricing
           </span>
           <h2 className="text-4xl lg:text-6xl font-bold tracking-tight mb-4">
-            Simple, transparent
+            Free to run yourself.
             <br />
-            <span className="text-muted-foreground">pricing.</span>
+            <span className="text-muted-foreground">Pay only for cloud.</span>
           </h2>
-          <p className="text-muted-foreground">Start free and grow as you need.</p>
+          <p className="text-muted-foreground max-w-xl leading-relaxed">
+            Tûm is open-source under a fair-code license. Self-host for free forever. Choose cloud
+            hosting only when you want zero-ops convenience.
+          </p>
         </div>
 
-        {/* Billing toggle */}
+        {/* Billing toggle (only relevant for Pro) */}
         <div className="flex items-center gap-3 mb-12">
           <span className={`text-sm ${!annual ? "text-foreground" : "text-muted-foreground"}`}>
             Monthly
@@ -100,7 +115,7 @@ export function PricingSection() {
           </span>
           {annual && (
             <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs font-mono rounded">
-              Save 20%
+              Save 17%
             </span>
           )}
         </div>
@@ -115,9 +130,9 @@ export function PricingSection() {
                   : "border-foreground/10 bg-card"
               }`}
             >
-              {plan.popular && (
+              {plan.badge && (
                 <span className="absolute -top-3 left-6 px-3 py-1 bg-primary text-primary-foreground text-xs font-mono rounded-full">
-                  Most popular
+                  {plan.badge}
                 </span>
               )}
 
@@ -135,7 +150,7 @@ export function PricingSection() {
                     <span className="text-5xl font-bold">
                       ${annual ? plan.annual : plan.monthly}
                     </span>
-                    <span className="text-muted-foreground text-sm">/mo</span>
+                    <span className="text-muted-foreground text-sm">/mo per workspace</span>
                   </div>
                 ) : (
                   <span className="text-3xl font-bold">Custom</span>
@@ -156,14 +171,29 @@ export function PricingSection() {
                 className="w-full rounded-full group"
                 asChild
               >
-                <Link href={plan.href}>
+                <Link
+                  href={plan.href}
+                  target={plan.external ? "_blank" : undefined}
+                  rel={plan.external ? "noopener noreferrer" : undefined}
+                >
                   {plan.cta}
-                  <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                  {plan.external ? (
+                    <ExternalLink className="size-3.5 ml-1.5" />
+                  ) : (
+                    <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                  )}
                 </Link>
               </Button>
             </div>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          All plans include unlimited users.{" "}
+          <span className="font-mono text-xs">
+            Fair-code license — free for internal use, cannot be resold as a competing service.
+          </span>
+        </p>
       </div>
     </section>
   );

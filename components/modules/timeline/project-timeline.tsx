@@ -2,6 +2,7 @@
 
 import { CalendarRangeIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
@@ -75,12 +76,6 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   const { getConfig } = useTimelineColors();
   const colors = getConfig(projectId);
 
-  // Content-aware height: expands with tasks, capped at viewport.
-  const panelHeight = useMemo(() => {
-    const count = tasks?.length ?? 0;
-    return Math.max(400, (count + 4) * GANTT_ROW_HEIGHT);
-  }, [tasks]);
-
   const [viewMode, setViewMode] = useState<GanttViewMode>("Week");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -89,22 +84,27 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   const [linkTarget, setLinkTarget] = useState<string | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   const leftScrollRef = useRef<HTMLDivElement>(null);
   const rightScrollRef = useRef<HTMLDivElement>(null);
   const ganttContainerRef = useRef<HTMLDivElement>(null);
 
-  // Dismiss link mode on Escape
+  // Dismiss link mode and focus mode on Escape
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && linkMode) {
-        setLinkMode(false);
-        setLinkSource(null);
+      if (e.key === "Escape") {
+        if (isFocused) {
+          setIsFocused(false);
+        } else if (linkMode) {
+          setLinkMode(false);
+          setLinkSource(null);
+        }
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [linkMode]);
+  }, [linkMode, isFocused]);
 
   const { data: allDeps } = useQuery({
     queryKey: DEP_KEYS.forProject(projectId),
@@ -255,7 +255,12 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
   const linkTargetTask = tasks?.find((t) => t.id === linkTarget);
 
   return (
-    <div className="space-y-4">
+    <div
+      className={cn(
+        "space-y-4",
+        isFocused && "fixed inset-0 z-50 flex flex-col overflow-hidden bg-background p-4",
+      )}
+    >
       {/* Dynamic color CSS for Frappe Gantt custom classes */}
       <style>{`
         .tum-on-track .bar { fill: ${colors.onTrackColor} !important; }
@@ -280,6 +285,8 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         }}
         colors={colors}
         ganttContainerRef={ganttContainerRef}
+        isFocused={isFocused}
+        onFocusToggle={() => setIsFocused((f) => !f)}
       />
 
       {ganttTasks.length === 0 && (tasks ?? []).length === 0 ? (
@@ -296,12 +303,11 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
          * handle has no bounded height to resize within.
          */
         <div
-          className="overflow-hidden rounded-xl border"
+          className={cn(
+            "overflow-hidden rounded-xl border",
+            isFocused ? "flex-1 min-h-0" : "h-[560px]",
+          )}
           ref={ganttContainerRef}
-          style={{
-            height: `min(calc(100svh - 18rem), ${panelHeight}px)`,
-            minHeight: "400px",
-          }}
         >
           <ResizablePanelGroup orientation="horizontal" className="h-full">
             {/* Left panel — task list. v4: sizes must be strings with % */}

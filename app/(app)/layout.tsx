@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/modules/shell/app-nav";
 import { NotificationCenter } from "@/components/modules/notifications";
 import { ThemeToggle } from "@/components/modules/shell/theme-toggle";
+import { SearchTrigger } from "@/components/modules/shell/search-trigger";
 import { CommandPalette } from "@/components/modules/search/command-palette";
 import { auth } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
@@ -27,7 +28,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-2">
+            <SearchTrigger />
             <ThemeToggle />
             <NotificationCenter />
           </div>

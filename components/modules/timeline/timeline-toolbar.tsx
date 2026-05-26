@@ -1,6 +1,13 @@
 "use client";
 
-import { DownloadIcon, FileTextIcon, ImageIcon, LinkIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  FileTextIcon,
+  ImageIcon,
+  LinkIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+} from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { type GanttViewMode } from "./gantt-chart";
 import { exportGanttPdf, exportGanttPng } from "./timeline-export";
 
@@ -22,6 +30,8 @@ interface TimelineToolbarProps {
   colors: { onTrackColor: string; nearDueColor: string; overdueColor: string };
   ganttContainerRef: React.RefObject<HTMLDivElement | null>;
   projectName?: string;
+  isFocused: boolean;
+  onFocusToggle: () => void;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -34,6 +44,8 @@ export function TimelineToolbar({
   colors,
   ganttContainerRef,
   projectName = "gantt",
+  isFocused,
+  onFocusToggle,
 }: TimelineToolbarProps) {
   const exporting = useRef(false);
 
@@ -98,6 +110,28 @@ export function TimelineToolbar({
           <LinkIcon className="size-3.5" />
           {linkMode ? "Cancel linking" : "Link tasks"}
         </Button>
+
+        {/* Focus mode toggle */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isFocused ? "default" : "outline"}
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={onFocusToggle}
+              aria-label={isFocused ? "Exit focus mode" : "Enter focus mode"}
+            >
+              {isFocused ? (
+                <Minimize2Icon className="size-3.5" />
+              ) : (
+                <Maximize2Icon className="size-3.5" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isFocused ? "Exit focus mode (Esc)" : "Focus mode — full view"}
+          </TooltipContent>
+        </Tooltip>
 
         {/* Export */}
         <DropdownMenu>

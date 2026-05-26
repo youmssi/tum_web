@@ -5,27 +5,27 @@ import { useEffect, useRef, useState } from "react";
 const steps = [
   {
     number: "01",
-    title: "Create your workspace",
+    title: "Sign up and create a workspace",
     description:
-      "Sign up and set up your organisation in under a minute. Invite your team via email or shareable link.",
+      "Get started in two minutes on Tûm Cloud — no setup required. Or self-host on your own server if you prefer to own your infrastructure.",
   },
   {
     number: "02",
-    title: "Define projects & tasks",
+    title: "Organise your work",
     description:
-      "Break down work into projects and tasks. Add priorities, assignees, due dates, and labels.",
+      "Create projects and tasks. Assign owners, set priorities, add due dates and labels. Tûm adapts to how your team already works — no rigid process imposed.",
   },
   {
     number: "03",
-    title: "Schedule on the timeline",
+    title: "See everything on the timeline",
     description:
-      "Drag tasks onto the Gantt chart. Link dependencies and mark milestones. The critical path emerges automatically.",
+      "Drag tasks onto the Gantt chart, link dependencies, and mark key milestones. The full picture of your project, always up to date.",
   },
   {
     number: "04",
-    title: "Track & adapt",
+    title: "Track progress and adapt",
     description:
-      "Monitor progress through dashboards. Reassign, reschedule, or reprioritise in seconds as reality shifts.",
+      "Live dashboards show completion trends, overdue alerts, and status breakdowns as they happen. Adjust the plan as reality evolves — in seconds, not meetings.",
   },
 ];
 

@@ -35,12 +35,13 @@ export function CtaSection() {
 
           <div className="relative z-10 max-w-2xl">
             <h2 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.05]">
-              Ready to run
+              Your projects.
               <br />
-              cleaner projects?
+              Finally under control.
             </h2>
             <p className="text-lg text-muted-foreground mb-10 leading-relaxed">
-              Join teams that ship on time with Tûm. Free plan available — no credit card required.
+              Tûm brings tasks, timelines, and team visibility into one coherent workspace. Pick it
+              up today — personally, with your team, or across your whole community.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button size="lg" className="h-12 px-8 rounded-full group" asChild>

@@ -1,6 +1,7 @@
 "use client";
 
-import { BuildingIcon, MailIcon, PlusCircleIcon } from "lucide-react";
+import { ArrowLeftIcon, BuildingIcon, MailIcon, PlusCircleIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +32,13 @@ export function WorkspacePicker() {
 
   return (
     <div className="w-full max-w-md space-y-6">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeftIcon className="size-3.5" />
+        Back to home
+      </Link>
       <div className="text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Choose a workspace</h1>
         <p className="mt-1 text-sm text-muted-foreground">

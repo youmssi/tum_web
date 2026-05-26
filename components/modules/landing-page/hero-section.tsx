@@ -7,7 +7,7 @@ import { ArrowRight, BarChart2, CalendarDays, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
-const words = ["execute", "ship", "deliver", "scale"];
+const words = ["execute", "deliver", "track", "succeed"];
 
 function AnimatedGrid() {
   return (
@@ -43,10 +43,10 @@ function GanttPreview() {
       {/* Gantt mockup */}
       <div className="p-4 space-y-2">
         {[
-          { label: "Design system", pct: 80, color: "bg-green-500", days: "May 1–12" },
-          { label: "API integration", pct: 55, color: "bg-blue-500", days: "May 8–20" },
-          { label: "Testing suite", pct: 30, color: "bg-amber-500", days: "May 15–28" },
-          { label: "Deploy & monitor", pct: 10, color: "bg-purple-500", days: "May 25–Jun 5" },
+          { label: "Campaign brief", pct: 80, color: "bg-green-500", days: "May 1–12" },
+          { label: "Asset delivery", pct: 55, color: "bg-blue-500", days: "May 8–20" },
+          { label: "Stakeholder review", pct: 30, color: "bg-amber-500", days: "May 15–28" },
+          { label: "Launch & measure", pct: 10, color: "bg-purple-500", days: "May 25–Jun 5" },
         ].map((row, i) => (
           <div key={i} className="flex items-center gap-3">
             <span className="w-28 text-xs text-muted-foreground truncate shrink-0">
@@ -107,7 +107,7 @@ export function HeroSection() {
         >
           <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground">
             <span className="w-6 h-px bg-foreground/40" />
-            Project execution & workflow visibility
+            Open-source · For any team · Any background
           </span>
         </div>
 
@@ -119,9 +119,9 @@ export function HeroSection() {
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              The platform
+              Project execution
               <br />
-              teams use to{" "}
+              built for teams to{" "}
               <span className="relative inline-block text-primary">
                 <span key={wordIdx} className="inline-flex">
                   {words[wordIdx].split("").map((ch, i) => (
@@ -144,7 +144,7 @@ export function HeroSection() {
               }`}
             >
               Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more
-              scattered tools — just clear execution.
+              scattered tools — just clear execution. For any team, any department, any project.
             </p>
 
             <div
@@ -163,13 +163,13 @@ export function HeroSection() {
               </Button>
             </div>
 
-            {/* Social proof */}
+            {/* Social proof / positioning */}
             <p
               className={`mt-8 text-xs text-muted-foreground font-mono transition-all duration-700 delay-500 ${
                 visible ? "opacity-100" : "opacity-0"
               }`}
             >
-              No credit card required · Free plan available
+              Free to use · No credit card required · Community &amp; cloud plans
             </p>
           </div>
 

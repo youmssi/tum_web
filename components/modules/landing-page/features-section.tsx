@@ -7,51 +7,51 @@ import {
   LayoutDashboard,
   MessageSquare,
   ShieldCheck,
-  Zap,
+  Users,
 } from "lucide-react";
 
 const features = [
   {
     number: "01",
     icon: CalendarDays,
-    title: "Visual Gantt Timeline",
+    title: "Visual Timeline",
     description:
-      "Drag-and-drop scheduling with dependency arrows, milestone markers, and progress tracking. See the full picture at a glance.",
+      "Drag-and-drop scheduling with dependency arrows, milestone markers, and per-task progress bars. See your whole project at a glance — no spreadsheet required.",
   },
   {
     number: "02",
     icon: LayoutDashboard,
-    title: "Real-time Dashboards",
+    title: "Instant Visibility",
     description:
-      "Completion trends, status breakdowns, overdue alerts — all calculated live. No manual reports, no stale spreadsheets.",
+      "Real-time dashboards with completion trends, status breakdowns, and overdue counters. Know what's on track and what needs attention — without a status meeting.",
   },
   {
     number: "03",
     icon: GitMerge,
     title: "Task Dependencies",
     description:
-      "Model finish-to-start, start-to-start, and cross-task links. Tûm keeps your critical path honest.",
+      "Link tasks so nothing starts before it should. Model sequential steps, parallel tracks, and milestones — Tûm keeps your plan coherent as things shift.",
   },
   {
     number: "04",
     icon: MessageSquare,
-    title: "@Mention Notifications",
+    title: "@Mention & Threads",
     description:
-      "Loop in teammates directly in task comments. Instant in-app notifications so nothing falls through the cracks.",
+      "Loop teammates in directly on tasks. In-app notifications mean nothing falls through the cracks — whether your team is in operations, HR, marketing, or anything else.",
   },
   {
     number: "05",
-    icon: Zap,
-    title: "Keyboard-first UX",
+    icon: Users,
+    title: "Built for Every Team",
     description:
-      "⌘K command palette for instant task search. Bulk status updates, quick filters — built for speed.",
+      "Operations, marketing, events, personal projects, community initiatives — if you have a project and a team, Tûm fits. No technical background required.",
   },
   {
     number: "06",
     icon: ShieldCheck,
-    title: "Enterprise Ready",
+    title: "Self-host or Cloud",
     description:
-      "Role-based access, audit logs, organisation switcher. Scales from a solo project to a 200-person engineering org.",
+      "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Fair-code license — free for internal use, no vendor lock-in.",
   },
 ];
 
@@ -128,9 +128,9 @@ export function FeaturesSection() {
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            Everything you need
+            One workspace.
             <br />
-            <span className="text-muted-foreground">to ship on time.</span>
+            <span className="text-muted-foreground">Every kind of project.</span>
           </h2>
         </div>
 
