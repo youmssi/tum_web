@@ -2,6 +2,7 @@
 
 import {
   AlertCircleIcon,
+  AlertTriangleIcon,
   CheckCircle2Icon,
   ClipboardCopyIcon,
   DownloadIcon,
@@ -39,6 +40,56 @@ import { useImportProject } from "./use-import";
 
 type Step = "upload" | "preview" | "result";
 
+function WarningsPanel({
+  warnings,
+  copied,
+  onCopy,
+}: {
+  warnings: string[];
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="rounded-md border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+      <div className="flex items-center justify-between px-3 py-2">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+          <AlertTriangleIcon className="size-3.5 shrink-0" />
+          {warnings.length} warning{warnings.length !== 1 ? "s" : ""} — affected fields will use
+          defaults
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-6 gap-1 px-2 text-xs text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/40"
+          onClick={onCopy}
+        >
+          {copied ? (
+            <>
+              <CheckCircle2Icon className="size-3" />
+              Copied
+            </>
+          ) : (
+            <>
+              <ClipboardCopyIcon className="size-3" />
+              Copy for AI
+            </>
+          )}
+        </Button>
+      </div>
+      <ScrollArea className="max-h-28 px-3 pb-2">
+        <ul className="space-y-1 text-xs text-amber-700 dark:text-amber-400">
+          {warnings.map((w, i) => (
+            <li key={i} className="flex gap-1.5">
+              <span className="shrink-0 select-none">•</span>
+              <span>{w}</span>
+            </li>
+          ))}
+        </ul>
+      </ScrollArea>
+    </div>
+  );
+}
+
 interface ImportResult {
   projectId: string;
   projectName: string;
@@ -53,6 +104,7 @@ export function ImportProjectDialog() {
   const [parseError, setParseError] = useState<string | null>(null);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [promptCopied, setPromptCopied] = useState(false);
+  const [warningsCopied, setWarningsCopied] = useState(false);
   const [templateLoading, setTemplateLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -64,6 +116,7 @@ export function ImportProjectDialog() {
     setParseError(null);
     setResult(null);
     setPromptCopied(false);
+    setWarningsCopied(false);
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -115,6 +168,23 @@ export function ImportProjectDialog() {
     await navigator.clipboard.writeText(AI_IMPORT_PROMPT);
     setPromptCopied(true);
     setTimeout(() => setPromptCopied(false), 2000);
+  }
+
+  async function handleCopyWarnings() {
+    if (!parsed?.warnings.length) return;
+    const text = [
+      "I have a CSV file for project import that produced the following warnings.",
+      "Please help me correct the CSV so all these issues are fixed.",
+      "",
+      "WARNINGS:",
+      ...parsed.warnings.map((w) => `- ${w}`),
+      "",
+      "Paste your original CSV below and I will return a corrected version:",
+      "(paste your CSV here)",
+    ].join("\n");
+    await navigator.clipboard.writeText(text);
+    setWarningsCopied(true);
+    setTimeout(() => setWarningsCopied(false), 2000);
   }
 
   return (
@@ -217,23 +287,20 @@ export function ImportProjectDialog() {
                 )}
 
                 {parsed && (
-                  <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm space-y-1">
-                    <p className="font-medium">{parsed.projectName}</p>
-                    <p className="text-muted-foreground">
-                      {parsed.tasks.length} task{parsed.tasks.length !== 1 ? "s" : ""} detected
-                      {parsed.projectDescription ? ` · ${parsed.projectDescription}` : ""}
-                    </p>
+                  <div className="space-y-2">
+                    <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                      <p className="font-medium">{parsed.projectName}</p>
+                      <p className="text-muted-foreground">
+                        {parsed.tasks.length} task{parsed.tasks.length !== 1 ? "s" : ""} detected
+                        {parsed.projectDescription ? ` · ${parsed.projectDescription}` : ""}
+                      </p>
+                    </div>
                     {parsed.warnings.length > 0 && (
-                      <details className="text-xs text-amber-600">
-                        <summary className="cursor-pointer">
-                          {parsed.warnings.length} warning{parsed.warnings.length !== 1 ? "s" : ""}
-                        </summary>
-                        <ul className="mt-1 space-y-0.5 list-disc list-inside">
-                          {parsed.warnings.map((w, i) => (
-                            <li key={i}>{w}</li>
-                          ))}
-                        </ul>
-                      </details>
+                      <WarningsPanel
+                        warnings={parsed.warnings}
+                        copied={warningsCopied}
+                        onCopy={handleCopyWarnings}
+                      />
                     )}
                   </div>
                 )}
@@ -324,6 +391,14 @@ export function ImportProjectDialog() {
                 dependencies · {parsed.tasks.filter((t) => t.parentTask).length} subtask
                 {parsed.tasks.filter((t) => t.parentTask).length !== 1 ? "s" : ""}
               </p>
+
+              {parsed.warnings.length > 0 && (
+                <WarningsPanel
+                  warnings={parsed.warnings}
+                  copied={warningsCopied}
+                  onCopy={handleCopyWarnings}
+                />
+              )}
 
               {importProject.isPending && (
                 <Progress value={undefined} className="h-1 animate-pulse" />
