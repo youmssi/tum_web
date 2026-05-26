@@ -153,7 +153,7 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         end,
         progress: t.progress,
         dependencies: depMap[t.id]?.join(",") ?? "",
-        custom_class: t.milestone ? `${colorClass} tum-milestone` : colorClass,
+        custom_class: t.milestone ? `${colorClass}-milestone` : colorClass,
       };
     });
   }, [scheduledTasks, depMap, colors.nearDueDays]);
@@ -264,10 +264,9 @@ export function ProjectTimeline({ projectId }: { projectId: string }) {
         .tum-near-due .bar-progress { fill: color-mix(in srgb, ${colors.nearDueColor} 70%, black) !important; }
         .tum-overdue .bar { fill: ${colors.overdueColor} !important; }
         .tum-overdue .bar-progress { fill: color-mix(in srgb, ${colors.overdueColor} 70%, black) !important; }
-        .tum-milestone .bar {
-          clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important;
-          rx: 0 !important;
-        }
+        .tum-on-track-milestone .bar { fill: ${colors.onTrackColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
+        .tum-near-due-milestone .bar { fill: ${colors.nearDueColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
+        .tum-overdue-milestone .bar { fill: ${colors.overdueColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
         .gantt-container { cursor: ${linkMode ? "crosshair" : "default"}; }
       `}</style>
 

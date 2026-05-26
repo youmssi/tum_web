@@ -19,6 +19,10 @@ export const metadata: Metadata = {
     template: "%s · Tûm",
   },
   description: "Tûm — project execution & workflow-visibility platform.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

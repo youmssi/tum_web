@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -57,32 +58,34 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={handleOpenChange}>
-      <CommandInput placeholder="Search tasks…" value={query} onValueChange={setQuery} />
-      <CommandList>
-        {isFetching && debouncedQuery.trim() ? (
-          <CommandEmpty>Searching&hellip;</CommandEmpty>
-        ) : !query.trim() ? (
-          <CommandEmpty>
-            <SearchIcon className="mx-auto mb-2 size-8 text-muted-foreground" />
-            <span>Type to search tasks&hellip;</span>
-          </CommandEmpty>
-        ) : results.length === 0 ? (
-          <CommandEmpty>No tasks found for &ldquo;{query}&rdquo;.</CommandEmpty>
-        ) : (
-          <CommandGroup heading="Tasks">
-            {results.map((task) => (
-              <CommandItem key={task.id} onSelect={() => handleSelect(task)}>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{task.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {STATUS_LABELS[task.status]}
-                  </span>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-      </CommandList>
+      <Command>
+        <CommandInput placeholder="Search tasks…" value={query} onValueChange={setQuery} />
+        <CommandList>
+          {isFetching && debouncedQuery.trim() ? (
+            <CommandEmpty>Searching&hellip;</CommandEmpty>
+          ) : !query.trim() ? (
+            <CommandEmpty>
+              <SearchIcon className="mx-auto mb-2 size-8 text-muted-foreground" />
+              <span>Type to search tasks&hellip;</span>
+            </CommandEmpty>
+          ) : results.length === 0 ? (
+            <CommandEmpty>No tasks found for &ldquo;{query}&rdquo;.</CommandEmpty>
+          ) : (
+            <CommandGroup heading="Tasks">
+              {results.map((task) => (
+                <CommandItem key={task.id} onSelect={() => handleSelect(task)}>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{task.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {STATUS_LABELS[task.status]}
+                    </span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+        </CommandList>
+      </Command>
     </CommandDialog>
   );
 }
