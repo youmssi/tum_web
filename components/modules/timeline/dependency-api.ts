@@ -21,8 +21,10 @@ export interface Dependency {
 }
 
 export const dependencyApi = {
-  listForTask: (taskId: string) =>
-    api.get(`api/tasks/${taskId}/dependencies`).json<Dependency[]>(),
+  listForTask: (taskId: string) => api.get(`api/tasks/${taskId}/dependencies`).json<Dependency[]>(),
+
+  listForProject: (projectId: string) =>
+    api.get(`api/projects/${projectId}/dependencies`).json<Dependency[]>(),
 
   create: (fromTaskId: string, data: { toTaskId: string; type: DependencyType }) =>
     api.post(`api/tasks/${fromTaskId}/dependencies`, { json: data }).json<Dependency>(),
