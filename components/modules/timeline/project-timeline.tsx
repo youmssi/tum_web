@@ -4,6 +4,7 @@ import { CalendarRangeIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
+import { formatLocalDate, parseLocalDate, todayLocalDate } from "@/lib/date";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
@@ -45,17 +46,9 @@ const GANTT_OPTIONS = {
 const LEFT_PANEL_MIN = 240;
 const LEFT_PANEL_MAX = 600;
 
-function formatDate(d: Date): string {
-  return d.toISOString().split("T")[0];
-}
-
-function todayStr(): string {
-  return new Date().toISOString().split("T")[0];
-}
-
 function taskColorClass(task: Task, nearDueDays: number): string {
   if (!task.endDate || task.status === "DONE") return "tum-on-track";
-  const end = new Date(task.endDate).getTime();
+  const end = parseLocalDate(task.endDate).getTime();
   const now = Date.now();
   if (end < now) return "tum-overdue";
   if (end - now < nearDueDays * 86400000) return "tum-near-due";
@@ -69,16 +62,13 @@ const DEP_TYPE_OPTIONS: { value: DependencyType; label: string }[] = [
   { value: "START_TO_FINISH", label: "Start → Finish" },
 ];
 
-function parseLocalDate(s: string): Date {
-  const [y, m, d] = s.split("-").map(Number);
-  return new Date(y, m - 1, d);
-}
-
 export function ProjectTimeline({
   projectId,
+  projectName,
   dateRange,
 }: {
   projectId: string;
+  projectName?: string;
   dateRange?: DateRange;
 }) {
   const { data: tasks, isLoading } = useTasks(projectId);
@@ -146,17 +136,8 @@ export function ProjectTimeline({
 
   const { data: allDeps } = useQuery({
     queryKey: DEP_KEYS.forProject(projectId),
-    queryFn: async () => {
-      if (!tasks?.length) return [];
-      const sets = await Promise.all(tasks.map((t) => dependencyApi.listForTask(t.id)));
-      const seen = new Set<string>();
-      return sets.flat().filter((d) => {
-        if (seen.has(d.id)) return false;
-        seen.add(d.id);
-        return true;
-      });
-    },
-    enabled: !!tasks,
+    queryFn: () => dependencyApi.listForProject(projectId),
+    enabled: !!projectId,
   });
 
   const depMap = useMemo(() => {
@@ -186,7 +167,7 @@ export function ProjectTimeline({
   );
 
   const ganttTasks: GanttTask[] = useMemo(() => {
-    const today = todayStr();
+    const today = todayLocalDate();
     return scheduledTasks.map((t) => {
       const start = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.startDate!;
       const end = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.endDate!;
@@ -208,8 +189,8 @@ export function ProjectTimeline({
       try {
         await reschedule.mutateAsync({
           id: ganttTask.id as string,
-          startDate: formatDate(start),
-          endDate: formatDate(end),
+          startDate: formatLocalDate(start),
+          endDate: formatLocalDate(end),
         });
       } catch {
         toast.error("Failed to reschedule task.");
@@ -329,9 +310,9 @@ export function ProjectTimeline({
           if (!active) setLinkSource(null);
         }}
         colors={colors}
-        ganttContainerRef={ganttContainerRef}
         tasks={tasks ?? []}
         allDeps={allDeps ?? []}
+        projectName={projectName}
         isFocused={isFocused}
         onFocusToggle={() => setIsFocused((f) => !f)}
       />
@@ -460,7 +441,9 @@ export function ProjectTimeline({
                   height: Math.max(200, (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT),
                 }}
               >
-                Add start &amp; end dates to tasks to see bars here.
+                {dateRange?.from || dateRange?.to
+                  ? "No tasks fall within the selected date range."
+                  : "Add start & end dates to tasks to see bars here."}
               </div>
             )}
           </div>

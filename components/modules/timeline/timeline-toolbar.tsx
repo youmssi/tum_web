@@ -1,6 +1,6 @@
 "use client";
 
-import { DownloadIcon, LinkIcon, Maximize2Icon, Minimize2Icon, TableIcon } from "lucide-react";
+import { LinkIcon, Maximize2Icon, Minimize2Icon, TableIcon } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -17,7 +17,6 @@ interface TimelineToolbarProps {
   linkMode: boolean;
   onLinkModeChange: (active: boolean) => void;
   colors: { onTrackColor: string; nearDueColor: string; overdueColor: string };
-  ganttContainerRef: React.RefObject<HTMLDivElement | null>;
   tasks: Task[];
   allDeps: Dependency[];
   projectName?: string;
@@ -35,7 +34,7 @@ export function TimelineToolbar({
   colors,
   tasks,
   allDeps,
-  projectName = "project",
+  projectName,
   isFocused,
   onFocusToggle,
 }: TimelineToolbarProps) {
@@ -45,7 +44,7 @@ export function TimelineToolbar({
     if (exporting.current) return;
     exporting.current = true;
     try {
-      await exportGanttXlsx(tasks, allDeps, projectName);
+      await exportGanttXlsx(tasks, allDeps, projectName ?? "project");
     } catch {
       toast.error("Failed to export XLSX.");
     } finally {
@@ -126,7 +125,6 @@ export function TimelineToolbar({
           <TooltipTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={handleExportXlsx}>
               <TableIcon className="size-3.5" />
-              <DownloadIcon className="size-3.5" />
               Export XLSX
             </Button>
           </TooltipTrigger>

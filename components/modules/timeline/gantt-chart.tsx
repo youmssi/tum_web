@@ -29,9 +29,11 @@ export interface GanttChartProps {
  * engine can be themed or swapped without wider changes. The library is loaded
  * client-side only because it manipulates the DOM/SVG on construction.
  *
- * For now it re-creates the chart when inputs change; once the timeline feature
- * (TUM-E06) firms up, switch to the instance `refresh()`/`update_task()` APIs
- * (already typed in `types/frappe-gantt.d.ts`) for cheaper updates.
+ * The chart is fully recreated only when {@link viewMode} changes. Task data
+ * changes flow through the instance `refresh()` API, which keeps scroll position
+ * and avoids the teardown flicker — so a background refetch, or selecting a bar
+ * in link mode, no longer resets the chart mid-interaction. Callbacks and options
+ * are read from a ref so their identity never forces a recreate.
  */
 export function GanttChart({
   tasks,
@@ -45,6 +47,15 @@ export function GanttChart({
   const containerRef = useRef<HTMLDivElement>(null);
   const ganttRef = useRef<GanttInstance | null>(null);
 
+  // Latest props read by the (stable) Gantt callbacks and by recreate, without re-triggering it.
+  const latest = useRef({ tasks, options, onClick, onDateChange, onProgressChange });
+
+  // Sync the ref after every render (writing a ref during render is disallowed). Declared before
+  // the create/refresh effects so it runs first on each commit, keeping their reads current.
+  useEffect(() => {
+    latest.current = { tasks, options, onClick, onDateChange, onProgressChange };
+  });
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -55,12 +66,12 @@ export function GanttChart({
       const { default: Gantt } = await import("frappe-gantt");
       if (disposed || !containerRef.current) return;
       container.innerHTML = "";
-      ganttRef.current = new Gantt(container, tasks, {
+      ganttRef.current = new Gantt(container, latest.current.tasks, {
         view_mode: viewMode,
-        on_click: onClick,
-        on_date_change: onDateChange,
-        on_progress_change: onProgressChange,
-        ...options,
+        on_click: (task) => latest.current.onClick?.(task),
+        on_date_change: (task, start, end) => latest.current.onDateChange?.(task, start, end),
+        on_progress_change: (task, progress) => latest.current.onProgressChange?.(task, progress),
+        ...latest.current.options,
       });
     })();
 
@@ -69,7 +80,13 @@ export function GanttChart({
       ganttRef.current = null;
       container.innerHTML = "";
     };
-  }, [tasks, viewMode, options, onClick, onDateChange, onProgressChange]);
+  }, [viewMode]);
+
+  // In-place data update — preserves scroll/interaction state. On mount the instance isn't ready
+  // yet (async import), so this no-ops and the create effect renders the initial tasks.
+  useEffect(() => {
+    ganttRef.current?.refresh(tasks);
+  }, [tasks]);
 
   return <div ref={containerRef} className={className} />;
 }
