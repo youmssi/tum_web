@@ -38,6 +38,7 @@
 | Drag & drop       | dnd-kit                        | 6.x / 10.x |
 | Timeline / Gantt  | Frappe Gantt                   | 1.2.2      |
 | Charts            | Recharts                       | 3.x        |
+| Spreadsheet I/O   | ExcelJS (XLSX export/import)   | 4.x        |
 | Database (auth)   | PostgreSQL via `pg`            | 8.x        |
 | Testing           | Vitest + React Testing Library | 4.x / 16.x |
 
@@ -137,22 +138,23 @@ sequenceDiagram
 
 ## Route map
 
-| Route                        | Component                 | Notes                                              |
-| ---------------------------- | ------------------------- | -------------------------------------------------- |
-| `/`                          | `app/page.tsx`            | Landing / redirect to dashboard                    |
-| `/login`                     | `LoginForm`               | Email + social sign-in                             |
-| `/signup`                    | `SignupForm`              | Email registration                                 |
-| `/onboarding`                | `OnboardingForm`          | Org creation after first sign-in                   |
-| `/invitations/accept`        | `InvitationAccept`        | Accept org invite via token                        |
-| `/dashboard`                 | `MyWorkDashboard`         | Personal task overview + stats                     |
-| `/projects`                  | `ProjectList`             | All projects in the active org                     |
-| `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, Board, Timeline, Members, Settings |
-| `/projects/[id]/settings`    | `ProjectSettingsForm`     | Project name, description, delete                  |
-| `/profile`                   | `ProfileForm`             | Name, avatar, password change                      |
-| `/organization/members`      | `MemberList`              | Invite, role change, remove                        |
-| `/organization/settings`     | `OrgSettingsForm`         | Org name, logo                                     |
-| `/organization/audit`        | `AuditLog`                | Filterable audit trail (admin/owner only)          |
-| `/notifications/preferences` | `NotificationPreferences` | Email + in-app toggles per type                    |
+| Route                        | Component                 | Notes                                            |
+| ---------------------------- | ------------------------- | ------------------------------------------------ |
+| `/`                          | `app/page.tsx`            | Landing / redirect to dashboard                  |
+| `/login`                     | `LoginForm`               | Email + social sign-in                           |
+| `/signup`                    | `SignupForm`              | Email registration                               |
+| `/onboarding`                | `OnboardingForm`          | Org creation after first sign-in                 |
+| `/workspaces`                | `WorkspacePicker`         | Pick, create, or join an org when none is active |
+| `/invitations/accept`        | `InvitationAccept`        | Accept org invite via token                      |
+| `/dashboard`                 | `MyWorkDashboard`         | Personal task overview + stats                   |
+| `/projects`                  | `ProjectList`             | All projects in the active org                   |
+| `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, List, Board, Timeline, Activity  |
+| `/projects/[id]/settings`    | `ProjectSettingsForm`     | Name, description, member-restriction, archive   |
+| `/profile`                   | `ProfileForm`             | Name, avatar, password change                    |
+| `/organization/members`      | `MemberList`              | Invite, role change, remove                      |
+| `/organization/settings`     | `OrgSettingsForm`         | Org name, logo                                   |
+| `/organization/audit`        | `AuditLog`                | Filterable audit trail (admin/owner only)        |
+| `/notifications/preferences` | `NotificationPreferences` | Email + in-app toggles per type                  |
 
 ---
 

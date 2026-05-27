@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
+  FileSpreadsheet,
   GitMerge,
+  KanbanSquare,
   LayoutDashboard,
   MessageSquare,
   ShieldCheck,
@@ -20,10 +22,10 @@ const features = [
   },
   {
     number: "02",
-    icon: LayoutDashboard,
-    title: "Instant Visibility",
+    icon: KanbanSquare,
+    title: "Kanban Board",
     description:
-      "Real-time dashboards with completion trends, status breakdowns, and overdue counters. Know what's on track and what needs attention — without a status meeting.",
+      "Drag tasks across status columns with real-time sync across your team. Priorities, assignees, labels, due dates, and bulk actions — organized the way you actually work.",
   },
   {
     number: "03",
@@ -34,20 +36,34 @@ const features = [
   },
   {
     number: "04",
-    icon: MessageSquare,
-    title: "@Mention & Threads",
+    icon: LayoutDashboard,
+    title: "Instant Visibility",
     description:
-      "Loop teammates in directly on tasks. In-app notifications mean nothing falls through the cracks — whether your team is in operations, HR, marketing, or anything else.",
+      "Real-time dashboards with completion trends, status breakdowns, and overdue counters. Know what's on track and what needs attention — without a status meeting.",
   },
   {
     number: "05",
+    icon: MessageSquare,
+    title: "@Mention & Threads",
+    description:
+      "Loop teammates in directly on tasks. Live in-app notifications and an activity feed mean nothing falls through the cracks — whatever department you're in.",
+  },
+  {
+    number: "06",
+    icon: FileSpreadsheet,
+    title: "Import & Export",
+    description:
+      "Bring a plan in from CSV or Excel and Tûm wires up subtasks and dependencies for you. Export a polished, re-importable Gantt workbook to share with anyone.",
+  },
+  {
+    number: "07",
     icon: Users,
     title: "Built for Every Team",
     description:
       "Operations, marketing, events, personal projects, community initiatives — if you have a project and a team, Tûm fits. No technical background required.",
   },
   {
-    number: "06",
+    number: "08",
     icon: ShieldCheck,
     title: "Self-host or Cloud",
     description:
