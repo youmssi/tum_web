@@ -2,6 +2,7 @@
 
 import { BellIcon, CheckCheckIcon, SettingsIcon } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
@@ -19,19 +20,27 @@ import {
   useNotifications,
 } from "./use-notifications";
 
-function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function useRelativeTime() {
+  // RelativeTimeFormat is locale-aware and present in every supported browser. Falls back to a
+  // localised short date for anything older than a week.
+  const locale = useLocale();
+  return (iso: string): string => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    if (m < 1) return rtf.format(0, "minute");
+    if (m < 60) return rtf.format(-m, "minute");
+    const h = Math.floor(m / 60);
+    if (h < 24) return rtf.format(-h, "hour");
+    const d = Math.floor(h / 24);
+    if (d < 7) return rtf.format(-d, "day");
+    return new Date(iso).toLocaleDateString(locale, { month: "short", day: "numeric" });
+  };
 }
 
 export function NotificationCenter() {
+  const t = useTranslations("shell.notifications");
+  const relativeTime = useRelativeTime();
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();
   const { data: notifications, isLoading } = useNotifications();
@@ -57,7 +66,7 @@ export function NotificationCenter() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative" aria-label={t("label")}>
           <BellIcon className="size-4" />
           {unread > 0 && (
             <Badge
@@ -71,7 +80,7 @@ export function NotificationCenter() {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between px-4 py-3">
-          <p className="text-sm font-semibold">Notifications</p>
+          <p className="text-sm font-semibold">{t("label")}</p>
           <div className="flex gap-1">
             {unread > 0 && (
               <Button
@@ -80,12 +89,18 @@ export function NotificationCenter() {
                 className="size-7"
                 onClick={() => markAllRead.mutate()}
                 disabled={markAllRead.isPending}
-                title="Mark all as read"
+                title={t("markAllRead")}
               >
                 <CheckCheckIcon className="size-3.5" />
               </Button>
             )}
-            <Button variant="ghost" size="icon" className="size-7" asChild title="Preferences">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-7"
+              asChild
+              title={t("preferencesLink")}
+            >
               <Link href={ROUTES.NOTIFICATION_PREFERENCES}>
                 <SettingsIcon className="size-3.5" />
               </Link>
@@ -109,7 +124,7 @@ export function NotificationCenter() {
           ) : !notifications?.length ? (
             <div className="flex min-h-32 flex-col items-center justify-center gap-1 text-center">
               <BellIcon className="size-6 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">No notifications yet.</p>
+              <p className="text-sm text-muted-foreground">{t("empty")}</p>
             </div>
           ) : (
             <div>

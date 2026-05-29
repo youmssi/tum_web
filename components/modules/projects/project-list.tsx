@@ -1,6 +1,7 @@
 "use client";
 
 import { FolderKanbanIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +20,7 @@ import { ProjectCard } from "./project-card";
 import { useProjects } from "./use-projects";
 
 export function ProjectList() {
+  const t = useTranslations("projects");
   const [includeArchived, setIncludeArchived] = useState(false);
   const { data: projects, isLoading } = useProjects(includeArchived);
 
@@ -26,8 +28,8 @@ export function ProjectList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Projects</h1>
-          <p className="text-sm text-muted-foreground">All projects in your organisation.</p>
+          <h1 className="text-xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <ImportProjectDialog />
@@ -38,7 +40,7 @@ export function ProjectList() {
       <div className="flex items-center gap-2">
         <Switch id="show-archived" checked={includeArchived} onCheckedChange={setIncludeArchived} />
         <label htmlFor="show-archived" className="text-sm cursor-pointer">
-          Show archived
+          {t("showArchived")}
         </label>
       </div>
 
@@ -54,8 +56,8 @@ export function ProjectList() {
             <EmptyMedia variant="icon">
               <FolderKanbanIcon />
             </EmptyMedia>
-            <EmptyTitle>No projects yet</EmptyTitle>
-            <EmptyDescription>Create your first project to start tracking work.</EmptyDescription>
+            <EmptyTitle>{t("empty")}</EmptyTitle>
+            <EmptyDescription>{t("emptyCta")}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <CreateProjectDialog />

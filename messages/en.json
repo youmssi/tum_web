@@ -11,53 +11,41 @@
     "back": "Back",
     "or": "or",
     "create": "Create",
+    "creating": "Creating…",
     "edit": "Edit",
     "search": "Search",
     "empty": "Nothing here yet.",
     "error": "Something went wrong.",
-    "retry": "Retry"
-  },
-  "dashboard": {
-    "title": "My Work",
-    "subtitle": "Tasks assigned to you across all projects."
-  },
-  "projects": {
-    "title": "Projects",
-    "new": "New project",
-    "empty": "No projects yet.",
-    "openSettings": "Settings",
-    "archive": "Archive",
-    "restore": "Restore",
-    "tabs": {
-      "overview": "Overview",
-      "list": "List",
-      "board": "Board",
-      "timeline": "Timeline",
-      "activity": "Activity"
-    }
-  },
-  "profile": {
-    "title": "Profile",
-    "subtitle": "Your account details and preferences."
-  },
-  "notificationsPage": {
-    "title": "Notifications",
-    "preferencesTitle": "Notification preferences",
-    "preferencesSubtitle": "Choose how Tûm reaches you."
-  },
-  "organizationPage": {
-    "members": {
-      "title": "Members",
-      "subtitle": "People in your organization and their roles."
-    },
-    "settings": {
-      "title": "Organization settings",
-      "subtitle": "Name, slug, and preferences for your workspace."
-    },
-    "audit": {
-      "title": "Audit log",
-      "subtitle": "Sensitive actions recorded for compliance."
-    }
+    "retry": "Retry",
+    "close": "Close",
+    "confirm": "Confirm",
+    "remove": "Remove",
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "yes": "Yes",
+    "no": "No",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "all": "All",
+    "none": "None",
+    "more": "More",
+    "page": "Page",
+    "of": "of",
+    "next": "Next",
+    "previous": "Previous",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "priority": "Priority",
+    "labels": "Labels",
+    "assignee": "Assignee",
+    "dueDate": "Due date",
+    "unassigned": "Unassigned",
+    "actions": "Actions",
+    "view": "View",
+    "open": "Open",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "locale": {
     "label": "Language",
@@ -108,6 +96,17 @@
       "checkEmailTitle": "Check your email",
       "checkEmailBody": "We sent a verification link to {email}. Click it to activate your account.",
       "backToSignIn": "Back to sign in"
+    },
+    "profile": {
+      "nameLabel": "Display name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailHelp": "Your email cannot be changed.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Profile updated.",
+      "saveFailed": "Failed to update profile.",
+      "signOut": "Sign out"
     }
   },
   "nav": {
@@ -122,7 +121,433 @@
     "profile": "Profile",
     "signOut": "Sign out",
     "switchOrganization": "Switch organization",
-    "newProject": "New project"
+    "newProject": "New project",
+    "skipToContent": "Skip to content",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
+  },
+  "dashboard": {
+    "title": "My Work",
+    "subtitle": "Tasks assigned to you across all projects.",
+    "empty": "No tasks assigned to you right now.",
+    "tabAll": "All",
+    "tabOverdue": "Overdue",
+    "tabDueToday": "Due today",
+    "tabDueThisWeek": "Due this week",
+    "openTask": "Open task"
+  },
+  "shell": {
+    "search": {
+      "placeholder": "Search tasks…",
+      "shortcut": "Search…",
+      "empty": "No matches.",
+      "loading": "Searching…",
+      "tasksGroup": "Tasks",
+      "openInProject": "Open in project"
+    },
+    "theme": {
+      "label": "Toggle theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "notifications": {
+      "label": "Notifications",
+      "empty": "You're all caught up.",
+      "markAllRead": "Mark all as read",
+      "viewAll": "View all",
+      "preferencesLink": "Notification preferences",
+      "newMention": "{actor} mentioned you",
+      "newAssignment": "{actor} assigned you a task",
+      "newStatus": "{actor} updated a task's status",
+      "newComment": "{actor} commented on a task"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Plan, run, and track every initiative in your workspace.",
+    "new": "New project",
+    "newDialogTitle": "Create a project",
+    "newDialogSubtitle": "Set a name and an optional description to get started.",
+    "nameLabel": "Project name",
+    "namePlaceholder": "e.g. Q3 product launch",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What is this project about?",
+    "submit": "Create project",
+    "submitting": "Creating…",
+    "empty": "No projects yet.",
+    "emptyCta": "Create your first project to get started.",
+    "openSettings": "Settings",
+    "archive": "Archive",
+    "restore": "Restore",
+    "memberRestricted": "Member-restricted",
+    "memberRestrictedHint": "Only project members and org admins can see this project.",
+    "importButton": "Import",
+    "showArchived": "Show archived",
+    "tabs": {
+      "overview": "Overview",
+      "list": "List",
+      "board": "Board",
+      "timeline": "Timeline",
+      "activity": "Activity"
+    },
+    "card": {
+      "noDescription": "No description.",
+      "tasksLabel": "{count, plural, =0 {No tasks} =1 {1 task} other {# tasks}}",
+      "archived": "Archived"
+    },
+    "settingsForm": {
+      "title": "Project settings",
+      "subtitle": "Rename the project, change its description, or update access.",
+      "saveSuccess": "Project updated.",
+      "saveFailed": "Failed to update project.",
+      "dangerZone": "Danger zone",
+      "deleteTitle": "Delete project",
+      "deleteWarning": "Permanently delete this project, its tasks, dependencies, comments, and attachments. This cannot be undone.",
+      "deleteConfirm": "Delete project",
+      "deleteSuccess": "Project deleted.",
+      "deleteFailed": "Failed to delete project."
+    },
+    "archiveSuccess": "Project archived.",
+    "restoreSuccess": "Project restored.",
+    "archiveFailed": "Failed to archive project.",
+    "restoreFailed": "Failed to restore project."
+  },
+  "tasks": {
+    "filters": {
+      "allStatuses": "All statuses",
+      "allPriorities": "All priorities"
+    },
+    "columns": {
+      "title": "Title",
+      "priority": "Priority",
+      "assignee": "Assignee",
+      "due": "Due",
+      "labels": "Labels"
+    },
+    "status": {
+      "TODO": "To do",
+      "IN_PROGRESS": "In progress",
+      "IN_REVIEW": "In review",
+      "DONE": "Done"
+    },
+    "priority": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "list": {
+      "empty": "No tasks yet. Create the first one.",
+      "emptyFiltered": "No tasks match the current filters.",
+      "selectedSummary": "{count} selected",
+      "setStatus": "Set status…",
+      "assignTo": "Assign to…",
+      "bulkDelete": "Delete",
+      "bulkDeleteSuccess": "{count, plural, =1 {1 task deleted.} other {# tasks deleted.}}",
+      "bulkUpdateSuccess": "{count, plural, =1 {1 task updated.} other {# tasks updated.}}",
+      "bulkReassignSuccess": "{count, plural, =1 {1 task reassigned.} other {# tasks reassigned.}}",
+      "bulkFailed": "Failed to update tasks.",
+      "bulkDeleteFailed": "Failed to delete tasks.",
+      "bulkReassignFailed": "Failed to reassign tasks.",
+      "pageSummary": "Page {page} of {total} · {count, plural, =1 {1 task} other {# tasks}}",
+      "emptyTasks": "0 tasks"
+    },
+    "create": {
+      "title": "Create a task",
+      "subtitle": "Add a new task to this project.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "What needs to be done?",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Add details (optional)",
+      "priorityLabel": "Priority",
+      "dueDateLabel": "Due date",
+      "submit": "Create task",
+      "submitting": "Creating…",
+      "created": "Task created.",
+      "failed": "Failed to create task.",
+      "titleRequired": "Title is required."
+    },
+    "detail": {
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Add a description…",
+      "statusLabel": "Status",
+      "priorityLabel": "Priority",
+      "assigneeLabel": "Assignee",
+      "dueDateLabel": "Due date",
+      "startDateLabel": "Start date",
+      "endDateLabel": "End date",
+      "progressLabel": "Progress",
+      "milestoneLabel": "Milestone",
+      "labelsLabel": "Labels",
+      "addLabelPlaceholder": "Add a label and press Enter",
+      "attachmentsLabel": "Attachments",
+      "dependenciesLabel": "Dependencies",
+      "addDependency": "Add predecessor",
+      "selectPredecessor": "Choose a task…",
+      "addDependencyAction": "Add",
+      "noDependencies": "No dependencies on this task.",
+      "deleteButton": "Delete task",
+      "deleteConfirmTitle": "Delete this task?",
+      "deleteConfirmBody": "This task and its comments will be removed. You can undo this for a few seconds after deleting.",
+      "deleteConfirmAction": "Delete",
+      "deleted": "Task deleted.",
+      "undo": "Undo",
+      "restored": "Task restored.",
+      "restoreFailed": "Failed to restore task.",
+      "deleteFailed": "Failed to delete task.",
+      "saveFailed": "Failed to save task.",
+      "scheduleFailed": "Failed to save schedule."
+    }
+  },
+  "board": {
+    "empty": "No tasks here yet.",
+    "addTask": "Add task",
+    "columnTitle": "{count, plural, =0 {No tasks} =1 {1 task} other {# tasks}}",
+    "moveFailed": "Failed to move task."
+  },
+  "timeline": {
+    "viewMode": {
+      "Day": "Day",
+      "Week": "Week",
+      "Month": "Month"
+    },
+    "legend": {
+      "onTrack": "On track",
+      "nearDue": "Near due",
+      "overdue": "Overdue"
+    },
+    "toolbar": {
+      "today": "Today",
+      "todayTooltip": "Scroll the chart to today's date",
+      "linkTasks": "Link tasks",
+      "linkTasksTooltip": "Link tasks — click two bars to create a dependency",
+      "cancelLinking": "Cancel linking",
+      "cancelLinkingTooltip": "Exit link mode (Esc)",
+      "focusEnter": "Focus mode — full view",
+      "focusExit": "Exit focus mode (Esc)",
+      "exportXlsx": "Export XLSX",
+      "exportXlsxTooltip": "Download all tasks as an Excel file (re-importable)"
+    },
+    "panel": {
+      "headerTask": "Task",
+      "headerStart": "Start",
+      "headerEnd": "End",
+      "headerProgress": "%",
+      "subtasks": "Subtasks · {count}",
+      "dependencies": "Dependencies · {count}",
+      "unscheduled": "Unscheduled · {count}",
+      "removeDependency": "Remove dependency",
+      "markMilestone": "Mark as milestone",
+      "removeMilestone": "Remove milestone",
+      "clearDate": "Clear",
+      "startDateAria": "Start date for {title}",
+      "endDateAria": "End date for {title}"
+    },
+    "linkDialog": {
+      "title": "Create dependency",
+      "selectType": "Select dependency type:",
+      "finishToStart": "Finish → Start",
+      "startToStart": "Start → Start",
+      "finishToFinish": "Finish → Finish",
+      "startToFinish": "Start → Finish",
+      "created": "Dependency created.",
+      "createFailed": "Failed to create dependency.",
+      "removed": "Dependency removed.",
+      "removeFailed": "Failed to remove dependency.",
+      "restoreFailed": "Failed to restore dependency."
+    },
+    "rescheduleFailed": "Failed to reschedule task.",
+    "progressFailed": "Failed to update progress.",
+    "milestoneFailed": "Failed to toggle milestone.",
+    "dateFailed": "Failed to update date.",
+    "linkSourcePrompt": "Now click the target task to create a dependency.",
+    "emptyAll": "No tasks yet. Create tasks and set dates to see them here.",
+    "emptyFiltered": "No tasks fall within the selected date range.",
+    "emptyDates": "Add start & end dates to tasks to see bars here."
+  },
+  "comments": {
+    "header": "Comments",
+    "empty": "No comments yet.",
+    "placeholder": "Add a comment… (type @ to mention)",
+    "submit": "Comment",
+    "submitting": "Posting…",
+    "edited": "(edited)",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "deleteFailed": "Failed to delete comment.",
+    "updateFailed": "Failed to update comment.",
+    "postFailed": "Failed to post comment."
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "preferencesTitle": "Notification preferences",
+    "preferencesSubtitle": "Choose how Tûm reaches you.",
+    "channels": {
+      "inApp": "In-app",
+      "email": "Email"
+    },
+    "events": {
+      "taskAssigned": "When a task is assigned to me",
+      "taskStatusChanged": "When a task I'm assigned changes status",
+      "commentAdded": "When someone comments on my task",
+      "mentioned": "When someone @mentions me"
+    },
+    "saveSuccess": "Preferences saved.",
+    "saveFailed": "Failed to save preferences."
+  },
+  "organization": {
+    "members": {
+      "headerTitle": "Members",
+      "headerSubtitle": "Manage who has access to {org}.",
+      "tabMembers": "Members",
+      "tabInvitations": "Invitations",
+      "columnMember": "Member",
+      "columnRole": "Role",
+      "columnJoined": "Joined",
+      "columnActions": "",
+      "roleOwner": "Owner",
+      "roleAdmin": "Admin",
+      "roleMember": "Member",
+      "actionChangeRoleAdmin": "Make admin",
+      "actionChangeRoleMember": "Make member",
+      "actionRemove": "Remove member",
+      "removed": "Member removed.",
+      "removeFailed": "Failed to remove member.",
+      "roleChanged": "Role updated.",
+      "roleChangeFailed": "Failed to update role.",
+      "selfRemoveBlocked": "You can't remove yourself."
+    },
+    "invitations": {
+      "columnEmail": "Email",
+      "columnInvitedBy": "Invited by",
+      "columnExpires": "Expires",
+      "columnStatus": "Status",
+      "statusPending": "Pending",
+      "statusAccepted": "Accepted",
+      "statusExpired": "Expired",
+      "statusRejected": "Rejected",
+      "cancel": "Cancel invitation",
+      "cancelled": "Invitation cancelled.",
+      "cancelFailed": "Failed to cancel invitation.",
+      "empty": "No pending invitations.",
+      "resend": "Resend",
+      "resent": "Invitation resent.",
+      "resendFailed": "Failed to resend invitation."
+    },
+    "invite": {
+      "trigger": "Invite member",
+      "title": "Invite a member",
+      "subtitle": "They'll receive an email with a link to join.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "teammate@example.com",
+      "roleLabel": "Role",
+      "submit": "Send invitation",
+      "submitting": "Sending…",
+      "success": "Invitation sent.",
+      "failed": "Failed to send invitation.",
+      "invalidEmail": "Enter a valid email address."
+    },
+    "switcher": {
+      "label": "Workspace",
+      "noOrgs": "No workspaces yet.",
+      "createNew": "Create a new workspace",
+      "switchTo": "Switch to {name}",
+      "switching": "Switching…",
+      "switchFailed": "Failed to switch workspace."
+    },
+    "workspacePicker": {
+      "title": "Pick a workspace",
+      "subtitle": "Choose where to work, or create a new workspace.",
+      "yourOrgs": "Your workspaces",
+      "select": "Open",
+      "create": "Create new workspace",
+      "joinInvitation": "Join via invitation",
+      "browsePublic": "Browse public projects",
+      "empty": "You aren't in any workspace yet."
+    },
+    "create": {
+      "title": "Create your workspace",
+      "subtitle": "Set up your organisation to get started with Tûm.",
+      "back": "Back to workspaces",
+      "nameLabel": "Workspace name",
+      "namePlaceholder": "Acme Inc.",
+      "slugLabel": "URL slug",
+      "slugHelp": "Used in public URLs once you publish projects.",
+      "submit": "Create workspace",
+      "submitting": "Creating…",
+      "success": "Workspace created.",
+      "failed": "Failed to create workspace."
+    },
+    "onboardingChoice": {
+      "title": "Get started with Tûm",
+      "subtitle": "Create a fresh workspace or join one you've been invited to.",
+      "createTitle": "Create a workspace",
+      "createBody": "Start a new organisation for your team or project.",
+      "joinTitle": "Accept an invitation",
+      "joinBody": "Join an existing workspace using your email invitation link."
+    },
+    "acceptInvitation": {
+      "title": "Join {org}",
+      "subtitle": "You've been invited to collaborate on Tûm.",
+      "accept": "Accept invitation",
+      "accepting": "Joining…",
+      "decline": "Decline",
+      "declined": "Invitation declined.",
+      "accepted": "Welcome aboard!",
+      "acceptFailed": "Failed to accept invitation.",
+      "declineFailed": "Failed to decline invitation.",
+      "invalidToken": "This invitation link is invalid or expired.",
+      "loginFirst": "You need to sign in first to accept this invitation.",
+      "signInLink": "Sign in"
+    },
+    "settings": {
+      "title": "Organization settings",
+      "subtitle": "Update your workspace's name and preferences.",
+      "nameLabel": "Workspace name",
+      "namePlaceholder": "Acme Inc.",
+      "saveSuccess": "Workspace updated.",
+      "saveFailed": "Failed to update workspace.",
+      "dangerZone": "Danger zone",
+      "deleteTitle": "Delete workspace",
+      "deleteWarning": "Permanently delete this workspace, all its projects, tasks, and history. This cannot be undone.",
+      "deleteConfirm": "Delete workspace",
+      "deleteSuccess": "Workspace deleted.",
+      "deleteFailed": "Failed to delete workspace."
+    },
+    "audit": {
+      "filterEntityType": "Entity type",
+      "filterAction": "Action",
+      "exportCsv": "Export CSV",
+      "exportFailed": "Failed to export audit log.",
+      "empty": "No audit entries yet.",
+      "columnAt": "When",
+      "columnActor": "Actor",
+      "columnAction": "Action",
+      "columnEntity": "Entity",
+      "columnDetail": "Detail"
+    }
+  },
+  "activity": {
+    "header": "Activity",
+    "empty": "No activity yet.",
+    "loadMore": "Load older entries"
+  },
+  "files": {
+    "uploadButton": "Upload file",
+    "dropHere": "Drop a file here",
+    "uploading": "Uploading…",
+    "uploadFailed": "Upload failed.",
+    "downloadButton": "Download",
+    "deleteButton": "Remove",
+    "deleted": "File removed.",
+    "deleteFailed": "Failed to remove file.",
+    "empty": "No attachments yet.",
+    "size": "{size}",
+    "tooLarge": "File is too large."
   },
   "landing": {
     "nav": {
@@ -144,10 +569,162 @@
     "features": {
       "sectionLabel": "Capabilities",
       "heading": "One workspace.",
-      "headingAccent": "Every kind of project."
+      "headingAccent": "Every kind of project.",
+      "items": {
+        "timeline": {
+          "title": "Visual Timeline",
+          "description": "Drag-and-drop scheduling with dependency arrows, milestone markers, and per-task progress bars. See your whole project at a glance — no spreadsheet required."
+        },
+        "visibility": {
+          "title": "Instant Visibility",
+          "description": "Real-time dashboards with completion trends, status breakdowns, and overdue counters. Know what's on track and what needs attention — without a status meeting."
+        },
+        "dependencies": {
+          "title": "Task Dependencies",
+          "description": "Link tasks so nothing starts before it should. Model sequential steps, parallel tracks, and milestones — Tûm keeps your plan coherent as things shift."
+        },
+        "mentions": {
+          "title": "@Mention & Threads",
+          "description": "Loop teammates in directly on tasks. In-app notifications mean nothing falls through the cracks — whether your team is in operations, HR, marketing, or anything else."
+        },
+        "team": {
+          "title": "Built for Every Team",
+          "description": "Operations, marketing, events, personal projects, community initiatives — if you have a project and a team, Tûm fits. No technical background required."
+        },
+        "selfHost": {
+          "title": "Self-host or Cloud",
+          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Fair-code license — free for internal use, no vendor lock-in."
+        }
+      }
+    },
+    "howItWorks": {
+      "sectionLabel": "How it works",
+      "heading": "Up and running",
+      "headingAccent": "in four steps.",
+      "steps": {
+        "signup": {
+          "title": "Sign up and create a workspace",
+          "description": "Get started in two minutes on Tûm Cloud — no setup required. Or self-host on your own server if you prefer to own your infrastructure."
+        },
+        "organise": {
+          "title": "Organise your work",
+          "description": "Create projects and tasks. Assign owners, set priorities, add due dates and labels. Tûm adapts to how your team already works — no rigid process imposed."
+        },
+        "timeline": {
+          "title": "See everything on the timeline",
+          "description": "Drag tasks onto the Gantt chart, link dependencies, and mark key milestones. The full picture of your project, always up to date."
+        },
+        "track": {
+          "title": "Track progress and adapt",
+          "description": "Live dashboards show completion trends, overdue alerts, and status breakdowns as they happen. Adjust the plan as reality evolves — in seconds, not meetings."
+        }
+      }
+    },
+    "pricing": {
+      "sectionLabel": "Pricing",
+      "heading": "Free to run yourself.",
+      "headingAccent": "Pay only for cloud.",
+      "intro": "Tûm is open-source under a fair-code license. Self-host for free forever. Choose cloud hosting only when you want zero-ops convenience.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualSavings": "Save 17%",
+      "perWorkspace": "/mo per workspace",
+      "custom": "Custom",
+      "footer": "All plans include unlimited users.",
+      "fairCodeNote": "Fair-code license — free for internal use, cannot be resold as a competing service.",
+      "plans": {
+        "community": {
+          "name": "Community",
+          "description": "Self-hosted, forever free",
+          "cta": "Self-host for free",
+          "features": [
+            "Unlimited projects & tasks",
+            "Unlimited team members",
+            "Gantt timeline & Kanban board",
+            "Task dependencies",
+            "Activity feed & @mentions",
+            "REST API access",
+            "Docker Compose deploy",
+            "Community forum support"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Tûm Cloud, managed for you",
+          "badge": "Most popular",
+          "cta": "Start 14-day trial",
+          "features": [
+            "Everything in Community",
+            "Tûm Cloud hosting (zero ops)",
+            "Advanced analytics & trends",
+            "Export PNG / PDF",
+            "30-day execution history",
+            "Email support",
+            "Automatic updates",
+            "99.9% uptime SLA"
+          ]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "description": "For large or regulated teams",
+          "cta": "Contact sales",
+          "features": [
+            "Everything in Pro",
+            "SSO (SAML / LDAP)",
+            "Full audit logs",
+            "Custom data residency",
+            "Dedicated onboarding",
+            "SLA with priority support",
+            "Custom contracts & invoicing",
+            "OEM / white-label option"
+          ]
+        }
+      }
+    },
+    "cta": {
+      "heading": "Your projects.",
+      "headingAccent": "Finally under control.",
+      "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. Pick it up today — personally, with your team, or across your whole community.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "Sign in"
     },
     "footer": {
-      "rights": "All rights reserved."
+      "tagline": "Project execution & workflow visibility. Built for teams that care about shipping.",
+      "rights": "Open-source project management.",
+      "sections": {
+        "product": "Product",
+        "platform": "Platform",
+        "account": "Account"
+      },
+      "links": {
+        "features": "Features",
+        "howItWorks": "How it works",
+        "pricing": "Pricing",
+        "dashboard": "Dashboard",
+        "timeline": "Timeline",
+        "board": "Task board",
+        "signIn": "Sign in",
+        "signUp": "Sign up",
+        "acceptInvitation": "Accept invitation"
+      }
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Your account details and preferences."
+  },
+  "organizationPage": {
+    "members": {
+      "title": "Members",
+      "subtitle": "People in your organization and their roles."
+    },
+    "settings": {
+      "title": "Organization settings",
+      "subtitle": "Name, slug, and preferences for your workspace."
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Sensitive actions recorded for compliance."
     }
   }
 }

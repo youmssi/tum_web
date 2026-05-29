@@ -8,14 +8,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-export default async function MembersPage() {
-  const t = await getTranslations("organizationPage.members");
+// MemberList already renders its own header (including the dynamic org name in the subtitle) so
+// the page is just a thin shell; adding another <h1> would duplicate the title visually.
+export default function MembersPage() {
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
-      </div>
+    <div className="p-6">
       <MemberList />
     </div>
   );

@@ -11,53 +11,41 @@
     "back": "Retour",
     "or": "ou",
     "create": "Créer",
+    "creating": "Création…",
     "edit": "Modifier",
     "search": "Rechercher",
     "empty": "Rien à afficher pour l’instant.",
     "error": "Une erreur s’est produite.",
-    "retry": "Réessayer"
-  },
-  "dashboard": {
-    "title": "Mon travail",
-    "subtitle": "Les tâches qui vous sont assignées dans tous les projets."
-  },
-  "projects": {
-    "title": "Projets",
-    "new": "Nouveau projet",
-    "empty": "Aucun projet pour l’instant.",
-    "openSettings": "Paramètres",
-    "archive": "Archiver",
-    "restore": "Restaurer",
-    "tabs": {
-      "overview": "Aperçu",
-      "list": "Liste",
-      "board": "Tableau",
-      "timeline": "Chronologie",
-      "activity": "Activité"
-    }
-  },
-  "profile": {
-    "title": "Profil",
-    "subtitle": "Vos informations de compte et vos préférences."
-  },
-  "notificationsPage": {
-    "title": "Notifications",
-    "preferencesTitle": "Préférences de notification",
-    "preferencesSubtitle": "Choisissez comment Tûm vous contacte."
-  },
-  "organizationPage": {
-    "members": {
-      "title": "Membres",
-      "subtitle": "Les personnes de votre organisation et leurs rôles."
-    },
-    "settings": {
-      "title": "Paramètres de l’organisation",
-      "subtitle": "Nom, identifiant et préférences de l’espace de travail."
-    },
-    "audit": {
-      "title": "Journal d’audit",
-      "subtitle": "Actions sensibles enregistrées à des fins de conformité."
-    }
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "remove": "Retirer",
+    "submit": "Envoyer",
+    "submitting": "Envoi…",
+    "yes": "Oui",
+    "no": "Non",
+    "today": "Aujourd’hui",
+    "yesterday": "Hier",
+    "all": "Tous",
+    "none": "Aucun",
+    "more": "Plus",
+    "page": "Page",
+    "of": "sur",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "name": "Nom",
+    "description": "Description",
+    "status": "Statut",
+    "priority": "Priorité",
+    "labels": "Étiquettes",
+    "assignee": "Responsable",
+    "dueDate": "Échéance",
+    "unassigned": "Non assigné",
+    "actions": "Actions",
+    "view": "Voir",
+    "open": "Ouvrir",
+    "copy": "Copier",
+    "copied": "Copié"
   },
   "locale": {
     "label": "Langue",
@@ -108,6 +96,17 @@
       "checkEmailTitle": "Vérifiez votre boîte e-mail",
       "checkEmailBody": "Nous avons envoyé un lien de vérification à {email}. Cliquez dessus pour activer votre compte.",
       "backToSignIn": "Retour à la connexion"
+    },
+    "profile": {
+      "nameLabel": "Nom affiché",
+      "namePlaceholder": "Votre nom",
+      "emailLabel": "E-mail",
+      "emailHelp": "Votre e-mail ne peut pas être modifié.",
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement…",
+      "saved": "Profil mis à jour.",
+      "saveFailed": "Échec de la mise à jour du profil.",
+      "signOut": "Se déconnecter"
     }
   },
   "nav": {
@@ -122,7 +121,433 @@
     "profile": "Profil",
     "signOut": "Se déconnecter",
     "switchOrganization": "Changer d’organisation",
-    "newProject": "Nouveau projet"
+    "newProject": "Nouveau projet",
+    "skipToContent": "Aller au contenu",
+    "openSidebar": "Ouvrir le menu",
+    "closeSidebar": "Fermer le menu"
+  },
+  "dashboard": {
+    "title": "Mon travail",
+    "subtitle": "Les tâches qui vous sont assignées dans tous les projets.",
+    "empty": "Aucune tâche ne vous est assignée pour l’instant.",
+    "tabAll": "Toutes",
+    "tabOverdue": "En retard",
+    "tabDueToday": "À rendre aujourd’hui",
+    "tabDueThisWeek": "À rendre cette semaine",
+    "openTask": "Ouvrir la tâche"
+  },
+  "shell": {
+    "search": {
+      "placeholder": "Rechercher des tâches…",
+      "shortcut": "Rechercher…",
+      "empty": "Aucun résultat.",
+      "loading": "Recherche…",
+      "tasksGroup": "Tâches",
+      "openInProject": "Ouvrir dans le projet"
+    },
+    "theme": {
+      "label": "Basculer le thème",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "notifications": {
+      "label": "Notifications",
+      "empty": "Vous êtes à jour.",
+      "markAllRead": "Tout marquer comme lu",
+      "viewAll": "Tout voir",
+      "preferencesLink": "Préférences de notification",
+      "newMention": "{actor} vous a mentionné",
+      "newAssignment": "{actor} vous a assigné une tâche",
+      "newStatus": "{actor} a mis à jour le statut d’une tâche",
+      "newComment": "{actor} a commenté une tâche"
+    }
+  },
+  "projects": {
+    "title": "Projets",
+    "subtitle": "Planifiez, exécutez et suivez chaque initiative de votre espace de travail.",
+    "new": "Nouveau projet",
+    "newDialogTitle": "Créer un projet",
+    "newDialogSubtitle": "Définissez un nom et une description facultative pour commencer.",
+    "nameLabel": "Nom du projet",
+    "namePlaceholder": "ex. Lancement produit T3",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "De quoi traite ce projet ?",
+    "submit": "Créer le projet",
+    "submitting": "Création…",
+    "empty": "Aucun projet pour l’instant.",
+    "emptyCta": "Créez votre premier projet pour commencer.",
+    "openSettings": "Paramètres",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "memberRestricted": "Réservé aux membres",
+    "memberRestrictedHint": "Seuls les membres du projet et les administrateurs de l’organisation peuvent voir ce projet.",
+    "importButton": "Importer",
+    "showArchived": "Afficher les archivés",
+    "tabs": {
+      "overview": "Aperçu",
+      "list": "Liste",
+      "board": "Tableau",
+      "timeline": "Chronologie",
+      "activity": "Activité"
+    },
+    "card": {
+      "noDescription": "Aucune description.",
+      "tasksLabel": "{count, plural, =0 {Aucune tâche} =1 {1 tâche} other {# tâches}}",
+      "archived": "Archivé"
+    },
+    "settingsForm": {
+      "title": "Paramètres du projet",
+      "subtitle": "Renommez le projet, changez sa description ou mettez à jour les accès.",
+      "saveSuccess": "Projet mis à jour.",
+      "saveFailed": "Échec de la mise à jour du projet.",
+      "dangerZone": "Zone sensible",
+      "deleteTitle": "Supprimer le projet",
+      "deleteWarning": "Supprimer définitivement ce projet, ses tâches, dépendances, commentaires et pièces jointes. Cette action est irréversible.",
+      "deleteConfirm": "Supprimer le projet",
+      "deleteSuccess": "Projet supprimé.",
+      "deleteFailed": "Échec de la suppression du projet."
+    },
+    "archiveSuccess": "Projet archivé.",
+    "restoreSuccess": "Projet restauré.",
+    "archiveFailed": "Échec de l’archivage du projet.",
+    "restoreFailed": "Échec de la restauration du projet."
+  },
+  "tasks": {
+    "filters": {
+      "allStatuses": "Tous les statuts",
+      "allPriorities": "Toutes les priorités"
+    },
+    "columns": {
+      "title": "Titre",
+      "priority": "Priorité",
+      "assignee": "Responsable",
+      "due": "Échéance",
+      "labels": "Étiquettes"
+    },
+    "status": {
+      "TODO": "À faire",
+      "IN_PROGRESS": "En cours",
+      "IN_REVIEW": "En revue",
+      "DONE": "Terminé"
+    },
+    "priority": {
+      "LOW": "Basse",
+      "MEDIUM": "Moyenne",
+      "HIGH": "Haute",
+      "URGENT": "Urgente"
+    },
+    "list": {
+      "empty": "Aucune tâche pour l’instant. Créez la première.",
+      "emptyFiltered": "Aucune tâche ne correspond aux filtres.",
+      "selectedSummary": "{count} sélectionnée(s)",
+      "setStatus": "Définir le statut…",
+      "assignTo": "Assigner à…",
+      "bulkDelete": "Supprimer",
+      "bulkDeleteSuccess": "{count, plural, =1 {1 tâche supprimée.} other {# tâches supprimées.}}",
+      "bulkUpdateSuccess": "{count, plural, =1 {1 tâche mise à jour.} other {# tâches mises à jour.}}",
+      "bulkReassignSuccess": "{count, plural, =1 {1 tâche réassignée.} other {# tâches réassignées.}}",
+      "bulkFailed": "Échec de la mise à jour des tâches.",
+      "bulkDeleteFailed": "Échec de la suppression des tâches.",
+      "bulkReassignFailed": "Échec de la réassignation des tâches.",
+      "pageSummary": "Page {page} sur {total} · {count, plural, =1 {1 tâche} other {# tâches}}",
+      "emptyTasks": "0 tâche"
+    },
+    "create": {
+      "title": "Créer une tâche",
+      "subtitle": "Ajouter une nouvelle tâche à ce projet.",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Que faut-il faire ?",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Ajoutez des détails (facultatif)",
+      "priorityLabel": "Priorité",
+      "dueDateLabel": "Échéance",
+      "submit": "Créer la tâche",
+      "submitting": "Création…",
+      "created": "Tâche créée.",
+      "failed": "Échec de la création de la tâche.",
+      "titleRequired": "Le titre est requis."
+    },
+    "detail": {
+      "titleLabel": "Titre",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Ajoutez une description…",
+      "statusLabel": "Statut",
+      "priorityLabel": "Priorité",
+      "assigneeLabel": "Responsable",
+      "dueDateLabel": "Échéance",
+      "startDateLabel": "Date de début",
+      "endDateLabel": "Date de fin",
+      "progressLabel": "Avancement",
+      "milestoneLabel": "Jalon",
+      "labelsLabel": "Étiquettes",
+      "addLabelPlaceholder": "Ajoutez une étiquette puis Entrée",
+      "attachmentsLabel": "Pièces jointes",
+      "dependenciesLabel": "Dépendances",
+      "addDependency": "Ajouter un prédécesseur",
+      "selectPredecessor": "Choisir une tâche…",
+      "addDependencyAction": "Ajouter",
+      "noDependencies": "Aucune dépendance sur cette tâche.",
+      "deleteButton": "Supprimer la tâche",
+      "deleteConfirmTitle": "Supprimer cette tâche ?",
+      "deleteConfirmBody": "Cette tâche et ses commentaires seront supprimés. Vous pouvez annuler quelques secondes après la suppression.",
+      "deleteConfirmAction": "Supprimer",
+      "deleted": "Tâche supprimée.",
+      "undo": "Annuler",
+      "restored": "Tâche restaurée.",
+      "restoreFailed": "Échec de la restauration de la tâche.",
+      "deleteFailed": "Échec de la suppression de la tâche.",
+      "saveFailed": "Échec de l’enregistrement de la tâche.",
+      "scheduleFailed": "Échec de l’enregistrement de la planification."
+    }
+  },
+  "board": {
+    "empty": "Aucune tâche ici pour l’instant.",
+    "addTask": "Ajouter une tâche",
+    "columnTitle": "{count, plural, =0 {Aucune tâche} =1 {1 tâche} other {# tâches}}",
+    "moveFailed": "Échec du déplacement de la tâche."
+  },
+  "timeline": {
+    "viewMode": {
+      "Day": "Jour",
+      "Week": "Semaine",
+      "Month": "Mois"
+    },
+    "legend": {
+      "onTrack": "Dans les temps",
+      "nearDue": "Échéance proche",
+      "overdue": "En retard"
+    },
+    "toolbar": {
+      "today": "Aujourd’hui",
+      "todayTooltip": "Faire défiler le graphique jusqu’à aujourd’hui",
+      "linkTasks": "Lier les tâches",
+      "linkTasksTooltip": "Lier des tâches — cliquez sur deux barres pour créer une dépendance",
+      "cancelLinking": "Annuler la liaison",
+      "cancelLinkingTooltip": "Quitter le mode liaison (Échap)",
+      "focusEnter": "Mode focus — pleine vue",
+      "focusExit": "Quitter le mode focus (Échap)",
+      "exportXlsx": "Exporter XLSX",
+      "exportXlsxTooltip": "Télécharger toutes les tâches dans un fichier Excel (réimportable)"
+    },
+    "panel": {
+      "headerTask": "Tâche",
+      "headerStart": "Début",
+      "headerEnd": "Fin",
+      "headerProgress": "%",
+      "subtasks": "Sous-tâches · {count}",
+      "dependencies": "Dépendances · {count}",
+      "unscheduled": "Non planifiées · {count}",
+      "removeDependency": "Supprimer la dépendance",
+      "markMilestone": "Marquer comme jalon",
+      "removeMilestone": "Retirer le jalon",
+      "clearDate": "Effacer",
+      "startDateAria": "Date de début pour {title}",
+      "endDateAria": "Date de fin pour {title}"
+    },
+    "linkDialog": {
+      "title": "Créer une dépendance",
+      "selectType": "Choisir le type de dépendance :",
+      "finishToStart": "Fin → Début",
+      "startToStart": "Début → Début",
+      "finishToFinish": "Fin → Fin",
+      "startToFinish": "Début → Fin",
+      "created": "Dépendance créée.",
+      "createFailed": "Échec de la création de la dépendance.",
+      "removed": "Dépendance supprimée.",
+      "removeFailed": "Échec de la suppression de la dépendance.",
+      "restoreFailed": "Échec de la restauration de la dépendance."
+    },
+    "rescheduleFailed": "Échec de la replanification de la tâche.",
+    "progressFailed": "Échec de la mise à jour de l’avancement.",
+    "milestoneFailed": "Échec du basculement du jalon.",
+    "dateFailed": "Échec de la mise à jour de la date.",
+    "linkSourcePrompt": "Cliquez maintenant sur la tâche cible pour créer une dépendance.",
+    "emptyAll": "Aucune tâche pour l’instant. Créez des tâches avec des dates pour les voir ici.",
+    "emptyFiltered": "Aucune tâche ne se trouve dans la plage de dates sélectionnée.",
+    "emptyDates": "Ajoutez des dates de début et de fin aux tâches pour voir les barres ici."
+  },
+  "comments": {
+    "header": "Commentaires",
+    "empty": "Aucun commentaire pour l’instant.",
+    "placeholder": "Ajoutez un commentaire… (tapez @ pour mentionner)",
+    "submit": "Commenter",
+    "submitting": "Publication…",
+    "edited": "(modifié)",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "deleteFailed": "Échec de la suppression du commentaire.",
+    "updateFailed": "Échec de la mise à jour du commentaire.",
+    "postFailed": "Échec de la publication du commentaire."
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "preferencesTitle": "Préférences de notification",
+    "preferencesSubtitle": "Choisissez comment Tûm vous contacte.",
+    "channels": {
+      "inApp": "Dans l’application",
+      "email": "E-mail"
+    },
+    "events": {
+      "taskAssigned": "Quand une tâche m’est assignée",
+      "taskStatusChanged": "Quand une tâche qui m’est assignée change de statut",
+      "commentAdded": "Quand quelqu’un commente ma tâche",
+      "mentioned": "Quand quelqu’un me @mentionne"
+    },
+    "saveSuccess": "Préférences enregistrées.",
+    "saveFailed": "Échec de l’enregistrement des préférences."
+  },
+  "organization": {
+    "members": {
+      "headerTitle": "Membres",
+      "headerSubtitle": "Gérez qui a accès à {org}.",
+      "tabMembers": "Membres",
+      "tabInvitations": "Invitations",
+      "columnMember": "Membre",
+      "columnRole": "Rôle",
+      "columnJoined": "A rejoint",
+      "columnActions": "",
+      "roleOwner": "Propriétaire",
+      "roleAdmin": "Administrateur",
+      "roleMember": "Membre",
+      "actionChangeRoleAdmin": "Promouvoir administrateur",
+      "actionChangeRoleMember": "Définir comme membre",
+      "actionRemove": "Retirer le membre",
+      "removed": "Membre retiré.",
+      "removeFailed": "Échec du retrait du membre.",
+      "roleChanged": "Rôle mis à jour.",
+      "roleChangeFailed": "Échec de la mise à jour du rôle.",
+      "selfRemoveBlocked": "Vous ne pouvez pas vous retirer vous-même."
+    },
+    "invitations": {
+      "columnEmail": "E-mail",
+      "columnInvitedBy": "Invité par",
+      "columnExpires": "Expire",
+      "columnStatus": "Statut",
+      "statusPending": "En attente",
+      "statusAccepted": "Acceptée",
+      "statusExpired": "Expirée",
+      "statusRejected": "Refusée",
+      "cancel": "Annuler l’invitation",
+      "cancelled": "Invitation annulée.",
+      "cancelFailed": "Échec de l’annulation de l’invitation.",
+      "empty": "Aucune invitation en attente.",
+      "resend": "Renvoyer",
+      "resent": "Invitation renvoyée.",
+      "resendFailed": "Échec de l’envoi de l’invitation."
+    },
+    "invite": {
+      "trigger": "Inviter un membre",
+      "title": "Inviter un membre",
+      "subtitle": "La personne recevra un e-mail avec un lien pour rejoindre.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "collegue@exemple.com",
+      "roleLabel": "Rôle",
+      "submit": "Envoyer l’invitation",
+      "submitting": "Envoi…",
+      "success": "Invitation envoyée.",
+      "failed": "Échec de l’envoi de l’invitation.",
+      "invalidEmail": "Entrez une adresse e-mail valide."
+    },
+    "switcher": {
+      "label": "Espace de travail",
+      "noOrgs": "Aucun espace de travail pour l’instant.",
+      "createNew": "Créer un nouvel espace de travail",
+      "switchTo": "Basculer sur {name}",
+      "switching": "Bascule…",
+      "switchFailed": "Échec de la bascule d’espace de travail."
+    },
+    "workspacePicker": {
+      "title": "Choisir un espace de travail",
+      "subtitle": "Choisissez où travailler ou créez un nouvel espace de travail.",
+      "yourOrgs": "Vos espaces de travail",
+      "select": "Ouvrir",
+      "create": "Créer un nouvel espace de travail",
+      "joinInvitation": "Rejoindre via une invitation",
+      "browsePublic": "Parcourir les projets publics",
+      "empty": "Vous ne faites partie d’aucun espace de travail."
+    },
+    "create": {
+      "title": "Créer votre espace de travail",
+      "subtitle": "Configurez votre organisation pour démarrer avec Tûm.",
+      "back": "Retour aux espaces de travail",
+      "nameLabel": "Nom de l’espace de travail",
+      "namePlaceholder": "Acme SARL",
+      "slugLabel": "Identifiant d’URL",
+      "slugHelp": "Utilisé dans les URLs publiques une fois que vous publiez des projets.",
+      "submit": "Créer l’espace de travail",
+      "submitting": "Création…",
+      "success": "Espace de travail créé.",
+      "failed": "Échec de la création de l’espace de travail."
+    },
+    "onboardingChoice": {
+      "title": "Commencer avec Tûm",
+      "subtitle": "Créez un nouvel espace de travail ou rejoignez-en un auquel vous avez été invité.",
+      "createTitle": "Créer un espace de travail",
+      "createBody": "Lancez une nouvelle organisation pour votre équipe ou votre projet.",
+      "joinTitle": "Accepter une invitation",
+      "joinBody": "Rejoignez un espace de travail existant via votre lien d’invitation par e-mail."
+    },
+    "acceptInvitation": {
+      "title": "Rejoindre {org}",
+      "subtitle": "Vous êtes invité à collaborer sur Tûm.",
+      "accept": "Accepter l’invitation",
+      "accepting": "Adhésion…",
+      "decline": "Refuser",
+      "declined": "Invitation refusée.",
+      "accepted": "Bienvenue à bord !",
+      "acceptFailed": "Échec de l’acceptation de l’invitation.",
+      "declineFailed": "Échec du refus de l’invitation.",
+      "invalidToken": "Ce lien d’invitation est invalide ou expiré.",
+      "loginFirst": "Vous devez d’abord vous connecter pour accepter cette invitation.",
+      "signInLink": "Se connecter"
+    },
+    "settings": {
+      "title": "Paramètres de l’organisation",
+      "subtitle": "Mettez à jour le nom et les préférences de votre espace de travail.",
+      "nameLabel": "Nom de l’espace de travail",
+      "namePlaceholder": "Acme SARL",
+      "saveSuccess": "Espace de travail mis à jour.",
+      "saveFailed": "Échec de la mise à jour de l’espace de travail.",
+      "dangerZone": "Zone sensible",
+      "deleteTitle": "Supprimer l’espace de travail",
+      "deleteWarning": "Supprimer définitivement cet espace de travail, tous ses projets, tâches et historique. Cette action est irréversible.",
+      "deleteConfirm": "Supprimer l’espace de travail",
+      "deleteSuccess": "Espace de travail supprimé.",
+      "deleteFailed": "Échec de la suppression de l’espace de travail."
+    },
+    "audit": {
+      "filterEntityType": "Type d’entité",
+      "filterAction": "Action",
+      "exportCsv": "Exporter en CSV",
+      "exportFailed": "Échec de l’export du journal d’audit.",
+      "empty": "Aucune entrée d’audit pour l’instant.",
+      "columnAt": "Quand",
+      "columnActor": "Acteur",
+      "columnAction": "Action",
+      "columnEntity": "Entité",
+      "columnDetail": "Détail"
+    }
+  },
+  "activity": {
+    "header": "Activité",
+    "empty": "Aucune activité pour l’instant.",
+    "loadMore": "Charger les entrées plus anciennes"
+  },
+  "files": {
+    "uploadButton": "Téléverser un fichier",
+    "dropHere": "Déposer un fichier ici",
+    "uploading": "Téléversement…",
+    "uploadFailed": "Échec du téléversement.",
+    "downloadButton": "Télécharger",
+    "deleteButton": "Retirer",
+    "deleted": "Fichier retiré.",
+    "deleteFailed": "Échec du retrait du fichier.",
+    "empty": "Aucune pièce jointe pour l’instant.",
+    "size": "{size}",
+    "tooLarge": "Le fichier est trop volumineux."
   },
   "landing": {
     "nav": {
@@ -144,10 +569,162 @@
     "features": {
       "sectionLabel": "Capacités",
       "heading": "Un seul espace.",
-      "headingAccent": "Pour tous vos projets."
+      "headingAccent": "Pour tous vos projets.",
+      "items": {
+        "timeline": {
+          "title": "Chronologie visuelle",
+          "description": "Planification glisser-déposer avec flèches de dépendances, jalons et barres d’avancement par tâche. Voyez tout votre projet d’un coup d’œil — sans tableur."
+        },
+        "visibility": {
+          "title": "Visibilité immédiate",
+          "description": "Tableaux de bord en temps réel avec tendances d’achèvement, répartition par statut et compteurs de retards. Sachez ce qui avance et ce qui demande votre attention — sans réunion de point."
+        },
+        "dependencies": {
+          "title": "Dépendances entre tâches",
+          "description": "Liez les tâches pour que rien ne commence avant son heure. Modélisez étapes séquentielles, parcours parallèles et jalons — Tûm garde votre plan cohérent à mesure que tout évolue."
+        },
+        "mentions": {
+          "title": "@Mentions et fils de discussion",
+          "description": "Impliquez vos coéquipiers directement sur les tâches. Les notifications dans l’application font que rien ne passe à la trappe — peu importe le métier de votre équipe."
+        },
+        "team": {
+          "title": "Conçu pour toutes les équipes",
+          "description": "Opérations, marketing, événements, projets personnels, initiatives communautaires — si vous avez un projet et une équipe, Tûm s’adapte. Aucun bagage technique requis."
+        },
+        "selfHost": {
+          "title": "Auto-hébergé ou Cloud",
+          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Licence fair-code — gratuit en interne, sans verrouillage fournisseur."
+        }
+      }
+    },
+    "howItWorks": {
+      "sectionLabel": "Comment ça marche",
+      "heading": "Opérationnel",
+      "headingAccent": "en quatre étapes.",
+      "steps": {
+        "signup": {
+          "title": "Inscrivez-vous et créez un espace de travail",
+          "description": "Démarrez en deux minutes sur Tûm Cloud — aucune configuration requise. Ou auto-hébergez sur votre serveur si vous préférez maîtriser votre infrastructure."
+        },
+        "organise": {
+          "title": "Organisez votre travail",
+          "description": "Créez projets et tâches. Attribuez les responsables, définissez les priorités, ajoutez échéances et étiquettes. Tûm s’adapte à votre façon de travailler — sans process rigide imposé."
+        },
+        "timeline": {
+          "title": "Visualisez tout sur la chronologie",
+          "description": "Glissez les tâches sur le diagramme de Gantt, liez les dépendances et marquez les jalons clés. La vue d’ensemble de votre projet, toujours à jour."
+        },
+        "track": {
+          "title": "Suivez l’avancement et adaptez-vous",
+          "description": "Les tableaux de bord en direct affichent tendances, alertes de retard et répartitions par statut au fil de l’eau. Ajustez le plan à mesure que la réalité évolue — en secondes, pas en réunions."
+        }
+      }
+    },
+    "pricing": {
+      "sectionLabel": "Tarifs",
+      "heading": "Gratuit à auto-héberger.",
+      "headingAccent": "Ne payez que pour le cloud.",
+      "intro": "Tûm est open source sous une licence fair-code. Auto-hébergez gratuitement à vie. Choisissez l’hébergement cloud uniquement si vous voulez le zéro-gestion.",
+      "monthly": "Mensuel",
+      "annual": "Annuel",
+      "annualSavings": "Économisez 17 %",
+      "perWorkspace": "/mois par espace de travail",
+      "custom": "Sur mesure",
+      "footer": "Toutes les formules incluent des utilisateurs illimités.",
+      "fairCodeNote": "Licence fair-code — gratuite en interne, ne peut pas être revendue en tant que service concurrent.",
+      "plans": {
+        "community": {
+          "name": "Communauté",
+          "description": "Auto-hébergé, gratuit à vie",
+          "cta": "Auto-héberger gratuitement",
+          "features": [
+            "Projets et tâches illimités",
+            "Membres d’équipe illimités",
+            "Chronologie Gantt et tableau Kanban",
+            "Dépendances entre tâches",
+            "Flux d’activité et @mentions",
+            "Accès à l’API REST",
+            "Déploiement Docker Compose",
+            "Support via le forum communauté"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Tûm Cloud, géré pour vous",
+          "badge": "Le plus populaire",
+          "cta": "Essai gratuit de 14 jours",
+          "features": [
+            "Tout ce qui est inclus dans Communauté",
+            "Hébergement Tûm Cloud (zéro ops)",
+            "Analytiques et tendances avancées",
+            "Export PNG / PDF",
+            "Historique d’exécution sur 30 jours",
+            "Support par e-mail",
+            "Mises à jour automatiques",
+            "SLA de disponibilité 99,9 %"
+          ]
+        },
+        "enterprise": {
+          "name": "Entreprise",
+          "description": "Pour les grandes équipes ou les secteurs régulés",
+          "cta": "Contacter le service commercial",
+          "features": [
+            "Tout ce qui est inclus dans Pro",
+            "SSO (SAML / LDAP)",
+            "Journaux d’audit complets",
+            "Résidence des données personnalisée",
+            "Onboarding dédié",
+            "SLA avec support prioritaire",
+            "Contrats et facturation personnalisés",
+            "Option OEM / marque blanche"
+          ]
+        }
+      }
+    },
+    "cta": {
+      "heading": "Vos projets.",
+      "headingAccent": "Enfin maîtrisés.",
+      "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Lancez-vous dès aujourd’hui — en solo, en équipe, ou pour toute votre communauté.",
+      "ctaPrimary": "Démarrer gratuitement",
+      "ctaSecondary": "Se connecter"
     },
     "footer": {
-      "rights": "Tous droits réservés."
+      "tagline": "Exécution de projets & visibilité des équipes. Conçu pour les équipes qui tiennent à livrer.",
+      "rights": "Gestion de projet open source.",
+      "sections": {
+        "product": "Produit",
+        "platform": "Plateforme",
+        "account": "Compte"
+      },
+      "links": {
+        "features": "Fonctionnalités",
+        "howItWorks": "Comment ça marche",
+        "pricing": "Tarifs",
+        "dashboard": "Tableau de bord",
+        "timeline": "Chronologie",
+        "board": "Tableau de tâches",
+        "signIn": "Se connecter",
+        "signUp": "Créer un compte",
+        "acceptInvitation": "Accepter l’invitation"
+      }
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Vos informations de compte et vos préférences."
+  },
+  "organizationPage": {
+    "members": {
+      "title": "Membres",
+      "subtitle": "Les personnes de votre organisation et leurs rôles."
+    },
+    "settings": {
+      "title": "Paramètres de l’organisation",
+      "subtitle": "Nom, identifiant et préférences de l’espace de travail."
+    },
+    "audit": {
+      "title": "Journal d’audit",
+      "subtitle": "Actions sensibles enregistrées à des fins de conformité."
     }
   }
 }
