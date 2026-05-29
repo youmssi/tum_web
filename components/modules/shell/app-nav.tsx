@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   FolderKanbanIcon,
   LayoutDashboardIcon,
@@ -22,24 +23,26 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { LocaleSwitcher } from "./locale-switcher";
 import { OrgSwitcher } from "@/components/modules/organization/org-switcher";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
-const NAV_ITEMS = [
-  { href: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutDashboardIcon },
-  { href: ROUTES.PROJECTS, label: "Projects", icon: FolderKanbanIcon },
-  { href: ROUTES.ORGANIZATION_MEMBERS, label: "Members", icon: UsersIcon },
-];
-
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("nav");
   const { data: activeOrg } = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
   const currentRole =
     activeOrg?.members.find((m) => m.userId === session?.user?.id)?.role ?? "member";
   const isAdmin = currentRole === "owner" || currentRole === "admin";
+
+  const navItems = [
+    { href: ROUTES.DASHBOARD, label: t("dashboard"), icon: LayoutDashboardIcon },
+    { href: ROUTES.PROJECTS, label: t("projects"), icon: FolderKanbanIcon },
+    { href: ROUTES.ORGANIZATION_MEMBERS, label: t("members"), icon: UsersIcon },
+  ];
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -56,7 +59,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarMenu className="gap-1">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+          {navItems.map(({ href, label, icon: Icon }) => (
             <SidebarMenuItem key={href}>
               <SidebarMenuButton asChild isActive={pathname.startsWith(href)} tooltip={label}>
                 <Link href={href}>
@@ -76,11 +79,11 @@ export function AppSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={pathname.startsWith(ROUTES.ORGANIZATION_AUDIT)}
-                tooltip="Audit log"
+                tooltip={t("audit")}
               >
                 <Link href={ROUTES.ORGANIZATION_AUDIT}>
                   <ShieldIcon />
-                  <span>Audit log</span>
+                  <span>{t("audit")}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -89,26 +92,33 @@ export function AppSidebar() {
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(ROUTES.ORGANIZATION_SETTINGS)}
-              tooltip="Settings"
+              tooltip={t("settings")}
             >
               <Link href={ROUTES.ORGANIZATION_SETTINGS}>
                 <SettingsIcon />
-                <span>Settings</span>
+                <span>{t("settings")}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === ROUTES.PROFILE} tooltip="Profile">
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === ROUTES.PROFILE}
+              tooltip={t("profile")}
+            >
               <Link href={ROUTES.PROFILE}>
                 <UserIcon />
-                <span>Profile</span>
+                <span>{t("profile")}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleSignOut} tooltip="Sign out">
+            <LocaleSwitcher />
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleSignOut} tooltip={t("signOut")}>
               <LogOutIcon />
-              <span>Sign out</span>
+              <span>{t("signOut")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

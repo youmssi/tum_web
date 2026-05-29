@@ -1,6 +1,12 @@
 "use client";
 
-import { LinkIcon, Maximize2Icon, Minimize2Icon, TableIcon } from "lucide-react";
+import {
+  CalendarCheck2Icon,
+  LinkIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+  TableIcon,
+} from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -22,6 +28,7 @@ interface TimelineToolbarProps {
   projectName?: string;
   isFocused: boolean;
   onFocusToggle: () => void;
+  onJumpToToday: () => void;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -37,6 +44,7 @@ export function TimelineToolbar({
   projectName,
   isFocused,
   onFocusToggle,
+  onJumpToToday,
 }: TimelineToolbarProps) {
   const exporting = useRef(false);
 
@@ -84,6 +92,17 @@ export function TimelineToolbar({
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        {/* Jump to today */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onJumpToToday}>
+              <CalendarCheck2Icon className="size-3.5" />
+              Today
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Scroll the chart to today&apos;s date</TooltipContent>
+        </Tooltip>
+
         {/* Link mode toggle */}
         <Button
           variant={linkMode ? "default" : "outline"}

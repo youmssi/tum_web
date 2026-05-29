@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
 import type GanttInstance from "frappe-gantt";
 import type { GanttOptions, GanttTask, GanttViewMode } from "frappe-gantt";
@@ -9,6 +9,12 @@ import type { GanttOptions, GanttTask, GanttViewMode } from "frappe-gantt";
 import "./frappe-gantt.css";
 
 export type { GanttOptions, GanttTask, GanttViewMode };
+
+/** Imperative handle exposed by {@link GanttChart}. */
+export interface GanttChartHandle {
+  /** Scroll the chart so today's date marker is in view. No-op if the chart isn't mounted yet. */
+  scrollToToday(): void;
+}
 
 export interface GanttChartProps {
   tasks: GanttTask[];
@@ -35,17 +41,22 @@ export interface GanttChartProps {
  * in link mode, no longer resets the chart mid-interaction. Callbacks and options
  * are read from a ref so their identity never forces a recreate.
  */
-export function GanttChart({
-  tasks,
-  viewMode = "Week",
-  options,
-  className,
-  onClick,
-  onDateChange,
-  onProgressChange,
-}: GanttChartProps) {
+export const GanttChart = forwardRef<GanttChartHandle, GanttChartProps>(function GanttChart(
+  { tasks, viewMode = "Week", options, className, onClick, onDateChange, onProgressChange },
+  ref,
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const ganttRef = useRef<GanttInstance | null>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToToday() {
+        ganttRef.current?.scroll_current();
+      },
+    }),
+    [],
+  );
 
   // Latest props read by the (stable) Gantt callbacks and by recreate, without re-triggering it.
   const latest = useRef({ tasks, options, onClick, onDateChange, onProgressChange });
@@ -89,4 +100,4 @@ export function GanttChart({
   }, [tasks]);
 
   return <div ref={containerRef} className={className} />;
-}
+});

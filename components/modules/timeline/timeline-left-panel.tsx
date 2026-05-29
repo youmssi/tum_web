@@ -5,12 +5,92 @@ import { type RefObject, useRef, useState } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { formatLocalDate, parseLocalDate } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import { useDirectory, type DirectoryMember } from "@/components/modules/organization";
 import { type Task } from "@/components/modules/tasks";
 import { DEPENDENCY_TYPE_LABELS, type Dependency } from "./dependency-api";
+
+const MONTH_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** Compact label for a yyyy-MM-dd date: "Jun 1" if this year, else "Jun 1 '26". Empty → em-dash. */
+function shortDateLabel(value: string | null): string {
+  if (!value) return "—";
+  const d = parseLocalDate(value);
+  const month = MONTH_SHORT[d.getMonth()];
+  const day = d.getDate();
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return sameYear ? `${month} ${day}` : `${month} ${day} '${String(d.getFullYear()).slice(-2)}`;
+}
+
+function DateCell({
+  value,
+  onChange,
+  label,
+}: {
+  value: string | null;
+  onChange: (date: string | null) => void;
+  label: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onClick={(e) => e.stopPropagation()}
+          className="w-16 shrink-0 rounded px-1 text-xs text-muted-foreground hover:bg-muted/60 focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+          aria-label={label}
+        >
+          {shortDateLabel(value)}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start" onClick={(e) => e.stopPropagation()}>
+        <Calendar
+          mode="single"
+          selected={value ? parseLocalDate(value) : undefined}
+          onSelect={(date) => {
+            onChange(date ? formatLocalDate(date) : null);
+            setOpen(false);
+          }}
+        />
+        {value && (
+          <div className="border-t p-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(null);
+                setOpen(false);
+              }}
+            >
+              Clear
+            </Button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 // Must match Frappe Gantt bar_height (28) + padding (12) = 40px
 export const GANTT_ROW_HEIGHT = 40;
@@ -42,10 +122,12 @@ function resolveAssignee(assigneeId: string | null, members: DirectoryMember[]) 
 function TaskRow({
   task,
   outgoingDeps,
+  subtasks,
   allTasks,
   expanded,
   onExpandToggle,
   onOpenTask,
+  onOpenTaskById,
   onProgressChange,
   onMilestoneToggle,
   onDeleteDependency,
@@ -56,10 +138,12 @@ function TaskRow({
 }: {
   task: Task;
   outgoingDeps: Dependency[];
+  subtasks: Task[];
   allTasks: Task[];
   expanded: boolean;
   onExpandToggle: () => void;
   onOpenTask: () => void;
+  onOpenTaskById: (id: string) => void;
   onProgressChange: (p: number) => void;
   onMilestoneToggle: () => void;
   onDeleteDependency: (dep: Dependency) => void;
@@ -113,7 +197,7 @@ function TaskRow({
           tabIndex={-1}
           aria-label={expanded ? "Collapse" : "Expand"}
         >
-          {outgoingDeps.length > 0 ? (
+          {outgoingDeps.length > 0 || subtasks.length > 0 ? (
             expanded ? (
               <ChevronDownIcon className="size-3.5" />
             ) : (
@@ -170,28 +254,18 @@ function TaskRow({
           <span className="ml-1 size-5 shrink-0" />
         )}
 
-        {/* Start date */}
-        <input
-          type="date"
-          className="w-[88px] shrink-0 rounded border-0 bg-transparent px-1 text-xs text-muted-foreground focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-          value={task.startDate ?? ""}
-          onClick={stopProp}
-          onChange={(e) => {
-            stopProp(e as unknown as React.MouseEvent);
-            onDateChange("start", e.target.value || null);
-          }}
+        {/* Start date — popover calendar (replaces native input, saves ~24 px per cell) */}
+        <DateCell
+          value={task.startDate ?? null}
+          onChange={(d) => onDateChange("start", d)}
+          label={`Start date for ${task.title}`}
         />
 
-        {/* End date */}
-        <input
-          type="date"
-          className="w-[88px] shrink-0 rounded border-0 bg-transparent px-1 text-xs text-muted-foreground focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-          value={task.endDate ?? ""}
-          onClick={stopProp}
-          onChange={(e) => {
-            stopProp(e as unknown as React.MouseEvent);
-            onDateChange("end", e.target.value || null);
-          }}
+        {/* End date — popover calendar */}
+        <DateCell
+          value={task.endDate ?? null}
+          onChange={(d) => onDateChange("end", d)}
+          label={`End date for ${task.title}`}
         />
 
         {/* Progress */}
@@ -216,36 +290,72 @@ function TaskRow({
         </div>
       </div>
 
-      {/* Dependency expansion row */}
-      {expanded && outgoingDeps.length > 0 && (
-        <div className="border-b bg-muted/20 px-6 py-1.5">
-          <p className="mb-1 text-[11px] font-medium text-muted-foreground">Dependencies</p>
-          <div className="space-y-0.5">
-            {outgoingDeps.map((dep) => {
-              const target = allTasks.find((t) => t.id === dep.toTaskId);
-              return (
-                <div key={dep.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="truncate flex-1">
-                    → {target?.title ?? dep.toTaskId.slice(0, 8)}
-                    <span className="ml-1 text-[10px] opacity-70">
-                      ({DEPENDENCY_TYPE_LABELS[dep.type]})
-                    </span>
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-5 shrink-0 text-muted-foreground hover:text-destructive"
+      {/* Expansion row — subtasks (↳ children of this task) and dependencies (→ downstream tasks)
+          are shown as two distinct labelled sections so it's clear which is which. */}
+      {expanded && (subtasks.length > 0 || outgoingDeps.length > 0) && (
+        <div className="space-y-2 border-b bg-muted/20 px-6 py-1.5">
+          {subtasks.length > 0 && (
+            <div>
+              <p className="mb-1 text-[11px] font-medium text-muted-foreground">
+                Subtasks · {subtasks.length}
+              </p>
+              <div className="space-y-0.5">
+                {subtasks.map((child) => (
+                  <button
+                    key={child.id}
+                    type="button"
+                    className="flex w-full items-center gap-2 rounded px-1 text-left text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDeleteDependency(dep);
+                      onOpenTaskById(child.id);
                     }}
                   >
-                    <Trash2Icon className="size-3" />
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+                    <span className="shrink-0 select-none text-muted-foreground/50">↳</span>
+                    <span className="truncate flex-1">{child.title}</span>
+                    {child.status === "DONE" && (
+                      <span className="shrink-0 text-[10px] opacity-70">done</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {outgoingDeps.length > 0 && (
+            <div>
+              <p className="mb-1 text-[11px] font-medium text-muted-foreground">
+                Dependencies · {outgoingDeps.length}
+              </p>
+              <div className="space-y-0.5">
+                {outgoingDeps.map((dep) => {
+                  const target = allTasks.find((t) => t.id === dep.toTaskId);
+                  return (
+                    <div
+                      key={dep.id}
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                      <span className="truncate flex-1">
+                        → {target?.title ?? dep.toTaskId.slice(0, 8)}
+                        <span className="ml-1 text-[10px] opacity-70">
+                          ({DEPENDENCY_TYPE_LABELS[dep.type]})
+                        </span>
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-5 shrink-0 text-muted-foreground hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteDependency(dep);
+                        }}
+                      >
+                        <Trash2Icon className="size-3" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
@@ -277,6 +387,20 @@ export function TimelineLeftPanel({
     outgoingDepsByTask.get(dep.fromTaskId)!.push(dep);
   }
 
+  // Children index: parentTaskId → ordered children. Used by the expand panel to surface
+  // a task's subtasks alongside its dependencies (each in a clearly labelled section).
+  const childrenByParent = new Map<string, Task[]>();
+  for (const t of tasks) {
+    if (!t.parentTaskId) continue;
+    if (!childrenByParent.has(t.parentTaskId)) childrenByParent.set(t.parentTaskId, []);
+    childrenByParent.get(t.parentTaskId)!.push(t);
+  }
+
+  function openTaskById(id: string) {
+    const target = tasks.find((t) => t.id === id);
+    if (target) onOpenTask(target);
+  }
+
   const scheduled = tasks.filter((t) => scheduledTaskIds.has(t.id));
   const unscheduled = tasks.filter((t) => !scheduledTaskIds.has(t.id));
 
@@ -291,8 +415,8 @@ export function TimelineLeftPanel({
         <span className="size-3.5 shrink-0" />
         <span className="flex-1 truncate">Task</span>
         <span className="size-5 shrink-0" />
-        <span className="w-[88px] shrink-0 text-center">Start</span>
-        <span className="w-[88px] shrink-0 text-center">End</span>
+        <span className="w-16 shrink-0 text-center">Start</span>
+        <span className="w-16 shrink-0 text-center">End</span>
         <span className="w-10 shrink-0 text-center">%</span>
       </div>
 
@@ -307,10 +431,12 @@ export function TimelineLeftPanel({
             key={task.id}
             task={task}
             outgoingDeps={outgoingDepsByTask.get(task.id) ?? []}
+            subtasks={childrenByParent.get(task.id) ?? []}
             allTasks={tasks}
             expanded={expandedTaskId === task.id}
             onExpandToggle={() => onExpandToggle(task.id)}
             onOpenTask={() => onOpenTask(task)}
+            onOpenTaskById={openTaskById}
             onProgressChange={(p) => onProgressChange(task, p)}
             onMilestoneToggle={() => onMilestoneToggle(task)}
             onDeleteDependency={onDeleteDependency}
@@ -334,10 +460,12 @@ export function TimelineLeftPanel({
                 key={task.id}
                 task={task}
                 outgoingDeps={outgoingDepsByTask.get(task.id) ?? []}
+                subtasks={childrenByParent.get(task.id) ?? []}
                 allTasks={tasks}
                 expanded={expandedTaskId === task.id}
                 onExpandToggle={() => onExpandToggle(task.id)}
                 onOpenTask={() => onOpenTask(task)}
+                onOpenTaskById={openTaskById}
                 onProgressChange={(p) => onProgressChange(task, p)}
                 onMilestoneToggle={() => onMilestoneToggle(task)}
                 onDeleteDependency={onDeleteDependency}

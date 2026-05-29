@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowRight, BarChart2, CalendarDays, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
+// Animated word stays English-only — these are short visual fragments tied to the typing animation;
+// localizing them properly is part of the Phase 10 full-localization epic.
 const words = ["execute", "deliver", "track", "succeed"];
 
 function AnimatedGrid() {
@@ -83,6 +86,7 @@ function GanttPreview() {
 }
 
 export function HeroSection() {
+  const t = useTranslations("landing.hero");
   const [visible, setVisible] = useState(false);
   const [wordIdx, setWordIdx] = useState(0);
 
@@ -107,7 +111,7 @@ export function HeroSection() {
         >
           <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground">
             <span className="w-6 h-px bg-foreground/40" />
-            Open-source · For any team · Any background
+            {t("eyebrow")}
           </span>
         </div>
 
@@ -143,8 +147,7 @@ export function HeroSection() {
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more
-              scattered tools — just clear execution. For any team, any department, any project.
+              {t("subhead")}
             </p>
 
             <div
@@ -154,12 +157,12 @@ export function HeroSection() {
             >
               <Button size="lg" className="h-12 px-8 rounded-full group" asChild>
                 <Link href={ROUTES.SIGNUP}>
-                  Start free
+                  {t("ctaStartFree")}
                   <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="h-12 px-8 rounded-full" asChild>
-                <Link href={ROUTES.LOGIN}>Sign in</Link>
+                <Link href={ROUTES.LOGIN}>{t("ctaSignIn")}</Link>
               </Button>
             </div>
 
@@ -169,7 +172,7 @@ export function HeroSection() {
                 visible ? "opacity-100" : "opacity-0"
               }`}
             >
-              Free to use · No credit card required · Community &amp; cloud plans
+              {t("microFooter")}
             </p>
           </div>
 

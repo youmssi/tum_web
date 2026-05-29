@@ -67,6 +67,73 @@ function MemberName({ userId }: { userId: string | null }) {
   return <span>{member?.name ?? userId}</span>;
 }
 
+function BulkActionsBar({
+  count,
+  pending,
+  onStatusChange,
+  onAssigneeChange,
+  onDelete,
+  onClear,
+}: {
+  count: number;
+  pending: boolean;
+  onStatusChange: (status: string) => void;
+  onAssigneeChange: (value: string) => void;
+  onDelete: () => void;
+  onClear: () => void;
+}) {
+  const { data: directory } = useDirectory();
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2">
+      <span className="text-sm font-medium">{count} selected</span>
+
+      <Select onValueChange={onStatusChange} disabled={pending}>
+        <SelectTrigger className="h-8 w-36 text-xs">
+          <SelectValue placeholder="Set status…" />
+        </SelectTrigger>
+        <SelectContent>
+          {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
+            <SelectItem key={s} value={s} className="text-xs">
+              {STATUS_LABELS[s]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select onValueChange={onAssigneeChange} disabled={pending || !directory}>
+        <SelectTrigger className="h-8 w-40 text-xs">
+          <SelectValue placeholder="Assign to…" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="__unassigned__" className="text-xs">
+            Unassigned
+          </SelectItem>
+          {(directory ?? []).map((m) => (
+            <SelectItem key={m.userId} value={m.userId} className="text-xs">
+              {m.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Button
+        size="sm"
+        variant="destructive"
+        className="h-8 text-xs"
+        onClick={onDelete}
+        disabled={pending}
+      >
+        <Trash2Icon className="mr-1 size-3" />
+        Delete
+      </Button>
+
+      <Button size="icon" variant="ghost" className="ml-auto size-8" onClick={onClear}>
+        <XIcon className="size-4" />
+      </Button>
+    </div>
+  );
+}
+
 export function TaskList({ projectId }: { projectId: string }) {
   const { data: tasks, isLoading } = useTasks(projectId);
   const bulkUpdate = useBulkUpdateTasks(projectId);
@@ -239,6 +306,21 @@ export function TaskList({ projectId }: { projectId: string }) {
     }
   }
 
+  async function handleBulkAssigneeChange(value: string) {
+    if (!selectedIds.length) return;
+    try {
+      await bulkUpdate.mutateAsync({
+        ids: selectedIds,
+        action: "UPDATE",
+        assigneeId: value === "__unassigned__" ? "" : value,
+      });
+      toast.success(`${selectedIds.length} task(s) reassigned.`);
+      setRowSelection({});
+    } catch {
+      toast.error("Failed to reassign tasks.");
+    }
+  }
+
   async function handleBulkDelete() {
     if (!selectedIds.length) return;
     try {
@@ -311,39 +393,14 @@ export function TaskList({ projectId }: { projectId: string }) {
       </div>
 
       {selectedIds.length > 0 && (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2">
-          <span className="text-sm font-medium">{selectedIds.length} selected</span>
-          <Select onValueChange={handleBulkStatusChange} disabled={bulkUpdate.isPending}>
-            <SelectTrigger className="h-8 w-36 text-xs">
-              <SelectValue placeholder="Set status…" />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-                <SelectItem key={s} value={s} className="text-xs">
-                  {STATUS_LABELS[s]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            size="sm"
-            variant="destructive"
-            className="h-8 text-xs"
-            onClick={handleBulkDelete}
-            disabled={bulkUpdate.isPending}
-          >
-            <Trash2Icon className="mr-1 size-3" />
-            Delete
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="ml-auto size-8"
-            onClick={() => setRowSelection({})}
-          >
-            <XIcon className="size-4" />
-          </Button>
-        </div>
+        <BulkActionsBar
+          count={selectedIds.length}
+          pending={bulkUpdate.isPending}
+          onStatusChange={handleBulkStatusChange}
+          onAssigneeChange={handleBulkAssigneeChange}
+          onDelete={handleBulkDelete}
+          onClear={() => setRowSelection({})}
+        />
       )}
 
       {filtered.length === 0 ? (

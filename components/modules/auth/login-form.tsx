@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -22,15 +23,16 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
-const loginSchema = z.object({
-  email: z.string().email("Enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = { email: string; password: string };
 
 export function LoginForm() {
   const router = useRouter();
+  const t = useTranslations("auth.login");
+
+  const loginSchema = z.object({
+    email: z.string().email(t("invalidEmail")),
+    password: z.string().min(1, t("passwordRequired")),
+  });
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -42,7 +44,7 @@ export function LoginForm() {
   async function onSubmit(values: LoginFormValues) {
     const { error } = await authClient.signIn.email(values);
     if (error) {
-      toast.error(error.message ?? "Sign-in failed. Please try again.");
+      toast.error(error.message ?? t("failed"));
       return;
     }
     router.push(ROUTES.DASHBOARD);
@@ -55,8 +57,8 @@ export function LoginForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to your Tûm account</CardDescription>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -67,14 +69,14 @@ export function LoginForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                  <FieldLabel htmlFor="login-email">{t("emailLabel")}</FieldLabel>
                   <Input
                     {...field}
                     id="login-email"
                     type="email"
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
-                    placeholder="you@example.com"
+                    placeholder={t("emailPlaceholder")}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
@@ -86,13 +88,13 @@ export function LoginForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="login-password">Password</FieldLabel>
+                  <FieldLabel htmlFor="login-password">{t("passwordLabel")}</FieldLabel>
                   <PasswordInput
                     {...field}
                     id="login-password"
                     autoComplete="current-password"
                     aria-invalid={fieldState.invalid}
-                    placeholder="••••••••"
+                    placeholder={t("passwordPlaceholder")}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
@@ -105,10 +107,10 @@ export function LoginForm() {
       <CardContent className="pt-0">
         <FieldGroup className="gap-3">
           <Button type="submit" form="login-form" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in…" : "Sign in"}
+            {isSubmitting ? t("submitting") : t("submit")}
           </Button>
 
-          <FieldSeparator>or continue with</FieldSeparator>
+          <FieldSeparator>{t("continueWith")}</FieldSeparator>
 
           <Button
             type="button"
@@ -116,7 +118,7 @@ export function LoginForm() {
             className="w-full"
             onClick={() => handleSocialSignIn("google")}
           >
-            Continue with Google
+            {t("google")}
           </Button>
           <Button
             type="button"
@@ -124,18 +126,18 @@ export function LoginForm() {
             className="w-full"
             onClick={() => handleSocialSignIn("github")}
           >
-            Continue with GitHub
+            {t("github")}
           </Button>
         </FieldGroup>
       </CardContent>
 
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        No account?&nbsp;
+        {t("noAccount")}&nbsp;
         <Link
           href={ROUTES.SIGNUP}
           className="text-foreground underline underline-offset-4 hover:text-primary"
         >
-          Sign up
+          {t("signUpLink")}
         </Link>
       </CardFooter>
     </Card>

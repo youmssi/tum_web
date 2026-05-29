@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LoginForm } from "./login-form";
+import { renderWithIntl as render } from "./test-utils";
 
 const { mockSignIn, mockSocialSignIn } = vi.hoisted(() => ({
   mockSignIn: vi.fn(),
