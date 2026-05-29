@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PRIORITY_LABELS, type Task, type TaskPriority } from "@/components/modules/tasks";
-import { authClient } from "@/lib/auth-client";
+import { useDirectory } from "@/components/modules/organization";
 
 const PRIORITY_VARIANTS: Record<TaskPriority, "default" | "secondary" | "destructive" | "outline"> =
   {
@@ -37,7 +37,7 @@ function isOverdue(dueDate: string | null, status: Task["status"]): boolean {
 }
 
 function AssigneeAvatar({ userId }: { userId: string | null }) {
-  const { data: activeOrg } = authClient.useActiveOrganization();
+  const { data: directory } = useDirectory();
   if (!userId) {
     return (
       <div className="flex size-5 items-center justify-center rounded-full border border-dashed border-muted-foreground/40">
@@ -45,8 +45,8 @@ function AssigneeAvatar({ userId }: { userId: string | null }) {
       </div>
     );
   }
-  const member = activeOrg?.members?.find((m) => m.userId === userId);
-  const initials = (member?.user?.name ?? userId).slice(0, 2).toUpperCase();
+  const member = directory?.find((m) => m.userId === userId);
+  const initials = (member?.name ?? userId).slice(0, 2).toUpperCase();
   return (
     <Avatar className="size-5">
       <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>

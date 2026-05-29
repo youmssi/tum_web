@@ -7,8 +7,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { useDirectory, type DirectoryMember } from "@/components/modules/organization";
 import { type Task } from "@/components/modules/tasks";
 import { DEPENDENCY_TYPE_LABELS, type Dependency } from "./dependency-api";
 
@@ -33,18 +33,10 @@ interface Props {
   onScroll?: () => void;
 }
 
-function resolveAssignee(
-  assigneeId: string | null,
-  members: NonNullable<ReturnType<typeof authClient.useActiveOrganization>["data"]>["members"],
-) {
+function resolveAssignee(assigneeId: string | null, members: DirectoryMember[]) {
   if (!assigneeId) return null;
   const m = members.find((mem) => mem.userId === assigneeId);
-  return m
-    ? {
-        name: m.user?.name ?? m.user?.email ?? "?",
-        initials: (m.user?.name ?? m.user?.email ?? "?").slice(0, 2).toUpperCase(),
-      }
-    : null;
+  return m ? { name: m.name, initials: m.name.slice(0, 2).toUpperCase() } : null;
 }
 
 function TaskRow({
@@ -72,7 +64,7 @@ function TaskRow({
   onMilestoneToggle: () => void;
   onDeleteDependency: (dep: Dependency) => void;
   onDateChange: (field: "start" | "end", date: string | null) => void;
-  members: NonNullable<ReturnType<typeof authClient.useActiveOrganization>["data"]>["members"];
+  members: DirectoryMember[];
   linkMode: boolean;
   isLinkSource: boolean;
 }) {
@@ -276,8 +268,8 @@ export function TimelineLeftPanel({
   leftScrollRef,
   onScroll,
 }: Props) {
-  const { data: activeOrg } = authClient.useActiveOrganization();
-  const members = activeOrg?.members ?? [];
+  const { data: directory } = useDirectory();
+  const members = directory ?? [];
 
   const outgoingDepsByTask = new Map<string, Dependency[]>();
   for (const dep of allDeps) {

@@ -7,7 +7,8 @@ import { Pool } from "pg";
 // App code must import from `lib/auth.ts` (which re-exports with the server-only guard).
 
 // Shared pool so definePayload can query member roles without a second connection.
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Also re-exported so server routes (e.g. the internal directory endpoint) reuse the same pool.
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const auth = betterAuth({
   database: pool,
