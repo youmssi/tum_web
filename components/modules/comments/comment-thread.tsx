@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
+import { useDirectory, type DirectoryMember } from "@/components/modules/organization";
 import { useComments, useCreateComment, useDeleteComment, useUpdateComment } from "./use-comments";
 
 function relativeTime(iso: string): string {
@@ -26,7 +27,7 @@ function relativeTime(iso: string): string {
 
 interface CommentInputProps {
   taskId: string;
-  members: Array<{ userId: string; user?: { name?: string | null; email?: string } | null }>;
+  members: DirectoryMember[];
 }
 
 function CommentInput({ taskId, members }: CommentInputProps) {
@@ -44,15 +45,11 @@ function CommentInput({ taskId, members }: CommentInputProps) {
     setMention(match ? { query: match[1], start: cursor - match[0].length } : null);
   }
 
-  function insertMention(member: {
-    userId: string;
-    user?: { name?: string | null; email?: string } | null;
-  }) {
+  function insertMention(member: DirectoryMember) {
     if (!mention || !textareaRef.current) return;
-    const name = member.user?.name ?? member.user?.email ?? member.userId;
     const cursor = textareaRef.current.selectionStart;
     const after = content.slice(cursor);
-    setContent(`${content.slice(0, mention.start)}@${name} ${after}`);
+    setContent(`${content.slice(0, mention.start)}@${member.name} ${after}`);
     setMentionedUserIds((prev) => (prev.includes(member.userId) ? prev : [...prev, member.userId]));
     setMention(null);
     textareaRef.current.focus();
@@ -72,9 +69,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
   }
 
   const suggestions = mention
-    ? members.filter((m) =>
-        (m.user?.name ?? "").toLowerCase().includes(mention.query.toLowerCase()),
-      )
+    ? members.filter((m) => m.name.toLowerCase().includes(mention.query.toLowerCase()))
     : [];
 
   return (
@@ -107,10 +102,10 @@ function CommentInput({ taskId, members }: CommentInputProps) {
               >
                 <Avatar className="size-5">
                   <AvatarFallback className="text-xs">
-                    {(m.user?.name ?? "?").slice(0, 2).toUpperCase()}
+                    {m.name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                {m.user?.name ?? m.user?.email ?? m.userId}
+                {m.name}
               </button>
             ))}
           </div>
@@ -138,9 +133,11 @@ export function CommentThread({ taskId }: CommentThreadProps) {
   const updateComment = useUpdateComment(taskId);
   const deleteComment = useDeleteComment(taskId);
   const { data: session } = authClient.useSession();
-  const { data: activeOrg } = authClient.useActiveOrganization();
-  const members = activeOrg?.members ?? [];
+  const { data: directory } = useDirectory();
   const currentUserId = session?.user?.id;
+  // Filter the caller out of the mention list — you can't notify yourself; the backend keeps a
+  // defensive drop too so a hand-crafted client can't bypass it.
+  const members = (directory ?? []).filter((m) => m.userId !== currentUserId);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -169,9 +166,11 @@ export function CommentThread({ taskId }: CommentThreadProps) {
     }
   }
 
+  // For displaying author names on existing comments, look up across the full directory (the caller
+  // included) so their own past comments still render with their name.
   function memberName(userId: string) {
-    const m = members.find((m) => m.userId === userId);
-    return m?.user?.name ?? m?.user?.email ?? userId;
+    const m = (directory ?? []).find((m) => m.userId === userId);
+    return m?.name ?? userId;
   }
 
   function memberInitials(userId: string) {

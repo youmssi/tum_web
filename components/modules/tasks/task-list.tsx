@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { authClient } from "@/lib/auth-client";
+import { useDirectory } from "@/components/modules/organization";
 import {
   PRIORITY_LABELS,
   STATUS_LABELS,
@@ -61,11 +61,10 @@ const PRIORITY_VARIANTS: Record<TaskPriority, "default" | "secondary" | "destruc
   };
 
 function MemberName({ userId }: { userId: string | null }) {
-  const { data: activeOrg } = authClient.useActiveOrganization();
+  const { data: directory } = useDirectory();
   if (!userId) return <span className="text-muted-foreground">—</span>;
-  const member = activeOrg?.members?.find((m) => m.userId === userId);
-  const name = member?.user?.name ?? member?.user?.email ?? userId;
-  return <span>{name}</span>;
+  const member = directory?.find((m) => m.userId === userId);
+  return <span>{member?.name ?? userId}</span>;
 }
 
 export function TaskList({ projectId }: { projectId: string }) {

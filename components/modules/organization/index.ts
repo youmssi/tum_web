@@ -6,3 +6,5 @@ export { MemberList } from "./member-list";
 export { OrgSettingsForm } from "./org-settings-form";
 export { OrgSwitcher } from "./org-switcher";
 export { WorkspacePicker } from "./workspace-picker";
+export { directoryApi, type DirectoryMember } from "./directory-api";
+export { useDirectory } from "./use-directory";

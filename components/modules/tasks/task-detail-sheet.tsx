@@ -32,7 +32,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { authClient } from "@/lib/auth-client";
+import { useDirectory } from "@/components/modules/organization";
 import { CommentThread } from "@/components/modules/comments";
 import { AttachmentList, FileUpload } from "@/components/modules/files";
 import {
@@ -74,8 +74,8 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   const updateTask = useUpdateTask();
   const rescheduleTask = useRescheduleTask(projectId);
   const deleteTask = useDeleteTask(projectId);
-  const { data: activeOrg } = authClient.useActiveOrganization();
-  const members = activeOrg?.members ?? [];
+  const { data: directory } = useDirectory();
+  const members = directory ?? [];
   const { data: allTasks } = useTasks(projectId);
   const { data: deps } = useDependencies(task?.id);
   const createDep = useCreateDependency();
@@ -282,7 +282,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                       <SelectItem value="__none__">Unassigned</SelectItem>
                       {members.map((m) => (
                         <SelectItem key={m.userId} value={m.userId}>
-                          {m.user?.name ?? m.user?.email ?? m.userId}
+                          {m.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
