@@ -19,6 +19,11 @@ import { toast } from "sonner";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  useStatuses,
+  type StatusCategory,
+  type TaskStatusConfig,
+} from "@/components/modules/projects";
+import {
   type Task,
   type TaskStatus,
   TaskDetailSheet,
@@ -28,29 +33,40 @@ import {
 import { BoardColumn } from "./board-column";
 import { TaskCard } from "./task-card";
 
-const STATUSES: TaskStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
+const FALLBACK_CATEGORIES: StatusCategory[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 
-type ColumnMap = Record<TaskStatus, string[]>;
+type ColumnMap = Record<string, string[]>;
 
-function buildColumns(tasks: Task[]): ColumnMap {
-  const cols: ColumnMap = { TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] };
+function buildColumns(tasks: Task[], categories: string[]): ColumnMap {
+  const cols: ColumnMap = Object.fromEntries(categories.map((c) => [c, []] as const));
   [...tasks]
     .sort((a, b) => a.orderIndex - b.orderIndex)
     .forEach((t) => {
-      cols[t.status].push(t.id);
+      if (cols[t.status]) cols[t.status].push(t.id);
     });
   return cols;
 }
 
 export function KanbanBoard({ projectId }: { projectId: string }) {
-  const { data: tasks, isLoading } = useTasks(projectId);
+  const { data: tasks, isLoading: tasksLoading } = useTasks(projectId);
+  const { data: configs, isLoading: statusesLoading } = useStatuses(projectId);
   const moveTask = useMoveTask(projectId);
 
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Derive column layout from server data; keep drag mutations in separate state
-  // so server refreshes never clobber an in-progress drag.
-  const serverCols = useMemo(() => buildColumns(tasks ?? []), [tasks]);
+  // One column per configured status, sorted by sortOrder. Falls back to the fixed category set
+  // before the server has answered so the loading skeleton still renders 4 columns.
+  const orderedConfigs: TaskStatusConfig[] = useMemo(() => {
+    if (!configs) return [];
+    return [...configs].sort((a, b) => a.sortOrder - b.sortOrder);
+  }, [configs]);
+
+  const categories: string[] = useMemo(() => {
+    if (orderedConfigs.length) return orderedConfigs.map((c) => c.category);
+    return FALLBACK_CATEGORIES;
+  }, [orderedConfigs]);
+
+  const serverCols = useMemo(() => buildColumns(tasks ?? [], categories), [tasks, categories]);
   const [dragCols, setDragCols] = useState<ColumnMap | null>(null);
   const cols = activeId ? (dragCols ?? serverCols) : serverCols;
   const colsRef = useRef<ColumnMap>(cols);
@@ -74,10 +90,10 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  function findContainer(id: string): TaskStatus | null {
-    if ((STATUSES as string[]).includes(id)) return id as TaskStatus;
-    for (const s of STATUSES) {
-      if (colsRef.current[s].includes(id)) return s;
+  function findContainer(id: string): string | null {
+    if (categories.includes(id)) return id;
+    for (const cat of categories) {
+      if (colsRef.current[cat]?.includes(id)) return cat;
     }
     return null;
   }
@@ -95,8 +111,8 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     if (!fromCol || !toCol || fromCol === toCol) return;
 
     const current = colsRef.current;
-    const fromItems = current[fromCol].filter((id) => id !== activeId);
-    const toItems = [...current[toCol]];
+    const fromItems = (current[fromCol] ?? []).filter((id) => id !== activeId);
+    const toItems = [...(current[toCol] ?? [])];
     const overIndex = toItems.indexOf(overId);
     const insertAt = overIndex >= 0 ? overIndex : toItems.length;
 
@@ -128,7 +144,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     let finalCols = current;
 
     if (fromCol === toCol && activeId !== overId) {
-      const items = [...current[fromCol]];
+      const items = [...(current[fromCol] ?? [])];
       const oldIdx = items.indexOf(activeId);
       const newIdx = items.indexOf(overId);
       if (oldIdx !== -1 && newIdx !== -1 && oldIdx !== newIdx) {
@@ -137,12 +153,16 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
       }
     }
 
-    const colItems = finalCols[fromCol];
+    const colItems = finalCols[fromCol] ?? [];
     const idx = colItems.indexOf(activeId);
     const afterTaskId = idx > 0 ? colItems[idx - 1] : undefined;
 
     try {
-      await moveTask.mutateAsync({ id: activeId, status: fromCol, afterTaskId });
+      await moveTask.mutateAsync({
+        id: activeId,
+        status: fromCol as TaskStatus,
+        afterTaskId,
+      });
       setDragCols(null);
     } catch {
       toast.error("Failed to move task.");
@@ -152,11 +172,11 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 
   const activeTask = activeId ? (taskMap[activeId] ?? null) : null;
 
-  if (isLoading) {
+  if (tasksLoading || statusesLoading) {
     return (
       <div className="flex gap-4">
-        {STATUSES.map((s) => (
-          <div key={s} className="flex min-w-56 flex-1 flex-col gap-2">
+        {FALLBACK_CATEGORIES.map((c) => (
+          <div key={c} className="flex min-w-56 flex-1 flex-col gap-2">
             <Skeleton className="h-7 w-28" />
             <Skeleton className="h-48 w-full rounded-xl" />
           </div>
@@ -164,6 +184,13 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
       </div>
     );
   }
+
+  // Configs may be empty for a brand-new (just-imported) project where the seed listener hasn't
+  // committed yet; render against the fallback categories so the board is always usable.
+  const columnDescriptors: { category: string; config: TaskStatusConfig | null }[] =
+    orderedConfigs.length
+      ? orderedConfigs.map((cfg) => ({ category: cfg.category, config: cfg }))
+      : FALLBACK_CATEGORIES.map((c) => ({ category: c, config: null }));
 
   return (
     <>
@@ -175,11 +202,12 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         onDragEnd={onDragEnd}
       >
         <div className="flex gap-3 overflow-x-auto pb-4 pt-1 px-0.5">
-          {STATUSES.map((status) => (
+          {columnDescriptors.map(({ category, config }) => (
             <BoardColumn
-              key={status}
-              status={status}
-              tasks={cols[status].map((id) => taskMap[id]).filter(Boolean) as Task[]}
+              key={category}
+              status={category as TaskStatus}
+              config={config}
+              tasks={(cols[category] ?? []).map((id) => taskMap[id]).filter(Boolean) as Task[]}
               onTaskClick={(task) => {
                 setSelectedTask(task);
                 setSheetOpen(true);

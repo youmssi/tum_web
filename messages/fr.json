@@ -561,6 +561,14 @@
       "tagline": "Exécution de projets & visibilité des équipes",
       "eyebrow": "Open source · Pour toutes les équipes · Tous profils",
       "heading": "Moins planifier. Plus livrer.",
+      "headingLine1": "Exécution de projet",
+      "headingLine2": "conçue pour aider les équipes à",
+      "animatedWords": {
+        "execute": "exécuter",
+        "deliver": "livrer",
+        "track": "suivre",
+        "succeed": "réussir"
+      },
       "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Plus d’outils éparpillés — juste une exécution claire. Pour toute équipe, tout département, tout projet.",
       "ctaStartFree": "Démarrer gratuitement",
       "ctaSignIn": "Se connecter",

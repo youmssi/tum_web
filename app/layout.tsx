@@ -52,12 +52,11 @@ export const metadata: Metadata = {
     title: "Tûm — Project execution & workflow visibility",
     description: "Tûm brings tasks, timelines, and team visibility into one coherent workspace.",
   },
+  // Icons: app/icon.svg is auto-served by Next.js as the favicon; public/favicon.svg stays as a
+  // bare-URL fallback for old links. No more .ico (the previous one was the Vercel default).
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
-    ],
-    shortcut: "/favicon.ico",
+    icon: [{ url: "/icon", type: "image/svg+xml" }],
+    shortcut: "/icon",
   },
   robots: {
     index: true,
@@ -69,6 +68,12 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  // Google Search Console — verifies the *.vercel.app subdomain without DNS TXT (which Vercel
+  // doesn't expose for preview domains). Next inserts this as a <meta name="google-site-
+  // verification"> tag in <head> automatically.
+  verification: {
+    google: "W_nff1NydesyM91YO1xnvKZDzK_b2hs-3io0n4yEj08",
   },
 };
 

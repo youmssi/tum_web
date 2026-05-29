@@ -561,6 +561,14 @@
       "tagline": "Project execution & workflow visibility",
       "eyebrow": "Open-source · For any team · Any background",
       "heading": "Plan less. Ship more.",
+      "headingLine1": "Project execution",
+      "headingLine2": "built for teams to",
+      "animatedWords": {
+        "execute": "execute",
+        "deliver": "deliver",
+        "track": "track",
+        "succeed": "succeed"
+      },
       "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools — just clear execution. For any team, any department, any project.",
       "ctaStartFree": "Start free",
       "ctaSignIn": "Sign in",

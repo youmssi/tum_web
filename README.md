@@ -137,22 +137,25 @@ sequenceDiagram
 
 ## Route map
 
-| Route                        | Component                 | Notes                                              |
-| ---------------------------- | ------------------------- | -------------------------------------------------- |
-| `/`                          | `app/page.tsx`            | Landing / redirect to dashboard                    |
-| `/login`                     | `LoginForm`               | Email + social sign-in                             |
-| `/signup`                    | `SignupForm`              | Email registration                                 |
-| `/onboarding`                | `OnboardingForm`          | Org creation after first sign-in                   |
-| `/invitations/accept`        | `InvitationAccept`        | Accept org invite via token                        |
-| `/dashboard`                 | `MyWorkDashboard`         | Personal task overview + stats                     |
-| `/projects`                  | `ProjectList`             | All projects in the active org                     |
-| `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, Board, Timeline, Members, Settings |
-| `/projects/[id]/settings`    | `ProjectSettingsForm`     | Project name, description, delete                  |
-| `/profile`                   | `ProfileForm`             | Name, avatar, password change                      |
-| `/organization/members`      | `MemberList`              | Invite, role change, remove                        |
-| `/organization/settings`     | `OrgSettingsForm`         | Org name, logo                                     |
-| `/organization/audit`        | `AuditLog`                | Filterable audit trail (admin/owner only)          |
-| `/notifications/preferences` | `NotificationPreferences` | Email + in-app toggles per type                    |
+**Locale-prefixed routing** — every UI route lives under `app/[locale]/`. Supported locales are `en` and `fr`; the prefix is omitted for the default locale (English) and rendered for everything else (e.g. `/fr/dashboard`). Routing is driven by `next-intl` (`i18n/routing.ts`, `i18n/navigation.ts`) and locale resolution happens in `proxy.ts`: cookie → `Accept-Language` → default. The list below shows the canonical paths; the same paths exist under each locale prefix.
+
+| Route                        | Component                 | Notes                                                                           |
+| ---------------------------- | ------------------------- | ------------------------------------------------------------------------------- |
+| `/`                          | `app/[locale]/page.tsx`   | Landing page (`HeroSection`, `FeaturesSection`, `HowItWorks`, `Pricing`, `CTA`) |
+| `/login`                     | `LoginForm`               | Email + Google + GitHub sign-in                                                 |
+| `/signup`                    | `SignupForm`              | Email registration with verification email                                      |
+| `/onboarding`                | `CreateOrgForm`           | Org creation after first sign-in                                                |
+| `/workspaces`                | `WorkspacePicker`         | Pick an org or create a new one (also reachable from the sidebar switcher)      |
+| `/invitations/accept`        | `AcceptInvitationView`    | Accept org invite via token                                                     |
+| `/dashboard`                 | `MyWorkDashboard`         | Personal task overview + completion-trend chart                                 |
+| `/projects`                  | `ProjectList`             | All projects in the active org; archived toggle; import CSV button              |
+| `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, List, Board, Timeline, Activity                                 |
+| `/projects/[id]/settings`    | `ProjectSettingsForm`     | Project name, description, member-restriction, delete                           |
+| `/profile`                   | `ProfileForm`             | Name, avatar, sign-out                                                          |
+| `/organization/members`      | `MemberList`              | Invite, role change, remove                                                     |
+| `/organization/settings`     | `OrgSettingsForm`         | Org name + preferences                                                          |
+| `/organization/audit`        | `AuditLog`                | Filterable audit trail (admin/owner only) + CSV export                          |
+| `/notifications/preferences` | `NotificationPreferences` | Email + in-app toggles per event type                                           |
 
 ---
 
@@ -308,7 +311,9 @@ pnpm test:watch    # watch mode
 - **Never use `process.env` outside** `lib/env.ts` (public vars) or `lib/env.server.ts` (secrets).
 - **Never hardcode route strings** — use `ROUTES.*` from `lib/constants.ts`.
 - **Always check `components/ui/`** before building any UI primitive from scratch.
-- **`proxy.ts` is the route guard** — it is the Next.js 16 equivalent of `middleware.ts` (the `middleware` file convention is deprecated in Next.js 16).
+- **`proxy.ts` is the route guard** — it is the Next.js 16 equivalent of `middleware.ts` (the `middleware` file convention is deprecated in Next.js 16). It composes `next-intl`'s locale-detection middleware with our session check.
+- **Use `@/i18n/navigation` for `Link`, `useRouter`, `usePathname`, and client-side `redirect`** — never `next/link` or `next/navigation` (the locale-aware helpers keep the `/en` or `/fr` prefix on every push, replace, and link). Server-side redirects from page components use `redirectLocalized()` in `i18n/server-redirect.ts`.
+- **All user-facing strings live in `messages/{en,fr}.json`** — wire them via `useTranslations(...)` (client) or `getTranslations(...)` (server). A vitest test (`messages/messages.test.ts`) enforces key parity between locales.
 
 ---
 
