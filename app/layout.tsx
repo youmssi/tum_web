@@ -1,18 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Providers } from "./providers";
+
 import { env } from "@/lib/env";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+/**
+ * Minimal root layout — the real {@code <html>} / {@code <body>} structure lives in
+ * {@code app/[locale]/layout.tsx} where the locale is known. This wrapper is just here because
+ * Next.js requires a layout at the {@code app/} root and we want metadata to attach to the entire
+ * site (locale-prefixed or not).
+ */
 
 export const viewport: Viewport = {
   themeColor: [
@@ -46,7 +41,6 @@ export const metadata: Metadata = {
   creator: "Tûm",
   openGraph: {
     type: "website",
-    locale: "en_US",
     url: env.siteUrl,
     siteName: "Tûm",
     title: "Tûm — Project execution & workflow visibility",
@@ -78,20 +72,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col">
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

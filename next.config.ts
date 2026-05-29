@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -18,4 +19,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// E15-F4 — i18n foundation. Cookie-based locale (no URL prefix) keeps routes unchanged; URL
+// routing can be added in the Phase 10 full-localization epic without re-plumbing message keys.
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+export default withNextIntl(nextConfig);

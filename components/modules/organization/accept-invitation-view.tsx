@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { BuildingIcon, CheckCircleIcon, InboxIcon, XCircleIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 

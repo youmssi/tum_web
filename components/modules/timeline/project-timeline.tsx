@@ -26,7 +26,12 @@ import {
   useToggleMilestone,
 } from "@/components/modules/tasks";
 import { useTimelineColors } from "./timeline-colors-store";
-import { GanttChart, type GanttTask, type GanttViewMode } from "./gantt-chart";
+import {
+  GanttChart,
+  type GanttChartHandle,
+  type GanttTask,
+  type GanttViewMode,
+} from "./gantt-chart";
 import { dependencyApi } from "./dependency-api";
 import {
   DEP_KEYS,
@@ -41,6 +46,9 @@ const GANTT_OPTIONS = {
   bar_height: 28,
   padding: 12,
   readonly_progress: false,
+  // Suppress Frappe Gantt's built-in "Today" button — we render our own in the toolbar (where
+  // users expect controls) and call scroll_current() via the GanttChart imperative handle.
+  today_button: false,
 } as const;
 
 const LEFT_PANEL_MIN = 240;
@@ -117,6 +125,7 @@ export function ProjectTimeline({
   const leftScrollRef = useRef<HTMLDivElement>(null);
   const rightScrollRef = useRef<HTMLDivElement>(null);
   const ganttContainerRef = useRef<HTMLDivElement>(null);
+  const ganttHandleRef = useRef<GanttChartHandle | null>(null);
 
   // Dismiss link mode and focus mode on Escape
   useEffect(() => {
@@ -315,6 +324,7 @@ export function ProjectTimeline({
         projectName={projectName}
         isFocused={isFocused}
         onFocusToggle={() => setIsFocused((f) => !f)}
+        onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
       />
 
       {ganttTasks.length === 0 && (tasks ?? []).length === 0 ? (
@@ -381,6 +391,22 @@ export function ProjectTimeline({
                     fromTaskId: dep.fromTaskId,
                     toTaskId: dep.toTaskId,
                   })
+                  .then(() => {
+                    toast.success("Dependency removed.", {
+                      action: {
+                        label: "Undo",
+                        onClick: () =>
+                          createDependency
+                            .mutateAsync({
+                              fromTaskId: dep.fromTaskId,
+                              toTaskId: dep.toTaskId,
+                              type: dep.type,
+                            })
+                            .catch(() => toast.error("Failed to restore dependency.")),
+                      },
+                      duration: 6000,
+                    });
+                  })
                   .catch(() => toast.error("Failed to remove dependency."))
               }
               onDateChange={(task, field, date) =>
@@ -427,6 +453,7 @@ export function ProjectTimeline({
           >
             {ganttTasks.length > 0 ? (
               <GanttChart
+                ref={ganttHandleRef}
                 tasks={ganttTasks}
                 viewMode={viewMode}
                 onClick={handleGanttClick}

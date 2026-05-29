@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,25 +23,28 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
-const signupSchema = z
-  .object({
-    name: z.string().min(2, "Name must be at least 2 characters."),
-    email: z.string().email("Enter a valid email address."),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters.")
-      .max(72, "Password must be at most 72 characters."),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
-  });
-
-type SignupFormValues = z.infer<typeof signupSchema>;
+type SignupFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export function SignupForm() {
+  const t = useTranslations("auth.signup");
   const [emailSent, setEmailSent] = useState(false);
+
+  const signupSchema = z
+    .object({
+      name: z.string().min(2, t("nameMin")),
+      email: z.string().email(t("invalidEmail")),
+      password: z.string().min(8, t("passwordMin")).max(72, t("passwordMax")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsDontMatch"),
+      path: ["confirmPassword"],
+    });
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -52,7 +56,7 @@ export function SignupForm() {
   async function onSubmit({ name, email, password }: SignupFormValues) {
     const { error } = await authClient.signUp.email({ name, email, password });
     if (error) {
-      toast.error(error.message ?? "Sign-up failed. Please try again.");
+      toast.error(error.message ?? t("failed"));
       return;
     }
     setEmailSent(true);
@@ -62,10 +66,11 @@ export function SignupForm() {
     return (
       <Card className="w-full text-center">
         <CardHeader>
-          <CardTitle className="text-xl">Check your email</CardTitle>
+          <CardTitle className="text-xl">{t("checkEmailTitle")}</CardTitle>
           <CardDescription>
-            We sent a verification link to <strong>{form.getValues("email")}</strong>. Click it to
-            activate your account.
+            {t.rich("checkEmailBody", {
+              email: () => <strong>{form.getValues("email")}</strong>,
+            })}
           </CardDescription>
         </CardHeader>
         <CardFooter className="justify-center">
@@ -73,7 +78,7 @@ export function SignupForm() {
             href={ROUTES.LOGIN}
             className="text-sm text-muted-foreground underline underline-offset-4 hover:text-primary"
           >
-            Back to sign in
+            {t("backToSignIn")}
           </Link>
         </CardFooter>
       </Card>
@@ -83,8 +88,8 @@ export function SignupForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl">Create an account</CardTitle>
-        <CardDescription>Get started with Tûm today</CardDescription>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -95,14 +100,14 @@ export function SignupForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-name">Name</FieldLabel>
+                  <FieldLabel htmlFor="signup-name">{t("nameLabel")}</FieldLabel>
                   <Input
                     {...field}
                     id="signup-name"
                     type="text"
                     autoComplete="name"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Your name"
+                    placeholder={t("namePlaceholder")}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
@@ -114,14 +119,14 @@ export function SignupForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-email">Email</FieldLabel>
+                  <FieldLabel htmlFor="signup-email">{t("emailLabel")}</FieldLabel>
                   <Input
                     {...field}
                     id="signup-email"
                     type="email"
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
-                    placeholder="you@example.com"
+                    placeholder={t("emailPlaceholder")}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
@@ -133,15 +138,15 @@ export function SignupForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-password">Password</FieldLabel>
+                  <FieldLabel htmlFor="signup-password">{t("passwordLabel")}</FieldLabel>
                   <PasswordInput
                     {...field}
                     id="signup-password"
                     autoComplete="new-password"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Min. 8 characters"
+                    placeholder={t("passwordPlaceholder")}
                   />
-                  <FieldDescription>At least 8 characters.</FieldDescription>
+                  <FieldDescription>{t("passwordHint")}</FieldDescription>
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -152,13 +157,13 @@ export function SignupForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-confirm-password">Confirm password</FieldLabel>
+                  <FieldLabel htmlFor="signup-confirm-password">{t("confirmLabel")}</FieldLabel>
                   <PasswordInput
                     {...field}
                     id="signup-confirm-password"
                     autoComplete="new-password"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Re-enter your password"
+                    placeholder={t("confirmPlaceholder")}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
@@ -170,17 +175,17 @@ export function SignupForm() {
 
       <CardContent className="pt-0">
         <Button type="submit" form="signup-form" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account…" : "Create account"}
+          {isSubmitting ? t("submitting") : t("submit")}
         </Button>
       </CardContent>
 
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        Already have an account?&nbsp;
+        {t("haveAccount")}&nbsp;
         <Link
           href={ROUTES.LOGIN}
           className="text-foreground underline underline-offset-4 hover:text-primary"
         >
-          Sign in
+          {t("loginLink")}
         </Link>
       </CardFooter>
     </Card>

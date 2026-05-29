@@ -1,16 +1,12 @@
-"use client";
+﻿"use client";
 
 import { BellIcon, CheckCheckIcon, SettingsIcon } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
@@ -47,15 +43,13 @@ export function NotificationCenter() {
   const orgId = activeOrg?.id ?? null;
 
   // Personal notification push
-  useStompSubscription(
-    userId ? `/user/${userId}/queue/notifications` : null,
-    () => queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all }),
+  useStompSubscription(userId ? `/user/${userId}/queue/notifications` : null, () =>
+    queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all }),
   );
 
   // Org-wide task events (refresh tasks across all tabs)
-  useStompSubscription(
-    orgId ? `/topic/org/${orgId}/tasks` : null,
-    () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  useStompSubscription(orgId ? `/topic/org/${orgId}/tasks` : null, () =>
+    queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   );
 
   const unread = (notifications ?? []).filter((n) => !n.read).length;
@@ -130,9 +124,7 @@ export function NotificationCenter() {
                     if (!n.read) markRead.mutate(n.id);
                   }}
                 >
-                  {!n.read && (
-                    <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />
-                  )}
+                  {!n.read && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />}
                   {n.read && <span className="mt-1.5 size-2 shrink-0" />}
                   <div className="flex-1 space-y-0.5">
                     <p className="text-xs font-medium leading-snug">{n.title}</p>

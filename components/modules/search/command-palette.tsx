@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 
 import {

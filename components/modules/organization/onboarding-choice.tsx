@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { BuildingIcon, UsersIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";

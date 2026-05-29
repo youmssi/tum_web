@@ -1,0 +1,153 @@
+{
+  "common": {
+    "appName": "Tûm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "loading": "Loading…",
+    "continue": "Continue",
+    "back": "Back",
+    "or": "or",
+    "create": "Create",
+    "edit": "Edit",
+    "search": "Search",
+    "empty": "Nothing here yet.",
+    "error": "Something went wrong.",
+    "retry": "Retry"
+  },
+  "dashboard": {
+    "title": "My Work",
+    "subtitle": "Tasks assigned to you across all projects."
+  },
+  "projects": {
+    "title": "Projects",
+    "new": "New project",
+    "empty": "No projects yet.",
+    "openSettings": "Settings",
+    "archive": "Archive",
+    "restore": "Restore",
+    "tabs": {
+      "overview": "Overview",
+      "list": "List",
+      "board": "Board",
+      "timeline": "Timeline",
+      "activity": "Activity"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Your account details and preferences."
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "preferencesTitle": "Notification preferences",
+    "preferencesSubtitle": "Choose how Tûm reaches you."
+  },
+  "organizationPage": {
+    "members": {
+      "title": "Members",
+      "subtitle": "People in your organization and their roles."
+    },
+    "settings": {
+      "title": "Organization settings",
+      "subtitle": "Name, slug, and preferences for your workspace."
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Sensitive actions recorded for compliance."
+    }
+  },
+  "locale": {
+    "label": "Language",
+    "english": "English",
+    "french": "Français"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your Tûm account",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "continueWith": "or continue with",
+      "google": "Continue with Google",
+      "github": "Continue with GitHub",
+      "noAccount": "No account?",
+      "signUpLink": "Sign up",
+      "invalidEmail": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "failed": "Sign-in failed. Please try again."
+    },
+    "signup": {
+      "title": "Create an account",
+      "subtitle": "Get started with Tûm today",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Min. 8 characters",
+      "passwordHint": "At least 8 characters.",
+      "confirmLabel": "Confirm password",
+      "confirmPlaceholder": "Re-enter your password",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "nameMin": "Name must be at least 2 characters.",
+      "invalidEmail": "Enter a valid email address.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "passwordMax": "Password must be at most 72 characters.",
+      "passwordsDontMatch": "Passwords do not match.",
+      "failed": "Sign-up failed. Please try again.",
+      "checkEmailTitle": "Check your email",
+      "checkEmailBody": "We sent a verification link to {email}. Click it to activate your account.",
+      "backToSignIn": "Back to sign in"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "tasks": "Tasks",
+    "notifications": "Notifications",
+    "organization": "Organization",
+    "members": "Members",
+    "audit": "Audit log",
+    "settings": "Settings",
+    "profile": "Profile",
+    "signOut": "Sign out",
+    "switchOrganization": "Switch organization",
+    "newProject": "New project"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "signIn": "Sign in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "tagline": "Project execution & workflow visibility",
+      "eyebrow": "Open-source · For any team · Any background",
+      "heading": "Plan less. Ship more.",
+      "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools — just clear execution. For any team, any department, any project.",
+      "ctaStartFree": "Start free",
+      "ctaSignIn": "Sign in",
+      "microFooter": "Free to use · No credit card required · Community & cloud plans"
+    },
+    "features": {
+      "sectionLabel": "Capabilities",
+      "heading": "One workspace.",
+      "headingAccent": "Every kind of project."
+    },
+    "footer": {
+      "rights": "All rights reserved."
+    }
+  }
+}

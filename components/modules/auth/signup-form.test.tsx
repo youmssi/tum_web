@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SignupForm } from "./signup-form";
+import { renderWithIntl as render } from "./test-utils";
 
 const { mockSignUp } = vi.hoisted(() => ({
   mockSignUp: vi.fn(),
@@ -11,8 +12,12 @@ const { mockToastError } = vi.hoisted(() => ({
   mockToastError: vi.fn(),
 }));
 
-vi.mock("next/navigation", () => ({
+vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
+  Link: ({ children, ...rest }: { children: React.ReactNode } & Record<string, unknown>) => {
+    const props = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+    return <a {...props}>{children}</a>;
+  },
 }));
 
 vi.mock("@/lib/auth-client", () => ({

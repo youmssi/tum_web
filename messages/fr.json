@@ -1,0 +1,153 @@
+{
+  "common": {
+    "appName": "Tûm",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "delete": "Supprimer",
+    "deleting": "Suppression…",
+    "loading": "Chargement…",
+    "continue": "Continuer",
+    "back": "Retour",
+    "or": "ou",
+    "create": "Créer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "empty": "Rien à afficher pour l’instant.",
+    "error": "Une erreur s’est produite.",
+    "retry": "Réessayer"
+  },
+  "dashboard": {
+    "title": "Mon travail",
+    "subtitle": "Les tâches qui vous sont assignées dans tous les projets."
+  },
+  "projects": {
+    "title": "Projets",
+    "new": "Nouveau projet",
+    "empty": "Aucun projet pour l’instant.",
+    "openSettings": "Paramètres",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "tabs": {
+      "overview": "Aperçu",
+      "list": "Liste",
+      "board": "Tableau",
+      "timeline": "Chronologie",
+      "activity": "Activité"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Vos informations de compte et vos préférences."
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "preferencesTitle": "Préférences de notification",
+    "preferencesSubtitle": "Choisissez comment Tûm vous contacte."
+  },
+  "organizationPage": {
+    "members": {
+      "title": "Membres",
+      "subtitle": "Les personnes de votre organisation et leurs rôles."
+    },
+    "settings": {
+      "title": "Paramètres de l’organisation",
+      "subtitle": "Nom, identifiant et préférences de l’espace de travail."
+    },
+    "audit": {
+      "title": "Journal d’audit",
+      "subtitle": "Actions sensibles enregistrées à des fins de conformité."
+    }
+  },
+  "locale": {
+    "label": "Langue",
+    "english": "English",
+    "french": "Français"
+  },
+  "auth": {
+    "login": {
+      "title": "Heureux de vous revoir",
+      "subtitle": "Connectez-vous à votre compte Tûm",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "continueWith": "ou continuer avec",
+      "google": "Continuer avec Google",
+      "github": "Continuer avec GitHub",
+      "noAccount": "Pas encore de compte ?",
+      "signUpLink": "Créer un compte",
+      "invalidEmail": "Entrez une adresse e-mail valide.",
+      "passwordRequired": "Le mot de passe est requis.",
+      "failed": "La connexion a échoué. Veuillez réessayer."
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Lancez-vous avec Tûm dès aujourd’hui",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "Min. 8 caractères",
+      "passwordHint": "Au moins 8 caractères.",
+      "confirmLabel": "Confirmer le mot de passe",
+      "confirmPlaceholder": "Saisissez à nouveau votre mot de passe",
+      "submit": "Créer le compte",
+      "submitting": "Création du compte…",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "loginLink": "Se connecter",
+      "nameMin": "Le nom doit comporter au moins 2 caractères.",
+      "invalidEmail": "Entrez une adresse e-mail valide.",
+      "passwordMin": "Le mot de passe doit comporter au moins 8 caractères.",
+      "passwordMax": "Le mot de passe doit comporter au maximum 72 caractères.",
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas.",
+      "failed": "L’inscription a échoué. Veuillez réessayer.",
+      "checkEmailTitle": "Vérifiez votre boîte e-mail",
+      "checkEmailBody": "Nous avons envoyé un lien de vérification à {email}. Cliquez dessus pour activer votre compte.",
+      "backToSignIn": "Retour à la connexion"
+    }
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "tasks": "Tâches",
+    "notifications": "Notifications",
+    "organization": "Organisation",
+    "members": "Membres",
+    "audit": "Journal d’audit",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "signOut": "Se déconnecter",
+    "switchOrganization": "Changer d’organisation",
+    "newProject": "Nouveau projet"
+  },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "signIn": "Se connecter",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "tagline": "Exécution de projets & visibilité des équipes",
+      "eyebrow": "Open source · Pour toutes les équipes · Tous profils",
+      "heading": "Moins planifier. Plus livrer.",
+      "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Plus d’outils éparpillés — juste une exécution claire. Pour toute équipe, tout département, tout projet.",
+      "ctaStartFree": "Démarrer gratuitement",
+      "ctaSignIn": "Se connecter",
+      "microFooter": "Gratuit · Sans carte bancaire · Formules communauté et cloud"
+    },
+    "features": {
+      "sectionLabel": "Capacités",
+      "heading": "Un seul espace.",
+      "headingAccent": "Pour tous vos projets."
+    },
+    "footer": {
+      "rights": "Tous droits réservés."
+    }
+  }
+}

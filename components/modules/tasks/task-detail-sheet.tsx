@@ -47,7 +47,13 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from "./task-api";
-import { useDeleteTask, useRescheduleTask, useUpdateTask, useTasks } from "./use-tasks";
+import {
+  useCreateTask,
+  useDeleteTask,
+  useRescheduleTask,
+  useUpdateTask,
+  useTasks,
+} from "./use-tasks";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required.").max(300),
@@ -72,6 +78,7 @@ interface TaskDetailSheetProps {
 
 export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDetailSheetProps) {
   const updateTask = useUpdateTask();
+  const createTask = useCreateTask(projectId);
   const rescheduleTask = useRescheduleTask(projectId);
   const deleteTask = useDeleteTask(projectId);
   const { data: directory } = useDirectory();
@@ -150,10 +157,56 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
 
   async function handleDelete() {
     if (!task) return;
+    // Snapshot before delete so undo can restore the visible fields. Best-effort: comments,
+    // attachments, and dependencies aren't part of the snapshot — the restored task is a fresh
+    // row with a new id. Six-second window matches the toast duration.
+    const snapshot = task;
     try {
       await deleteTask.mutateAsync(task.id);
-      toast.success("Task deleted.");
       onOpenChange(false);
+      toast.success("Task deleted.", {
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            try {
+              const recreated = await createTask.mutateAsync({
+                title: snapshot.title,
+                description: snapshot.description ?? undefined,
+                priority: snapshot.priority,
+                assigneeId: snapshot.assigneeId ?? undefined,
+                dueDate: snapshot.dueDate ?? undefined,
+                labels: snapshot.labels,
+              });
+              await updateTask.mutateAsync({
+                id: recreated.id,
+                data: {
+                  title: recreated.title,
+                  description: snapshot.description ?? null,
+                  status: snapshot.status,
+                  priority: snapshot.priority,
+                  assigneeId: snapshot.assigneeId,
+                  dueDate: snapshot.dueDate,
+                  labels: snapshot.labels,
+                  progress: snapshot.progress,
+                  milestone: snapshot.milestone,
+                },
+              });
+              // Schedule (start/end) goes through the dedicated endpoint; only restore if set.
+              if (snapshot.startDate || snapshot.endDate) {
+                await rescheduleTask.mutateAsync({
+                  id: recreated.id,
+                  startDate: snapshot.startDate,
+                  endDate: snapshot.endDate,
+                });
+              }
+              toast.success("Task restored.");
+            } catch {
+              toast.error("Failed to restore task.");
+            }
+          },
+        },
+        duration: 6000,
+      });
     } catch {
       toast.error("Failed to delete task.");
     }

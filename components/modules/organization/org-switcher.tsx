@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { ChevronsUpDownIcon, PlusCircleIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {

@@ -1,20 +1,22 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { LocaleSwitcher } from "@/components/modules/shell/locale-switcher";
 import { ROUTES } from "@/lib/constants";
 import { TumLogo } from "./tum-logo";
 
-const navLinks = [
-  { name: "Features", href: "#features" },
-  { name: "How it works", href: "#how-it-works" },
-  { name: "Pricing", href: "#pricing" },
-];
-
 export function LandingNav() {
+  const t = useTranslations("landing.nav");
+  const navLinks = [
+    { key: "features", name: t("features"), href: "#features" },
+    { key: "howItWorks", name: t("howItWorks"), href: "#how-it-works" },
+    { key: "pricing", name: t("pricing"), href: "#pricing" },
+  ];
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -67,11 +69,12 @@ export function LandingNav() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <LocaleSwitcher />
             <Button variant="ghost" size="sm" asChild>
-              <Link href={ROUTES.LOGIN}>Sign in</Link>
+              <Link href={ROUTES.LOGIN}>{t("signIn")}</Link>
             </Button>
             <Button size="sm" className="rounded-full px-5" asChild>
-              <Link href={ROUTES.SIGNUP}>Get started free</Link>
+              <Link href={ROUTES.SIGNUP}>{t("getStarted")}</Link>
             </Button>
           </div>
 
@@ -110,12 +113,12 @@ export function LandingNav() {
           <div className="flex gap-3 pt-8 border-t border-foreground/10">
             <Button variant="outline" className="flex-1 h-12 rounded-full" asChild>
               <Link href={ROUTES.LOGIN} onClick={() => setMobileOpen(false)}>
-                Sign in
+                {t("signIn")}
               </Link>
             </Button>
             <Button className="flex-1 h-12 rounded-full" asChild>
               <Link href={ROUTES.SIGNUP} onClick={() => setMobileOpen(false)}>
-                Get started
+                {t("getStarted")}
               </Link>
             </Button>
           </div>

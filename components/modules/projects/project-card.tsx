@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { ArchiveIcon, LockIcon } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

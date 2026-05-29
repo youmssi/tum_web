@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   ActivityIcon,
@@ -12,8 +12,9 @@ import {
   SquareKanbanIcon,
   XIcon,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import { format } from "date-fns";
 import { type DateRange } from "react-day-picker";
@@ -36,6 +37,8 @@ import { useProject, useToggleArchive } from "./use-projects";
 
 export function ProjectDetail({ id }: { id: string }) {
   const router = useRouter();
+  const tProjects = useTranslations("projects");
+  const tabs = useTranslations("projects.tabs");
   const { data: project, isLoading } = useProject(id);
   const toggleArchive = useToggleArchive();
   const { data: activeOrg } = authClient.useActiveOrganization();
@@ -153,19 +156,19 @@ export function ProjectDetail({ id }: { id: string }) {
             {project.archived ? (
               <>
                 <ArchiveRestoreIcon className="mr-2 size-4" />
-                Restore
+                {tProjects("restore")}
               </>
             ) : (
               <>
                 <ArchiveIcon className="mr-2 size-4" />
-                Archive
+                {tProjects("archive")}
               </>
             )}
           </Button>
           <Button variant="outline" size="sm" asChild>
             <Link href={`/projects/${project.id}/settings`}>
               <SlidersHorizontalIcon className="mr-2 size-4" />
-              Settings
+              {tProjects("openSettings")}
             </Link>
           </Button>
         </div>
@@ -175,23 +178,23 @@ export function ProjectDetail({ id }: { id: string }) {
         <TabsList>
           <TabsTrigger value="overview" className="gap-1.5">
             <FolderKanbanIcon className="size-4" />
-            Overview
+            {tabs("overview")}
           </TabsTrigger>
           <TabsTrigger value="list" className="gap-1.5">
             <LayoutListIcon className="size-4" />
-            List
+            {tabs("list")}
           </TabsTrigger>
           <TabsTrigger value="board" className="gap-1.5">
             <SquareKanbanIcon className="size-4" />
-            Board
+            {tabs("board")}
           </TabsTrigger>
           <TabsTrigger value="timeline" className="gap-1.5">
             <CalendarRangeIcon className="size-4" />
-            Timeline
+            {tabs("timeline")}
           </TabsTrigger>
           <TabsTrigger value="activity" className="gap-1.5">
             <ActivityIcon className="size-4" />
-            Activity
+            {tabs("activity")}
           </TabsTrigger>
         </TabsList>
 

@@ -43,5 +43,7 @@ declare module "frappe-gantt" {
     refresh(tasks: GanttTask[]): void;
     change_view_mode(mode: GanttViewMode): void;
     update_task(id: string, newDetails: Partial<GanttTask>): void;
+    /** Scroll the timeline so the current-date highlight is in view. */
+    scroll_current(): void;
   }
 }
