@@ -65,7 +65,10 @@ function MemberName({ userId }: { userId: string | null }) {
   const { data: directory } = useDirectory();
   if (!userId) return <span className="text-muted-foreground">—</span>;
   const member = directory?.find((m) => m.userId === userId);
-  return <span>{member?.name ?? userId}</span>;
+  // Directory hasn't loaded yet (transient, ~1 render) or the assignee is no longer in the org —
+  // render a human label either way rather than leaking the raw user id into the cell.
+  if (!member) return <span className="text-muted-foreground">…</span>;
+  return <span>{member.name}</span>;
 }
 
 function BulkActionsBar({

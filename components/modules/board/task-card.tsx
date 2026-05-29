@@ -46,7 +46,9 @@ function AssigneeAvatar({ userId }: { userId: string | null }) {
     );
   }
   const member = directory?.find((m) => m.userId === userId);
-  const initials = (member?.name ?? userId).slice(0, 2).toUpperCase();
+  // Use the member's name when we have it; otherwise show a neutral "?" so the avatar never
+  // displays the first two characters of a UUID-shaped user id.
+  const initials = member ? member.name.slice(0, 2).toUpperCase() : "?";
   return (
     <Avatar className="size-5">
       <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>

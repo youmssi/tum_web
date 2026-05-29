@@ -6,7 +6,7 @@ import { ActivityIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { authClient } from "@/lib/auth-client";
+import { useDirectory } from "@/components/modules/organization";
 import { STATUS_LABELS, type TaskStatus, useTasks } from "@/components/modules/tasks";
 import { type ActivityAction, type Activity } from "./activity-api";
 import { useActivity } from "./use-activity";
@@ -90,13 +90,18 @@ interface ActivityFeedProps {
 export function ActivityFeed({ projectId, limit }: ActivityFeedProps) {
   const { data: entries, isLoading } = useActivity(projectId);
   const { data: tasks } = useTasks(projectId);
-  const { data: activeOrg } = authClient.useActiveOrganization();
-  const members = activeOrg?.members ?? [];
+  // Use the canonical org directory from the backend (E14) — Better Auth's local
+  // useActiveOrganization payload sometimes ships membership rows without a populated `user`
+  // slot, which is what was leaking raw user ids into the feed.
+  const { data: directory } = useDirectory();
   const [page, setPage] = useState(0);
 
   function memberName(userId: string) {
-    const m = members.find((m) => m.userId === userId);
-    return m?.user?.name ?? m?.user?.email ?? "Someone";
+    const m = directory?.find((m) => m.userId === userId);
+    // The directory endpoint guarantees `name` (it falls back to email server-side), so any
+    // current org member always resolves to a human label. The final fallback covers ids of
+    // people who have left the org and are no longer in the directory.
+    return m?.name ?? "Former member";
   }
 
   function taskTitle(taskId: string) {

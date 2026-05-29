@@ -175,10 +175,11 @@ export function CommentThread({ taskId }: CommentThreadProps) {
   }
 
   // For displaying author names on existing comments, look up across the full directory (the caller
-  // included) so their own past comments still render with their name.
+  // included) so their own past comments still render with their name. When the author has left
+  // the org (no longer in the directory) we render a human label instead of the raw user id.
   function memberName(userId: string) {
     const m = (directory ?? []).find((m) => m.userId === userId);
-    return m?.name ?? userId;
+    return m?.name ?? "Former member";
   }
 
   function memberInitials(userId: string) {
