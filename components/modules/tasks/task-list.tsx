@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDownIcon, CircleIcon, LayoutListIcon, Trash2Icon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -82,19 +83,21 @@ function BulkActionsBar({
   onDelete: () => void;
   onClear: () => void;
 }) {
+  const t = useTranslations("tasks.list");
+  const status = useTranslations("tasks.status");
   const { data: directory } = useDirectory();
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2">
-      <span className="text-sm font-medium">{count} selected</span>
+      <span className="text-sm font-medium">{t("selectedSummary", { count })}</span>
 
       <Select onValueChange={onStatusChange} disabled={pending}>
         <SelectTrigger className="h-8 w-36 text-xs">
-          <SelectValue placeholder="Set status…" />
+          <SelectValue placeholder={t("setStatus")} />
         </SelectTrigger>
         <SelectContent>
           {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
             <SelectItem key={s} value={s} className="text-xs">
-              {STATUS_LABELS[s]}
+              {status(s)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -102,7 +105,7 @@ function BulkActionsBar({
 
       <Select onValueChange={onAssigneeChange} disabled={pending || !directory}>
         <SelectTrigger className="h-8 w-40 text-xs">
-          <SelectValue placeholder="Assign to…" />
+          <SelectValue placeholder={t("assignTo")} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="__unassigned__" className="text-xs">
@@ -124,7 +127,7 @@ function BulkActionsBar({
         disabled={pending}
       >
         <Trash2Icon className="mr-1 size-3" />
-        Delete
+        {t("bulkDelete")}
       </Button>
 
       <Button size="icon" variant="ghost" className="ml-auto size-8" onClick={onClear}>
