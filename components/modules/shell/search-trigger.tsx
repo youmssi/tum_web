@@ -1,12 +1,14 @@
 "use client";
 
 import { SearchIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useCommandPalette } from "@/components/modules/search/use-command-palette";
 
 export function SearchTrigger() {
+  const t = useTranslations("shell.search");
   const { openPalette } = useCommandPalette();
 
   return (
@@ -18,7 +20,7 @@ export function SearchTrigger() {
     >
       <span className="flex items-center gap-2">
         <SearchIcon className="size-3.5 shrink-0" />
-        <span className="text-xs">Search tasks…</span>
+        <span className="text-xs">{t("shortcut")}</span>
       </span>
       <KbdGroup>
         <Kbd>⌘</Kbd>

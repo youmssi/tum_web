@@ -7,6 +7,7 @@ import {
   Minimize2Icon,
   TableIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -46,6 +47,9 @@ export function TimelineToolbar({
   onFocusToggle,
   onJumpToToday,
 }: TimelineToolbarProps) {
+  const t = useTranslations("timeline.toolbar");
+  const viewModeT = useTranslations("timeline.viewMode");
+  const legendT = useTranslations("timeline.legend");
   const exporting = useRef(false);
 
   async function handleExportXlsx() {
@@ -54,11 +58,17 @@ export function TimelineToolbar({
     try {
       await exportGanttXlsx(tasks, allDeps, projectName ?? "project");
     } catch {
-      toast.error("Failed to export XLSX.");
+      toast.error(t("exportXlsxTooltip"));
     } finally {
       exporting.current = false;
     }
   }
+
+  const legend: { label: string; color: string }[] = [
+    { label: legendT("onTrack"), color: colors.onTrackColor },
+    { label: legendT("nearDue"), color: colors.nearDueColor },
+    { label: legendT("overdue"), color: colors.overdueColor },
+  ];
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -72,18 +82,14 @@ export function TimelineToolbar({
             className="h-7 px-3 text-xs"
             onClick={() => onViewModeChange(mode)}
           >
-            {mode}
+            {viewModeT(mode)}
           </Button>
         ))}
       </div>
 
       {/* Legend */}
       <div className="flex items-center gap-3">
-        {[
-          { label: "On track", color: colors.onTrackColor },
-          { label: "Near due", color: colors.nearDueColor },
-          { label: "Overdue", color: colors.overdueColor },
-        ].map(({ label, color }) => (
+        {legend.map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1.5">
             <span className="inline-block size-2.5 rounded-sm" style={{ backgroundColor: color }} />
             <span className="text-xs text-muted-foreground">{label}</span>
@@ -97,10 +103,10 @@ export function TimelineToolbar({
           <TooltipTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onJumpToToday}>
               <CalendarCheck2Icon className="size-3.5" />
-              Today
+              {t("today")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Scroll the chart to today&apos;s date</TooltipContent>
+          <TooltipContent side="bottom">{t("todayTooltip")}</TooltipContent>
         </Tooltip>
 
         {/* Link mode toggle */}
@@ -109,12 +115,10 @@ export function TimelineToolbar({
           size="sm"
           className="h-8 gap-1.5"
           onClick={() => onLinkModeChange(!linkMode)}
-          title={
-            linkMode ? "Exit link mode (Esc)" : "Link tasks — click two bars to create a dependency"
-          }
+          title={linkMode ? t("cancelLinkingTooltip") : t("linkTasksTooltip")}
         >
           <LinkIcon className="size-3.5" />
-          {linkMode ? "Cancel linking" : "Link tasks"}
+          {linkMode ? t("cancelLinking") : t("linkTasks")}
         </Button>
 
         {/* Focus mode toggle */}
@@ -125,7 +129,7 @@ export function TimelineToolbar({
               size="sm"
               className="h-8 w-8 p-0"
               onClick={onFocusToggle}
-              aria-label={isFocused ? "Exit focus mode" : "Enter focus mode"}
+              aria-label={isFocused ? t("focusExit") : t("focusEnter")}
             >
               {isFocused ? (
                 <Minimize2Icon className="size-3.5" />
@@ -135,7 +139,7 @@ export function TimelineToolbar({
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {isFocused ? "Exit focus mode (Esc)" : "Focus mode — full view"}
+            {isFocused ? t("focusExit") : t("focusEnter")}
           </TooltipContent>
         </Tooltip>
 
@@ -144,12 +148,10 @@ export function TimelineToolbar({
           <TooltipTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={handleExportXlsx}>
               <TableIcon className="size-3.5" />
-              Export XLSX
+              {t("exportXlsx")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">
-            Download all tasks as an Excel file (re-importable)
-          </TooltipContent>
+          <TooltipContent side="bottom">{t("exportXlsxTooltip")}</TooltipContent>
         </Tooltip>
       </div>
     </div>
