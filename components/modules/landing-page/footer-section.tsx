@@ -1,27 +1,52 @@
-﻿import { Link } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { ROUTES } from "@/lib/constants";
 import { TumLogo } from "./tum-logo";
 
-const links = {
-  Product: [
-    { label: "Features", href: "#features" },
-    { label: "How it works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
-  ],
-  Platform: [
-    { label: "Dashboard", href: ROUTES.DASHBOARD },
-    { label: "Timeline", href: ROUTES.PROJECTS },
-    { label: "Task board", href: ROUTES.PROJECTS },
-  ],
-  Account: [
-    { label: "Sign in", href: ROUTES.LOGIN },
-    { label: "Sign up", href: ROUTES.SIGNUP },
-    { label: "Accept invitation", href: ROUTES.INVITATIONS_ACCEPT },
-  ],
-};
+type LinkKey =
+  | "features"
+  | "howItWorks"
+  | "pricing"
+  | "dashboard"
+  | "timeline"
+  | "board"
+  | "signIn"
+  | "signUp"
+  | "acceptInvitation";
 
-export function FooterSection() {
+export async function FooterSection() {
+  const t = await getTranslations("landing.footer");
+  const sections: {
+    section: "product" | "platform" | "account";
+    items: { key: LinkKey; href: string }[];
+  }[] = [
+    {
+      section: "product",
+      items: [
+        { key: "features", href: "#features" },
+        { key: "howItWorks", href: "#how-it-works" },
+        { key: "pricing", href: "#pricing" },
+      ],
+    },
+    {
+      section: "platform",
+      items: [
+        { key: "dashboard", href: ROUTES.DASHBOARD },
+        { key: "timeline", href: ROUTES.PROJECTS },
+        { key: "board", href: ROUTES.PROJECTS },
+      ],
+    },
+    {
+      section: "account",
+      items: [
+        { key: "signIn", href: ROUTES.LOGIN },
+        { key: "signUp", href: ROUTES.SIGNUP },
+        { key: "acceptInvitation", href: ROUTES.INVITATIONS_ACCEPT },
+      ],
+    },
+  ];
+
   return (
     <footer className="border-t border-foreground/8 py-16">
       <div className="max-w-6xl mx-auto px-6 lg:px-12">
@@ -32,23 +57,21 @@ export function FooterSection() {
               <TumLogo className="size-7" />
               <span className="font-bold text-lg">Tûm</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Project execution & workflow visibility. Built for teams that care about shipping.
-            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">{t("tagline")}</p>
           </div>
 
-          {/* Links */}
-          {Object.entries(links).map(([section, items]) => (
+          {/* Link sections */}
+          {sections.map(({ section, items }) => (
             <div key={section}>
-              <h4 className="text-sm font-semibold mb-4">{section}</h4>
+              <h4 className="text-sm font-semibold mb-4">{t(`sections.${section}`)}</h4>
               <ul className="space-y-3">
                 {items.map((item) => (
-                  <li key={item.label}>
+                  <li key={item.key}>
                     <Link
                       href={item.href}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {item.label}
+                      {t(`links.${item.key}`)}
                     </Link>
                   </li>
                 ))}
@@ -58,7 +81,9 @@ export function FooterSection() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-foreground/8 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Tûm. Open-source project management.</p>
+          <p>
+            © {new Date().getFullYear()} Tûm. {t("rights")}
+          </p>
           <p className="font-mono">v0.2 · phase-2b-gantt</p>
         </div>
       </div>

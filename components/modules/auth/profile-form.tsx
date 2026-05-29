@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,15 +17,19 @@ import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 import { AvatarUpload } from "@/components/modules/files";
 
-const profileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
+type ProfileFormValues = { name: string };
 
 export function ProfileForm() {
   const router = useRouter();
+  const t = useTranslations("auth.profile");
+  const tProfile = useTranslations("profile");
+  const tSignup = useTranslations("auth.signup");
+  const tCommon = useTranslations("common");
   const { data: session, isPending } = authClient.useSession();
+
+  const profileSchema = z.object({
+    name: z.string().min(2, tSignup("nameMin")),
+  });
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -42,10 +47,10 @@ export function ProfileForm() {
   async function onSubmit(values: ProfileFormValues) {
     const { error } = await authClient.updateUser(values);
     if (error) {
-      toast.error(error.message ?? "Failed to update profile.");
+      toast.error(error.message ?? t("saveFailed"));
       return;
     }
-    toast.success("Profile updated.");
+    toast.success(t("saved"));
   }
 
   async function handleSignOut() {
@@ -64,7 +69,7 @@ export function ProfileForm() {
 
   async function handleAvatarUploaded(url: string) {
     const { error } = await authClient.updateUser({ image: url });
-    if (error) toast.error("Failed to update avatar.");
+    if (error) toast.error(t("saveFailed"));
   }
 
   return (
@@ -81,13 +86,13 @@ export function ProfileForm() {
             />
           )}
           <div>
-            <CardTitle>Profile</CardTitle>
+            <CardTitle>{tProfile("title")}</CardTitle>
             <CardDescription>
               {session?.user?.email}
               {session?.user?.emailVerified ? (
-                <span className="ml-2 text-xs text-green-600">Verified</span>
+                <span className="ml-2 text-xs text-green-600">✓</span>
               ) : (
-                <span className="ml-2 text-xs text-yellow-600">Not verified</span>
+                <span className="ml-2 text-xs text-yellow-600">!</span>
               )}
             </CardDescription>
           </div>
@@ -102,7 +107,7 @@ export function ProfileForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="profile-name">Display name</FieldLabel>
+                  <FieldLabel htmlFor="profile-name">{t("nameLabel")}</FieldLabel>
                   <Input
                     {...field}
                     id="profile-name"
@@ -121,7 +126,7 @@ export function ProfileForm() {
       <CardContent className="pt-0">
         <div className="flex items-center gap-2">
           <Button type="submit" form="profile-form" disabled={isSubmitting}>
-            {isSubmitting ? "Saving…" : "Save changes"}
+            {isSubmitting ? t("saving") : t("save")}
           </Button>
           <Button
             type="button"
@@ -129,7 +134,7 @@ export function ProfileForm() {
             onClick={() => form.reset()}
             disabled={isSubmitting}
           >
-            Cancel
+            {tCommon("cancel")}
           </Button>
         </div>
       </CardContent>
@@ -137,7 +142,7 @@ export function ProfileForm() {
       <CardContent className="pt-0">
         <Separator className="mb-4" />
         <Button variant="outline" type="button" onClick={handleSignOut}>
-          Sign out
+          {t("signOut")}
         </Button>
       </CardContent>
     </Card>

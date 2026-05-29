@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckIcon, PencilIcon, Trash2Icon, XIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,16 +14,20 @@ import { authClient } from "@/lib/auth-client";
 import { useDirectory, type DirectoryMember } from "@/components/modules/organization";
 import { useComments, useCreateComment, useDeleteComment, useUpdateComment } from "./use-comments";
 
-function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function useRelativeTime() {
+  const locale = useLocale();
+  return (iso: string): string => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    if (m < 1) return rtf.format(0, "minute");
+    if (m < 60) return rtf.format(-m, "minute");
+    const h = Math.floor(m / 60);
+    if (h < 24) return rtf.format(-h, "hour");
+    const d = Math.floor(h / 24);
+    if (d < 7) return rtf.format(-d, "day");
+    return new Date(iso).toLocaleDateString(locale, { month: "short", day: "numeric" });
+  };
 }
 
 interface CommentInputProps {
@@ -31,6 +36,7 @@ interface CommentInputProps {
 }
 
 function CommentInput({ taskId, members }: CommentInputProps) {
+  const t = useTranslations("comments");
   const [content, setContent] = useState("");
   const [mention, setMention] = useState<{ query: string; start: number } | null>(null);
   const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
@@ -64,7 +70,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
       setMention(null);
       setMentionedUserIds([]);
     } catch {
-      toast.error("Failed to post comment.");
+      toast.error(t("postFailed"));
     }
   }
 
@@ -79,7 +85,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
           ref={textareaRef}
           value={content}
           onChange={handleChange}
-          placeholder="Add a comment… (type @ to mention)"
+          placeholder={t("placeholder")}
           rows={3}
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
@@ -117,7 +123,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
           disabled={!content.trim() || createComment.isPending}
           onClick={handleSubmit}
         >
-          {createComment.isPending ? "Posting…" : "Comment"}
+          {createComment.isPending ? t("submitting") : t("submit")}
         </Button>
       </div>
     </div>
@@ -129,6 +135,8 @@ interface CommentThreadProps {
 }
 
 export function CommentThread({ taskId }: CommentThreadProps) {
+  const t = useTranslations("comments");
+  const relativeTime = useRelativeTime();
   const { data: comments, isLoading } = useComments(taskId);
   const updateComment = useUpdateComment(taskId);
   const deleteComment = useDeleteComment(taskId);
@@ -154,7 +162,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
       await updateComment.mutateAsync({ id, content: trimmed });
       setEditingId(null);
     } catch {
-      toast.error("Failed to update comment.");
+      toast.error(t("updateFailed"));
     }
   }
 
@@ -162,7 +170,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
     try {
       await deleteComment.mutateAsync(id);
     } catch {
-      toast.error("Failed to delete comment.");
+      toast.error(t("deleteFailed"));
     }
   }
 
@@ -180,7 +188,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium">Comments</p>
+      <p className="text-sm font-medium">{t("header")}</p>
 
       {isLoading ? (
         <div className="space-y-3">
@@ -192,7 +200,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
           ))}
         </div>
       ) : comments?.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No comments yet.</p>
+        <p className="text-sm text-muted-foreground">{t("empty")}</p>
       ) : (
         <div className="space-y-4">
           {comments?.map((comment) => {
@@ -211,7 +219,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
                       {relativeTime(comment.createdAt)}
                     </span>
                     {comment.updatedAt !== comment.createdAt && (
-                      <span className="text-xs text-muted-foreground">(edited)</span>
+                      <span className="text-xs text-muted-foreground">{t("edited")}</span>
                     )}
                   </div>
                   {editingId === comment.id ? (

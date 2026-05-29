@@ -2,6 +2,7 @@
 
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { MoreHorizontalIcon, ShieldAlertIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -277,6 +278,7 @@ function InvitationTable({
 }
 
 export function MemberList() {
+  const t = useTranslations("organization.members");
   const { data: activeOrg, isPending, refetch } = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
 
@@ -329,9 +331,9 @@ export function MemberList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Members</h1>
+          <h1 className="text-xl font-semibold">{t("headerTitle")}</h1>
           <p className="text-sm text-muted-foreground">
-            Manage who has access to {activeOrg?.name ?? "your organisation"}.
+            {t("headerSubtitle", { org: activeOrg?.name ?? "—" })}
           </p>
         </div>
         {canManage && <InviteMemberDialog onInvited={() => refetch()} />}
@@ -347,13 +349,13 @@ export function MemberList() {
         <Tabs defaultValue="members">
           <TabsList>
             <TabsTrigger value="members">
-              Members
+              {t("tabMembers")}
               <Badge variant="secondary" className="ml-2 text-xs">
                 {members.length}
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="invitations">
-              Invitations
+              {t("tabInvitations")}
               {invitations.filter((i) => i.status === "pending").length > 0 && (
                 <Badge variant="secondary" className="ml-2 text-xs">
                   {invitations.filter((i) => i.status === "pending").length}
