@@ -8,9 +8,9 @@ import { ArrowRight, BarChart2, CalendarDays, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
-// Animated word stays English-only — these are short visual fragments tied to the typing animation;
-// localizing them properly is part of the Phase 10 full-localization epic.
-const words = ["execute", "deliver", "track", "succeed"];
+// Animated word keys — actual strings resolved from the active locale's catalog at render time
+// (landing.hero.animatedWords.<key>). Order is preserved so the typing-cycle stays deterministic.
+const WORD_KEYS = ["execute", "deliver", "track", "succeed"] as const;
 
 function AnimatedGrid() {
   return (
@@ -87,6 +87,7 @@ function GanttPreview() {
 
 export function HeroSection() {
   const t = useTranslations("landing.hero");
+  const words = useTranslations("landing.hero.animatedWords");
   const [visible, setVisible] = useState(false);
   const [wordIdx, setWordIdx] = useState(0);
 
@@ -96,8 +97,8 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
-    const t = setInterval(() => setWordIdx((p) => (p + 1) % words.length), 2800);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setWordIdx((p) => (p + 1) % WORD_KEYS.length), 2800);
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -123,20 +124,22 @@ export function HeroSection() {
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              Project execution
+              {t("headingLine1")}
               <br />
-              built for teams to{" "}
+              {t("headingLine2")}{" "}
               <span className="relative inline-block text-primary">
                 <span key={wordIdx} className="inline-flex">
-                  {words[wordIdx].split("").map((ch, i) => (
-                    <span
-                      key={`${wordIdx}-${i}`}
-                      className="inline-block animate-[fadeInUp_0.4s_both]"
-                      style={{ animationDelay: `${i * 40}ms` }}
-                    >
-                      {ch}
-                    </span>
-                  ))}
+                  {words(WORD_KEYS[wordIdx])
+                    .split("")
+                    .map((ch, i) => (
+                      <span
+                        key={`${wordIdx}-${i}`}
+                        className="inline-block animate-[fadeInUp_0.4s_both]"
+                        style={{ animationDelay: `${i * 40}ms` }}
+                      >
+                        {ch}
+                      </span>
+                    ))}
                 </span>
                 <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary/40 rounded-full" />
               </span>
