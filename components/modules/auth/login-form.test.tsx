@@ -14,8 +14,14 @@ const { mockToastError } = vi.hoisted(() => ({
 }));
 
 const mockPush = vi.fn();
-vi.mock("next/navigation", () => ({
+vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
+  // The form imports Link from the same module; React doesn't render anchor children eagerly
+  // here — vitest just needs the symbol to exist.
+  Link: ({ children, ...rest }: { children: React.ReactNode } & Record<string, unknown>) => {
+    const props = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+    return <a {...props}>{children}</a>;
+  },
 }));
 
 vi.mock("@/lib/auth-client", () => ({

@@ -12,8 +12,12 @@ const { mockToastError } = vi.hoisted(() => ({
   mockToastError: vi.fn(),
 }));
 
-vi.mock("next/navigation", () => ({
+vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
+  Link: ({ children, ...rest }: { children: React.ReactNode } & Record<string, unknown>) => {
+    const props = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+    return <a {...props}>{children}</a>;
+  },
 }));
 
 vi.mock("@/lib/auth-client", () => ({

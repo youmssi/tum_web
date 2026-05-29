@@ -9,7 +9,55 @@
     "loading": "Loading…",
     "continue": "Continue",
     "back": "Back",
-    "or": "or"
+    "or": "or",
+    "create": "Create",
+    "edit": "Edit",
+    "search": "Search",
+    "empty": "Nothing here yet.",
+    "error": "Something went wrong.",
+    "retry": "Retry"
+  },
+  "dashboard": {
+    "title": "My Work",
+    "subtitle": "Tasks assigned to you across all projects."
+  },
+  "projects": {
+    "title": "Projects",
+    "new": "New project",
+    "empty": "No projects yet.",
+    "openSettings": "Settings",
+    "archive": "Archive",
+    "restore": "Restore",
+    "tabs": {
+      "overview": "Overview",
+      "list": "List",
+      "board": "Board",
+      "timeline": "Timeline",
+      "activity": "Activity"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Your account details and preferences."
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "preferencesTitle": "Notification preferences",
+    "preferencesSubtitle": "Choose how Tûm reaches you."
+  },
+  "organizationPage": {
+    "members": {
+      "title": "Members",
+      "subtitle": "People in your organization and their roles."
+    },
+    "settings": {
+      "title": "Organization settings",
+      "subtitle": "Name, slug, and preferences for your workspace."
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Sensitive actions recorded for compliance."
+    }
   },
   "locale": {
     "label": "Language",

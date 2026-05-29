@@ -1,35 +1,65 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
 
+import { routing } from "@/i18n/routing";
 import { AUTH_COOKIES, ROUTES } from "@/lib/constants";
 
-const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.SIGNUP, "/api/auth", ROUTES.INVITATIONS_ACCEPT];
+/**
+ * Composes locale resolution (from {@code next-intl}) with our session check. Order matters: the
+ * intl middleware redirects when a locale prefix is missing so every downstream redirect targets
+ * a properly-localised URL.
+ *
+ * Special files at the root of {@code app/} (favicon, manifest, robots, sitemap, etc.) and the
+ * API surface are skipped by the matcher entirely — they're locale-agnostic resources.
+ */
+const intlMiddleware = createIntlMiddleware(routing);
+
+const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.INVITATIONS_ACCEPT];
+
+/** Strip the optional locale prefix so we can match on the canonical app route. */
+function stripLocale(pathname: string): string {
+  for (const loc of routing.locales) {
+    if (pathname === `/${loc}`) return "/";
+    if (pathname.startsWith(`/${loc}/`)) return pathname.slice(loc.length + 1);
+  }
+  return pathname;
+}
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isPublic =
-    PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
-    pathname === ROUTES.HOME ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon");
+  // API routes never need locale rewriting or auth at this layer.
+  if (pathname.startsWith("/api/")) return NextResponse.next();
 
-  if (isPublic) {
-    return NextResponse.next();
-  }
+  // Let next-intl decide the locale (it may issue a redirect — return that immediately).
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse.headers.get("location")) return intlResponse;
+
+  const bareRoute = stripLocale(pathname);
+  const isPublic = bareRoute === ROUTES.HOME || PUBLIC_PATHS.some((p) => bareRoute.startsWith(p));
+
+  if (isPublic) return intlResponse;
 
   const sessionCookie =
     request.cookies.get(AUTH_COOKIES.SESSION) ?? request.cookies.get(AUTH_COOKIES.SESSION_SECURE);
 
   if (!sessionCookie?.value) {
-    const loginUrl = new URL(ROUTES.LOGIN, request.url);
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
+    // Send unauthenticated callers to login while preserving the locale they were on and the
+    // page they were trying to reach.
+    const url = request.nextUrl.clone();
+    const locale = intlResponse.headers.get("x-middleware-request-x-next-intl-locale") ?? "";
+    url.pathname = locale ? `/${locale}${ROUTES.LOGIN}` : ROUTES.LOGIN;
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  return intlResponse;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    // Run on everything except Next internals, static files, and API routes.
+    "/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|opengraph-image).*)",
+  ],
 };

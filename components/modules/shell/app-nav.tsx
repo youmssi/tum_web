@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
   FolderKanbanIcon,
@@ -23,7 +23,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { LocaleSwitcher } from "./locale-switcher";
 import { OrgSwitcher } from "@/components/modules/organization/org-switcher";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
@@ -111,9 +110,6 @@ export function AppSidebar() {
                 <span>{t("profile")}</span>
               </Link>
             </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <LocaleSwitcher />
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleSignOut} tooltip={t("signOut")}>

@@ -11,43 +11,54 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setLocaleAction } from "@/app/actions/set-locale";
-import { LOCALES, LOCALE_LABELS, type Locale } from "@/i18n/locales";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { LOCALE_LABELS, routing, type Locale } from "@/i18n/routing";
 
 /**
- * Tiny client component that flips the {@code tum.locale} cookie via a server action and asks
- * Next.js to re-render the tree with the new messages. Lives in the shell module so the nav can
- * include it; the server action lives next door in {@code app/actions/} so the same cookie write
- * is reusable from elsewhere (e.g. an onboarding step) later.
+ * Compact, icon-only language toggle for the topbar (logged-in) and landing nav (logged-out).
+ * Uses the next-intl router so a locale switch swaps only the {@code /[locale]} segment of the
+ * current URL — query string, hash, and downstream segments are preserved. The cookie is also
+ * updated by the router so the next plain navigation honours the choice.
  */
 export function LocaleSwitcher() {
   const current = useLocale() as Locale;
   const t = useTranslations("locale");
+  const router = useRouter();
+  const pathname = usePathname();
   const [pending, startTransition] = useTransition();
 
   function choose(locale: Locale) {
     if (locale === current) return;
-    startTransition(async () => {
-      await setLocaleAction(locale);
+    startTransition(() => {
+      // next-intl's usePathname returns the path WITHOUT the locale prefix; router.replace then
+      // re-prepends the new locale, preserving the rest of the URL (including resolved dynamic
+      // segments).
+      router.replace(pathname, { locale });
     });
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 text-xs"
-          disabled={pending}
-          aria-label={t("label")}
-        >
-          <GlobeIcon className="size-3.5" />
-          {LOCALE_LABELS[current]}
-        </Button>
-      </DropdownMenuTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-9"
+              disabled={pending}
+              aria-label={t("label")}
+            >
+              <GlobeIcon className="size-4" />
+              <span className="sr-only">{t("label")}</span>
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{t("label")}</TooltipContent>
+      </Tooltip>
       <DropdownMenuContent align="end">
-        {LOCALES.map((loc) => (
+        {routing.locales.map((loc) => (
           <DropdownMenuItem
             key={loc}
             onClick={() => choose(loc)}

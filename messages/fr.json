@@ -9,7 +9,55 @@
     "loading": "Chargement…",
     "continue": "Continuer",
     "back": "Retour",
-    "or": "ou"
+    "or": "ou",
+    "create": "Créer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "empty": "Rien à afficher pour l’instant.",
+    "error": "Une erreur s’est produite.",
+    "retry": "Réessayer"
+  },
+  "dashboard": {
+    "title": "Mon travail",
+    "subtitle": "Les tâches qui vous sont assignées dans tous les projets."
+  },
+  "projects": {
+    "title": "Projets",
+    "new": "Nouveau projet",
+    "empty": "Aucun projet pour l’instant.",
+    "openSettings": "Paramètres",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "tabs": {
+      "overview": "Aperçu",
+      "list": "Liste",
+      "board": "Tableau",
+      "timeline": "Chronologie",
+      "activity": "Activité"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Vos informations de compte et vos préférences."
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "preferencesTitle": "Préférences de notification",
+    "preferencesSubtitle": "Choisissez comment Tûm vous contacte."
+  },
+  "organizationPage": {
+    "members": {
+      "title": "Membres",
+      "subtitle": "Les personnes de votre organisation et leurs rôles."
+    },
+    "settings": {
+      "title": "Paramètres de l’organisation",
+      "subtitle": "Nom, identifiant et préférences de l’espace de travail."
+    },
+    "audit": {
+      "title": "Journal d’audit",
+      "subtitle": "Actions sensibles enregistrées à des fins de conformité."
+    }
   },
   "locale": {
     "label": "Langue",

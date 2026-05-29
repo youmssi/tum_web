@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import { Link } from "@/i18n/navigation";
 
 import { ROUTES } from "@/lib/constants";
 import { TumLogo } from "./tum-logo";
