@@ -97,6 +97,11 @@ interface ImportResult {
   dependenciesCreated: number;
 }
 
+function isCsvFile(file: File) {
+  if (file.type === "text/csv" || file.type === "application/csv") return true;
+  return file.name.toLowerCase().endsWith(".csv");
+}
+
 export function ImportProjectDialog() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("upload");
@@ -106,7 +111,9 @@ export function ImportProjectDialog() {
   const [promptCopied, setPromptCopied] = useState(false);
   const [warningsCopied, setWarningsCopied] = useState(false);
   const [templateLoading, setTemplateLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const dragDepthRef = useRef(0);
 
   const importProject = useImportProject();
 
@@ -117,6 +124,8 @@ export function ImportProjectDialog() {
     setResult(null);
     setPromptCopied(false);
     setWarningsCopied(false);
+    setIsDragging(false);
+    dragDepthRef.current = 0;
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -125,17 +134,56 @@ export function ImportProjectDialog() {
     if (!v) reset();
   }
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function ingestFile(file: File) {
     setParseError(null);
     setParsed(null);
+    if (!isCsvFile(file)) {
+      setParseError("Only .csv files are supported.");
+      return;
+    }
     try {
       const data = await parseCsv(file);
       setParsed(data);
     } catch (err) {
       setParseError(err instanceof Error ? err.message : "Failed to parse CSV.");
     }
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await ingestFile(file);
+  }
+
+  function handleDragEnter(e: React.DragEvent<HTMLLabelElement>) {
+    e.preventDefault();
+    if (!e.dataTransfer.types.includes("Files")) return;
+    dragDepthRef.current += 1;
+    setIsDragging(true);
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLLabelElement>) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+  }
+
+  function handleDragLeave(e: React.DragEvent<HTMLLabelElement>) {
+    e.preventDefault();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) setIsDragging(false);
+  }
+
+  async function handleDrop(e: React.DragEvent<HTMLLabelElement>) {
+    e.preventDefault();
+    dragDepthRef.current = 0;
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (e.dataTransfer.files.length > 1) {
+      setParseError("Drop one .csv file at a time.");
+      return;
+    }
+    await ingestFile(file);
   }
 
   async function handleImport() {
@@ -265,10 +313,20 @@ export function ImportProjectDialog() {
                 <p className="text-sm font-medium">Upload CSV</p>
                 <label
                   htmlFor="csv-upload"
-                  className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-8 cursor-pointer hover:bg-muted/40 transition-colors"
+                  onDragEnter={handleDragEnter}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-8 cursor-pointer transition-colors ${
+                    isDragging ? "border-primary bg-primary/5" : "hover:bg-muted/40"
+                  }`}
                 >
-                  <FileUpIcon className="size-8 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Click to select a .csv file</span>
+                  <FileUpIcon
+                    className={`size-8 ${isDragging ? "text-primary" : "text-muted-foreground"}`}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {isDragging ? "Drop the .csv file" : "Click or drag a .csv file here"}
+                  </span>
                   <input
                     ref={fileRef}
                     id="csv-upload"
