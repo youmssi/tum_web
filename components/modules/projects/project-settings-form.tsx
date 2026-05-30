@@ -31,6 +31,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/lib/constants";
+import { StatusSettingsCard } from "./status-settings-card";
 import { useDeleteProject, useProject, useUpdateProject } from "./use-projects";
 
 const settingsSchema = z.object({
@@ -185,6 +186,10 @@ export function ProjectSettingsForm({ id }: { id: string }) {
           </form>
         </CardContent>
       </Card>
+
+      <Separator className="max-w-lg" />
+
+      <StatusSettingsCard projectId={id} />
 
       <Separator className="max-w-lg" />
 

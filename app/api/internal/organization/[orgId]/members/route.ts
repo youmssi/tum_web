@@ -29,6 +29,11 @@ interface DirectoryRow {
   avatarUrl: string | null;
 }
 
+interface OrganizationRow {
+  name: string;
+  slug: string | null;
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ orgId: string }> }) {
   const token = request.headers.get("x-internal-token");
   const expected = serverEnv.internalServiceToken;
@@ -41,20 +46,26 @@ export async function GET(request: Request, { params }: { params: Promise<{ orgI
     return NextResponse.json({ error: "orgId required" }, { status: 400 });
   }
 
-  const result = await pool.query<DirectoryRow>(
-    `SELECT u.id            AS "userId",
-            u.name          AS name,
-            u.email         AS email,
-            u.image         AS "avatarUrl",
-            m.role          AS role
-       FROM member m
-       JOIN "user" u ON u.id = m."userId"
-      WHERE m."organizationId" = $1
-      ORDER BY u.name ASC NULLS LAST, u.email ASC`,
-    [orgId],
-  );
+  // Org meta + members in parallel — both pulls are short and the backend caches the response.
+  const [orgResult, memberResult] = await Promise.all([
+    pool.query<OrganizationRow>(`SELECT name, slug FROM organization WHERE id = $1 LIMIT 1`, [
+      orgId,
+    ]),
+    pool.query<DirectoryRow>(
+      `SELECT u.id            AS "userId",
+              u.name          AS name,
+              u.email         AS email,
+              u.image         AS "avatarUrl",
+              m.role          AS role
+         FROM member m
+         JOIN "user" u ON u.id = m."userId"
+        WHERE m."organizationId" = $1
+        ORDER BY u.name ASC NULLS LAST, u.email ASC`,
+      [orgId],
+    ),
+  ]);
 
-  const members: DirectoryEntry[] = result.rows.map((row) => ({
+  const members: DirectoryEntry[] = memberResult.rows.map((row) => ({
     userId: row.userId,
     name: row.name ?? row.email,
     email: row.email,
@@ -62,5 +73,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ orgI
     avatarUrl: row.avatarUrl,
   }));
 
-  return NextResponse.json({ members });
+  const organization = orgResult.rows[0] ?? null;
+
+  // organization is null when the workspace was deleted but stale references remain. The backend
+  // already tolerates a missing org by falling back to the org id, so a null payload is safe.
+  return NextResponse.json({ organization, members });
 }

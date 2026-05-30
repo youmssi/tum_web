@@ -72,10 +72,10 @@ const DEP_TYPE_OPTIONS: { value: DependencyType; label: string }[] = [
 
 export function ProjectTimeline({
   projectId,
-  projectName,
   dateRange,
 }: {
   projectId: string;
+  /** Retained for callsite API stability; previously used by the in-browser Gantt export. */
   projectName?: string;
   dateRange?: DateRange;
 }) {
@@ -319,9 +319,7 @@ export function ProjectTimeline({
           if (!active) setLinkSource(null);
         }}
         colors={colors}
-        tasks={tasks ?? []}
-        allDeps={allDeps ?? []}
-        projectName={projectName}
+        projectId={projectId}
         isFocused={isFocused}
         onFocusToggle={() => setIsFocused((f) => !f)}
         onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
