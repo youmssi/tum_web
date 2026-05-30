@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowRight, Check, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
+import { authClient } from "@/lib/auth-client";
 
 type PlanKey = "community" | "pro" | "enterprise";
 
@@ -30,8 +32,8 @@ const PLAN_CONFIG: {
   },
   {
     key: "pro",
-    monthly: 12,
-    annual: 10,
+    monthly: 20,
+    annual: 17,
     href: ROUTES.SIGNUP,
     external: false,
     popular: true,
@@ -51,11 +53,39 @@ const PLAN_CONFIG: {
 export function PricingSection() {
   const t = useTranslations("landing.pricing");
   const plans = useTranslations("landing.pricing.plans");
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [annual, setAnnual] = useState(true);
+  const [proPending, setProPending] = useState(false);
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>
     Array.from({ length: 8 }, (_, i) => plans(`${key}.features.${i}`));
+
+  /**
+   * Pro CTA dispatch. Authenticated visitors go straight to a Polar checkout via the Better Auth
+   * adapter; visitors who aren't signed in are sent to the signup flow with an upgrade intent
+   * the post-signup page can pick up. Polar handles the entire payment surface (card, PayPal,
+   * subscription management).
+   */
+  async function handleProClick() {
+    if (!session) {
+      router.push(`${ROUTES.SIGNUP}?intent=upgrade-pro`);
+      return;
+    }
+    setProPending(true);
+    try {
+      // The "pro" slug must match the slug configured in the checkout() plugin in auth.config.ts.
+      await authClient.checkout({ slug: "pro" });
+      // On success the SDK navigates the browser away; this line is only reached if the call
+      // resolved without redirecting (shouldn't happen in normal usage).
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not start checkout. Try again.";
+      toast.error(message);
+      setProPending(false);
+    }
+  }
 
   return (
     <section id="pricing" className="relative py-24 lg:py-32 border-t border-foreground/8">
@@ -99,73 +129,90 @@ export function PricingSection() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
-          {PLAN_CONFIG.map((plan, idx) => (
-            <div
-              key={plan.key}
-              className={`relative p-8 rounded-2xl border transition-all ${
-                plan.popular
-                  ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
-                  : "border-foreground/10 bg-card"
-              }`}
-            >
-              {plan.hasBadge && (
-                <span className="absolute -top-3 left-6 px-3 py-1 bg-primary text-primary-foreground text-xs font-mono rounded-full">
-                  {plans(`${plan.key}.badge`)}
-                </span>
-              )}
+          {PLAN_CONFIG.map((plan, idx) => {
+            const isPro = plan.key === "pro";
+            return (
+              <div
+                key={plan.key}
+                className={`relative p-8 rounded-2xl border transition-all ${
+                  plan.popular
+                    ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
+                    : "border-foreground/10 bg-card"
+                }`}
+              >
+                {plan.hasBadge && (
+                  <span className="absolute -top-3 left-6 px-3 py-1 bg-primary text-primary-foreground text-xs font-mono rounded-full">
+                    {plans(`${plan.key}.badge`)}
+                  </span>
+                )}
 
-              <div className="mb-6">
-                <span className="font-mono text-xs text-muted-foreground">
-                  {String(idx + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-2xl font-bold mt-1">{plans(`${plan.key}.name`)}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {plans(`${plan.key}.description`)}
-                </p>
-              </div>
+                <div className="mb-6">
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="text-2xl font-bold mt-1">{plans(`${plan.key}.name`)}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {plans(`${plan.key}.description`)}
+                  </p>
+                </div>
 
-              <div className="mb-6 pb-6 border-b border-foreground/10">
-                {plan.monthly !== null ? (
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-bold">
-                      ${annual ? plan.annual : plan.monthly}
-                    </span>
-                    <span className="text-muted-foreground text-sm">{t("perWorkspace")}</span>
-                  </div>
+                <div className="mb-6 pb-6 border-b border-foreground/10">
+                  {plan.monthly !== null ? (
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-bold">
+                        ${annual ? plan.annual : plan.monthly}
+                      </span>
+                      <span className="text-muted-foreground text-sm">{t("perWorkspace")}</span>
+                    </div>
+                  ) : (
+                    <span className="text-3xl font-bold">{t("custom")}</span>
+                  )}
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {featuresFor(plan.key).map((f, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm">
+                      <Check className="size-4 text-primary mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {isPro ? (
+                  <Button
+                    variant="default"
+                    className="w-full rounded-full group"
+                    onClick={handleProClick}
+                    disabled={proPending}
+                  >
+                    {proPending ? "Opening checkout…" : plans("pro.cta")}
+                    {!proPending && (
+                      <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                    )}
+                  </Button>
                 ) : (
-                  <span className="text-3xl font-bold">{t("custom")}</span>
+                  <Button
+                    variant={plan.popular ? "default" : "outline"}
+                    className="w-full rounded-full group"
+                    asChild
+                  >
+                    <Link
+                      href={plan.href}
+                      target={plan.external ? "_blank" : undefined}
+                      rel={plan.external ? "noopener noreferrer" : undefined}
+                    >
+                      {plans(`${plan.key}.cta`)}
+                      {plan.external ? (
+                        <ExternalLink className="size-3.5 ml-1.5" />
+                      ) : (
+                        <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                      )}
+                    </Link>
+                  </Button>
                 )}
               </div>
-
-              <ul className="space-y-3 mb-8">
-                {featuresFor(plan.key).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm">
-                    <Check className="size-4 text-primary mt-0.5 shrink-0" />
-                    <span className="text-muted-foreground">{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                variant={plan.popular ? "default" : "outline"}
-                className="w-full rounded-full group"
-                asChild
-              >
-                <Link
-                  href={plan.href}
-                  target={plan.external ? "_blank" : undefined}
-                  rel={plan.external ? "noopener noreferrer" : undefined}
-                >
-                  {plans(`${plan.key}.cta`)}
-                  {plan.external ? (
-                    <ExternalLink className="size-3.5 ml-1.5" />
-                  ) : (
-                    <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-                  )}
-                </Link>
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <p className="mt-8 text-center text-sm text-muted-foreground">

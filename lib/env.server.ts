@@ -14,4 +14,13 @@ export const serverEnv = {
     clientId: process.env.GITHUB_CLIENT_ID ?? "",
     clientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
   },
+  // Polar.sh payments — the plugin is only registered when accessToken is non-empty so dev
+  // installs without a Polar account still build. server defaults to "sandbox"; flip to
+  // "production" via env on the deployed environment.
+  polar: {
+    accessToken: process.env.POLAR_ACCESS_TOKEN ?? "",
+    proProductId: process.env.POLAR_PRO_PRODUCT_ID ?? "",
+    webhookSecret: process.env.POLAR_WEBHOOK_SECRET ?? "",
+    server: (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "production",
+  },
 } as const;
