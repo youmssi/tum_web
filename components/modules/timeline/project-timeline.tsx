@@ -319,7 +319,6 @@ export function ProjectTimeline({
           if (!active) setLinkSource(null);
         }}
         colors={colors}
-        projectId={projectId}
         isFocused={isFocused}
         onFocusToggle={() => setIsFocused((f) => !f)}
         onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}

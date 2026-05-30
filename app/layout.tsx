@@ -69,12 +69,13 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // Google Search Console — verifies the *.vercel.app subdomain without DNS TXT (which Vercel
-  // doesn't expose for preview domains). Next inserts this as a <meta name="google-site-
-  // verification"> tag in <head> automatically.
-  verification: {
-    google: "W_nff1NydesyM91YO1xnvKZDzK_b2hs-3io0n4yEj08",
-  },
+  // Google Search Console — verifies the deployment without needing DNS TXT (Vercel preview
+  // domains don't expose those). Token comes from NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION; when the
+  // env var is absent we omit the metadata key entirely so no stale value leaks into prod.
+  // Next.js renders this as <meta name="google-site-verification"> in <head> on every page (the
+  // [locale] child layout owns <html>, but metadata cascades from the root, so the tag still
+  // appears on the locale-prefixed URLs Search Console will crawl).
+  ...(env.googleSiteVerification ? { verification: { google: env.googleSiteVerification } } : {}),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
