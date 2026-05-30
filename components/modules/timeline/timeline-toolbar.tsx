@@ -31,6 +31,7 @@ export function TimelineToolbar({
   onJumpToToday,
 }: TimelineToolbarProps) {
   const t = useTranslations("timeline.toolbar");
+  const tExport = useTranslations("projects.export");
   const viewModeT = useTranslations("timeline.viewMode");
   const legendT = useTranslations("timeline.legend");
 
