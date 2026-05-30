@@ -33,6 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useDirectory } from "@/components/modules/organization";
+import { useStatusName } from "@/components/modules/projects";
 import { CommentThread } from "@/components/modules/comments";
 import { AttachmentList, FileUpload } from "@/components/modules/files";
 import {
@@ -104,6 +105,9 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   const deleteTask = useDeleteTask(projectId);
   const { data: directory } = useDirectory();
   const members = directory ?? [];
+  // Use the project-configured status names — the detail sheet's Status select must show
+  // "Backlog" / "Shipped" / whatever the owner has renamed the columns to.
+  const resolveStatusName = useStatusName(projectId);
   const { data: allTasks } = useTasks(projectId);
   const { data: deps } = useDependencies(task?.id);
   const createDep = useCreateDependency();
@@ -304,7 +308,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                       <SelectContent>
                         {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
                           <SelectItem key={s} value={s}>
-                            {STATUS_LABELS[s]}
+                            {resolveStatusName(s)}
                           </SelectItem>
                         ))}
                       </SelectContent>

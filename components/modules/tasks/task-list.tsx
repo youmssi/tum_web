@@ -35,6 +35,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useDirectory } from "@/components/modules/organization";
+import { useStatusName } from "@/components/modules/projects";
 import {
   PRIORITY_LABELS,
   STATUS_LABELS,
@@ -74,6 +75,7 @@ function MemberName({ userId }: { userId: string | null }) {
 function BulkActionsBar({
   count,
   pending,
+  projectId,
   onStatusChange,
   onAssigneeChange,
   onDelete,
@@ -81,14 +83,17 @@ function BulkActionsBar({
 }: {
   count: number;
   pending: boolean;
+  projectId: string;
   onStatusChange: (status: string) => void;
   onAssigneeChange: (value: string) => void;
   onDelete: () => void;
   onClear: () => void;
 }) {
   const t = useTranslations("tasks.list");
-  const status = useTranslations("tasks.status");
   const { data: directory } = useDirectory();
+  // Use the project-configured display name so the bulk dropdown reads "Shipped" after a rename,
+  // not the original "Done".
+  const resolveStatusName = useStatusName(projectId);
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2">
       <span className="text-sm font-medium">{t("selectedSummary", { count })}</span>
@@ -100,7 +105,7 @@ function BulkActionsBar({
         <SelectContent>
           {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
             <SelectItem key={s} value={s} className="text-xs">
-              {status(s)}
+              {resolveStatusName(s)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -143,6 +148,9 @@ function BulkActionsBar({
 export function TaskList({ projectId }: { projectId: string }) {
   const { data: tasks, isLoading } = useTasks(projectId);
   const bulkUpdate = useBulkUpdateTasks(projectId);
+  // Project-scoped status display name resolver (E17 followup) — picks the configured name when
+  // available, falls back to STATUS_LABELS while the statuses query is loading or unseeded.
+  const resolveStatusName = useStatusName(projectId);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -195,7 +203,7 @@ export function TaskList({ projectId }: { projectId: string }) {
         cell: ({ row }) => (
           <CircleIcon
             className={`size-4 ${STATUS_COLORS[row.original.status]}`}
-            aria-label={STATUS_LABELS[row.original.status]}
+            aria-label={resolveStatusName(row.original.status)}
           />
         ),
         size: 32,
@@ -214,7 +222,9 @@ export function TaskList({ projectId }: { projectId: string }) {
         cell: ({ row }) => (
           <div>
             <p className="text-sm font-medium line-clamp-1">{row.original.title}</p>
-            <p className="text-xs text-muted-foreground">{STATUS_LABELS[row.original.status]}</p>
+            <p className="text-xs text-muted-foreground">
+              {resolveStatusName(row.original.status)}
+            </p>
           </div>
         ),
       },
@@ -280,7 +290,9 @@ export function TaskList({ projectId }: { projectId: string }) {
         ),
       },
     ],
-    [],
+    // resolveStatusName changes identity when the statuses query refetches, so a column rebuild
+    // is what pushes the new label down to the cells.
+    [resolveStatusName],
   );
 
   const table = useReactTable({
@@ -368,7 +380,7 @@ export function TaskList({ projectId }: { projectId: string }) {
               </SelectItem>
               {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
                 <SelectItem key={s} value={s} className="text-xs">
-                  {STATUS_LABELS[s]}
+                  {resolveStatusName(s)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -402,6 +414,7 @@ export function TaskList({ projectId }: { projectId: string }) {
         <BulkActionsBar
           count={selectedIds.length}
           pending={bulkUpdate.isPending}
+          projectId={projectId}
           onStatusChange={handleBulkStatusChange}
           onAssigneeChange={handleBulkAssigneeChange}
           onDelete={handleBulkDelete}

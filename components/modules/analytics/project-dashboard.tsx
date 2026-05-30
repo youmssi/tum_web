@@ -15,16 +15,10 @@ import { AlertCircleIcon, CheckCircle2Icon, ListTodoIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActivityFeed } from "@/components/modules/activity";
+import { useStatusColor, useStatusName } from "@/components/modules/projects";
 import { useTasks } from "@/components/modules/tasks/use-tasks";
-import { type TaskStatus, STATUS_LABELS } from "@/components/modules/tasks/task-api";
+import { type TaskStatus } from "@/components/modules/tasks/task-api";
 import { useProjectMetrics } from "./use-analytics";
-
-const STATUS_COLORS: Record<TaskStatus, string> = {
-  TODO: "bg-muted",
-  IN_PROGRESS: "bg-blue-500",
-  IN_REVIEW: "bg-amber-500",
-  DONE: "bg-green-500",
-};
 
 function StatCard({
   icon: Icon,
@@ -61,6 +55,10 @@ interface ProjectDashboardProps {
 export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
   const { data: tasks, isLoading: tasksLoading } = useTasks(projectId);
   const { data: metrics, isLoading: metricsLoading } = useProjectMetrics(projectId);
+  // E17 followup — surface the project's configured status name + colour on the donut and the
+  // breakdown rows so renaming "Done" → "Shipped" propagates to the overview.
+  const resolveStatusName = useStatusName(projectId);
+  const resolveStatusColor = useStatusColor(projectId);
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -124,15 +122,15 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
             return (
               <div key={status} className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{STATUS_LABELS[status]}</span>
+                  <span>{resolveStatusName(status)}</span>
                   <span>
                     {count} ({pct}%)
                   </span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={`h-full rounded-full transition-all ${STATUS_COLORS[status]}`}
-                    style={{ width: `${pct}%` }}
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${pct}%`, backgroundColor: resolveStatusColor(status) }}
                   />
                 </div>
               </div>
