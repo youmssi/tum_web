@@ -61,6 +61,7 @@ const schema = z.object({
   status: z.enum(["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"]),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
   assigneeId: z.string().nullable(),
+  parentTaskId: z.string().nullable(),
   startDate: z.string().nullable(),
   endDate: z.string().nullable(),
   dueDate: z.string().nullable(),
@@ -68,6 +69,26 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
+
+/**
+ * BFS down the parent-child tree to find every task that has {@code rootId} somewhere in its
+ * ancestor chain. Used to filter the parent-task dropdown so users can't introduce a cycle
+ * client-side (the backend also blocks cycles defensively).
+ */
+function descendantIds(rootId: string, all: Task[]): Set<string> {
+  const out = new Set<string>();
+  const queue: string[] = [rootId];
+  while (queue.length) {
+    const id = queue.shift()!;
+    for (const candidate of all) {
+      if (candidate.parentTaskId === id && !out.has(candidate.id)) {
+        out.add(candidate.id);
+        queue.push(candidate.id);
+      }
+    }
+  }
+  return out;
+}
 
 interface TaskDetailSheetProps {
   task: Task | null;
@@ -97,6 +118,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
       status: "TODO",
       priority: "MEDIUM",
       assigneeId: null,
+      parentTaskId: null,
       startDate: null,
       endDate: null,
       dueDate: null,
@@ -112,6 +134,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
         status: task.status,
         priority: task.priority,
         assigneeId: task.assigneeId ?? null,
+        parentTaskId: task.parentTaskId ?? null,
         startDate: task.startDate ?? null,
         endDate: task.endDate ?? null,
         dueDate: task.dueDate ?? null,
@@ -134,10 +157,14 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
           dueDate: values.dueDate || null,
           labels: values.labels,
           orderIndex: task.orderIndex,
+          // Always send the parent envelope so the backend distinguishes "leave alone" (absent)
+          // from "clear" (envelope present, value null) — same wrapper semantics as the WIP limit.
+          parentTaskId: { value: values.parentTaskId || null },
         },
       });
-    } catch {
-      toast.error("Failed to save task.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save task.";
+      toast.error(message);
     }
   }
 
@@ -342,6 +369,46 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                   </Select>
                 </Field>
               )}
+            />
+
+            <Controller
+              name="parentTaskId"
+              control={form.control}
+              render={({ field }) => {
+                // Exclude self + any descendant so the user can't introduce a cycle from the UI
+                // (the backend re-checks the cycle on save, this just hides invalid choices).
+                const descendants = descendantIds(task.id, allTasks ?? []);
+                const candidates = (allTasks ?? []).filter(
+                  (t) => t.id !== task.id && !descendants.has(t.id),
+                );
+                return (
+                  <Field>
+                    <FieldLabel>Parent task</FieldLabel>
+                    <Select
+                      value={field.value ?? ""}
+                      onValueChange={(v) => {
+                        field.onChange(v === "__none__" ? null : v);
+                        form.handleSubmit(save)();
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Top-level task" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Top-level task</SelectItem>
+                        {candidates.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Make this a subtask of another task in the same project.
+                    </p>
+                  </Field>
+                );
+              }}
             />
 
             <div className="grid grid-cols-2 gap-4">

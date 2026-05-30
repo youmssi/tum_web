@@ -23,5 +23,6 @@ export {
 } from "./status-api";
 export { STATUS_KEYS, useStatuses, useUpdateStatus, useReorderStatuses } from "./use-statuses";
 export { ExportProjectButton } from "./export-button";
+export { StatusSettingsCard } from "./status-settings-card";
 export { useExportProjectArchive } from "./use-export";
 export { exportApi, type ProjectExportFile } from "./export-api";

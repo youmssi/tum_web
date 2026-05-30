@@ -11,4 +11,3 @@ export {
   useCreateDependency,
   useDeleteDependency,
 } from "./use-timeline";
-export { exportGanttXlsx } from "./timeline-export";

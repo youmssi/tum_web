@@ -44,6 +44,12 @@ export interface UpdateTaskPayload {
   orderIndex?: number | null;
   progress?: number | null;
   milestone?: boolean | null;
+  /**
+   * Parent task envelope — mirrors the backend wrapper so callers can distinguish
+   * "leave alone" (omit the field) from "clear it" (`{ value: null }`). To set a new parent
+   * send `{ value: "<task-id>" }`.
+   */
+  parentTaskId?: { value: string | null };
 }
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {

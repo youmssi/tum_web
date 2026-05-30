@@ -377,6 +377,7 @@
     "header": "Comments",
     "empty": "No comments yet.",
     "placeholder": "Add a comment… (type @ to mention)",
+    "mentionTip": "Type @ to tag teammates — they'll be notified.",
     "submit": "Comment",
     "submitting": "Posting…",
     "edited": "(edited)",

@@ -377,6 +377,7 @@
     "header": "Commentaires",
     "empty": "Aucun commentaire pour l’instant.",
     "placeholder": "Ajoutez un commentaire… (tapez @ pour mentionner)",
+    "mentionTip": "Tapez @ pour identifier des coéquipiers — ils seront notifiés.",
     "submit": "Commenter",
     "submitting": "Publication…",
     "edited": "(modifié)",
