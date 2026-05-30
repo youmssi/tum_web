@@ -191,6 +191,12 @@
       "timeline": "Timeline",
       "activity": "Activity"
     },
+    "export": {
+      "button": "Export to Excel",
+      "preparing": "Preparing…",
+      "ready": "Exported {filename}",
+      "failed": "Could not export this project."
+    },
     "card": {
       "noDescription": "No description.",
       "tasksLabel": "{count, plural, =0 {No tasks} =1 {1 task} other {# tasks}}",
@@ -371,6 +377,7 @@
     "header": "Comments",
     "empty": "No comments yet.",
     "placeholder": "Add a comment… (type @ to mention)",
+    "mentionTip": "Type @ to tag teammates — they'll be notified.",
     "submit": "Comment",
     "submitting": "Posting…",
     "edited": "(edited)",

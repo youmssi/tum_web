@@ -191,6 +191,12 @@
       "timeline": "Chronologie",
       "activity": "Activité"
     },
+    "export": {
+      "button": "Exporter vers Excel",
+      "preparing": "Préparation…",
+      "ready": "Exporté : {filename}",
+      "failed": "Impossible d'exporter ce projet."
+    },
     "card": {
       "noDescription": "Aucune description.",
       "tasksLabel": "{count, plural, =0 {Aucune tâche} =1 {1 tâche} other {# tâches}}",
@@ -371,6 +377,7 @@
     "header": "Commentaires",
     "empty": "Aucun commentaire pour l’instant.",
     "placeholder": "Ajoutez un commentaire… (tapez @ pour mentionner)",
+    "mentionTip": "Tapez @ pour identifier des coéquipiers — ils seront notifiés.",
     "submit": "Commenter",
     "submitting": "Publication…",
     "edited": "(modifié)",

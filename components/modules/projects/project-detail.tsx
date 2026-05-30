@@ -33,6 +33,7 @@ import { KanbanBoard } from "@/components/modules/board";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
 import { authClient } from "@/lib/auth-client";
+import { ExportProjectButton } from "./export-button";
 import { useProject, useToggleArchive } from "./use-projects";
 
 export function ProjectDetail({ id }: { id: string }) {
@@ -147,6 +148,7 @@ export function ProjectDetail({ id }: { id: string }) {
               <XIcon className="size-4" />
             </Button>
           )}
+          <ExportProjectButton projectId={project.id} />
           <Button
             variant="outline"
             size="sm"

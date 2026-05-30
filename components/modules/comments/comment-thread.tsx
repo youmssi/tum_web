@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, PencilIcon, Trash2Icon, XIcon } from "lucide-react";
+import { AtSignIcon, CheckIcon, PencilIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -117,7 +117,11 @@ function CommentInput({ taskId, members }: CommentInputProps) {
           </div>
         )}
       </div>
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+          <AtSignIcon className="size-3" />
+          {t("mentionTip")}
+        </p>
         <Button
           size="sm"
           disabled={!content.trim() || createComment.isPending}

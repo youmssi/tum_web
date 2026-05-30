@@ -2,21 +2,19 @@
 
 import {
   CalendarCheck2Icon,
+  FileSpreadsheetIcon,
   LinkIcon,
+  Loader2Icon,
   Maximize2Icon,
   Minimize2Icon,
-  TableIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRef } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { type Task } from "@/components/modules/tasks";
+import { useExportProjectArchive } from "@/components/modules/projects";
 import { type GanttViewMode } from "./gantt-chart";
-import { type Dependency } from "./dependency-api";
-import { exportGanttXlsx } from "./timeline-export";
 
 interface TimelineToolbarProps {
   viewMode: GanttViewMode;
@@ -24,9 +22,7 @@ interface TimelineToolbarProps {
   linkMode: boolean;
   onLinkModeChange: (active: boolean) => void;
   colors: { onTrackColor: string; nearDueColor: string; overdueColor: string };
-  tasks: Task[];
-  allDeps: Dependency[];
-  projectName?: string;
+  projectId: string;
   isFocused: boolean;
   onFocusToggle: () => void;
   onJumpToToday: () => void;
@@ -40,27 +36,24 @@ export function TimelineToolbar({
   linkMode,
   onLinkModeChange,
   colors,
-  tasks,
-  allDeps,
-  projectName,
+  projectId,
   isFocused,
   onFocusToggle,
   onJumpToToday,
 }: TimelineToolbarProps) {
   const t = useTranslations("timeline.toolbar");
+  const tExport = useTranslations("projects.export");
   const viewModeT = useTranslations("timeline.viewMode");
   const legendT = useTranslations("timeline.legend");
-  const exporting = useRef(false);
+  const exportArchive = useExportProjectArchive();
 
   async function handleExportXlsx() {
-    if (exporting.current) return;
-    exporting.current = true;
     try {
-      await exportGanttXlsx(tasks, allDeps, projectName ?? "project");
-    } catch {
-      toast.error(t("exportXlsxTooltip"));
-    } finally {
-      exporting.current = false;
+      const filename = await exportArchive.mutateAsync(projectId);
+      toast.success(tExport("ready", { filename }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : tExport("failed");
+      toast.error(message);
     }
   }
 
@@ -143,12 +136,22 @@ export function TimelineToolbar({
           </TooltipContent>
         </Tooltip>
 
-        {/* Export XLSX */}
+        {/* Export project archive — the interactive XLSX with dropdowns, filters and formulas. */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={handleExportXlsx}>
-              <TableIcon className="size-3.5" />
-              {t("exportXlsx")}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5"
+              onClick={handleExportXlsx}
+              disabled={exportArchive.isPending}
+            >
+              {exportArchive.isPending ? (
+                <Loader2Icon className="size-3.5 animate-spin" />
+              ) : (
+                <FileSpreadsheetIcon className="size-3.5" />
+              )}
+              {exportArchive.isPending ? tExport("preparing") : tExport("button")}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">{t("exportXlsxTooltip")}</TooltipContent>
