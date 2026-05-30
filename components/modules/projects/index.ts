@@ -21,7 +21,14 @@ export {
   type UpdateStatusPayload,
   type ReorderStatusesPayload,
 } from "./status-api";
-export { STATUS_KEYS, useStatuses, useUpdateStatus, useReorderStatuses } from "./use-statuses";
+export {
+  STATUS_KEYS,
+  useStatuses,
+  useStatusColor,
+  useStatusName,
+  useUpdateStatus,
+  useReorderStatuses,
+} from "./use-statuses";
 export { ExportProjectButton } from "./export-button";
 export { StatusSettingsCard } from "./status-settings-card";
 export { useExportProjectArchive } from "./use-export";

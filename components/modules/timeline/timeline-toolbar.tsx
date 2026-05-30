@@ -1,19 +1,10 @@
 "use client";
 
-import {
-  CalendarCheck2Icon,
-  FileSpreadsheetIcon,
-  LinkIcon,
-  Loader2Icon,
-  Maximize2Icon,
-  Minimize2Icon,
-} from "lucide-react";
+import { CalendarCheck2Icon, LinkIcon, Maximize2Icon, Minimize2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useExportProjectArchive } from "@/components/modules/projects";
 import { type GanttViewMode } from "./gantt-chart";
 
 interface TimelineToolbarProps {
@@ -22,7 +13,6 @@ interface TimelineToolbarProps {
   linkMode: boolean;
   onLinkModeChange: (active: boolean) => void;
   colors: { onTrackColor: string; nearDueColor: string; overdueColor: string };
-  projectId: string;
   isFocused: boolean;
   onFocusToggle: () => void;
   onJumpToToday: () => void;
@@ -36,7 +26,6 @@ export function TimelineToolbar({
   linkMode,
   onLinkModeChange,
   colors,
-  projectId,
   isFocused,
   onFocusToggle,
   onJumpToToday,
@@ -45,17 +34,6 @@ export function TimelineToolbar({
   const tExport = useTranslations("projects.export");
   const viewModeT = useTranslations("timeline.viewMode");
   const legendT = useTranslations("timeline.legend");
-  const exportArchive = useExportProjectArchive();
-
-  async function handleExportXlsx() {
-    try {
-      const filename = await exportArchive.mutateAsync(projectId);
-      toast.success(tExport("ready", { filename }));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : tExport("failed");
-      toast.error(message);
-    }
-  }
 
   const legend: { label: string; color: string }[] = [
     { label: legendT("onTrack"), color: colors.onTrackColor },
@@ -114,7 +92,8 @@ export function TimelineToolbar({
           {linkMode ? t("cancelLinking") : t("linkTasks")}
         </Button>
 
-        {/* Focus mode toggle */}
+        {/* Focus mode toggle — Export lives next to the Archive button in the project header so
+            there is one canonical place to trigger it. */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -134,27 +113,6 @@ export function TimelineToolbar({
           <TooltipContent side="bottom">
             {isFocused ? t("focusExit") : t("focusEnter")}
           </TooltipContent>
-        </Tooltip>
-
-        {/* Export project archive — the interactive XLSX with dropdowns, filters and formulas. */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1.5"
-              onClick={handleExportXlsx}
-              disabled={exportArchive.isPending}
-            >
-              {exportArchive.isPending ? (
-                <Loader2Icon className="size-3.5 animate-spin" />
-              ) : (
-                <FileSpreadsheetIcon className="size-3.5" />
-              )}
-              {exportArchive.isPending ? tExport("preparing") : tExport("button")}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">{t("exportXlsxTooltip")}</TooltipContent>
         </Tooltip>
       </div>
     </div>

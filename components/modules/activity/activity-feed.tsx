@@ -7,7 +7,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirectory } from "@/components/modules/organization";
-import { STATUS_LABELS, type TaskStatus, useTasks } from "@/components/modules/tasks";
+import { useStatusName } from "@/components/modules/projects";
+import { type TaskStatus, useTasks } from "@/components/modules/tasks";
 import { type ActivityAction, type Activity } from "./activity-api";
 import { useActivity } from "./use-activity";
 
@@ -94,6 +95,9 @@ export function ActivityFeed({ projectId, limit }: ActivityFeedProps) {
   // useActiveOrganization payload sometimes ships membership rows without a populated `user`
   // slot, which is what was leaking raw user ids into the feed.
   const { data: directory } = useDirectory();
+  // E17 followup — resolve TASK_STATUS_CHANGED events against the project's configured names so
+  // "Vincent updated status of <task> · Shipped" reads with the rename in place.
+  const resolveStatusName = useStatusName(projectId);
   const [page, setPage] = useState(0);
 
   function memberName(userId: string) {
@@ -112,7 +116,10 @@ export function ActivityFeed({ projectId, limit }: ActivityFeedProps) {
     if (!entry.detail) return null;
     switch (entry.action) {
       case "TASK_STATUS_CHANGED":
-        return STATUS_LABELS[entry.detail as TaskStatus] ?? entry.detail;
+        // The event detail carries the immutable category (TODO / IN_PROGRESS / ...) — resolve to
+        // the project's currently-configured display name. Falls back to the raw category string
+        // if statuses haven't loaded yet (one render, transient).
+        return resolveStatusName(entry.detail as TaskStatus);
       case "TASK_ASSIGNED":
         return memberName(entry.detail);
       default:
