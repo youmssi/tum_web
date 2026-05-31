@@ -39,21 +39,48 @@ async function ensureCustomer(): Promise<void> {
   await webApi.post("/api/billing/ensure-customer").catch(() => null);
 }
 
+/**
+ * Distinct outcomes the billing surface can land in. The hooks use this so the UI can render
+ * each state as a different empty / banner / data view instead of conflating them all into a
+ * generic error.
+ */
+export type BillingState =
+  | { kind: "no-subscription" }
+  | { kind: "subscription"; subscription: ActiveSubscription }
+  | { kind: "unconfigured"; message: string }; // Polar misconfigured (no token, missing scopes,
+// bad server). User can keep using the app; billing is the only thing that's degraded.
+
+function looksLikePolarMisconfigured(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("insufficient_scope") ||
+    lower.includes("status 403") ||
+    lower.includes("subscriptions list failed") ||
+    lower.includes("polar customer creation failed")
+  );
+}
+
 export const billingApi = {
   /**
-   * Returns the active subscription (the first one), or {@code null} when the customer has no
-   * active subscription yet. Performs a single backfill retry if the first call fails — this
-   * covers the legacy-user case without leaking that detail to the UI.
+   * Returns the user's billing state. Resolves rather than throws when Polar is partially
+   * configured — the caller renders a friendly "billing temporarily unavailable" surface
+   * instead of treating misconfig as a crash.
    */
-  async getActiveSubscription(): Promise<ActiveSubscription | null> {
+  async getBillingState(): Promise<BillingState> {
     const fetchState = async () => authClient.customer.state();
     let result = await fetchState();
     if (result.error) {
+      // Backfill the Polar customer once and retry. ensureCustomer returns a polar-scope-missing
+      // status quietly when the token lacks customers:read/write; the retry below will surface
+      // the same shape so we map it to "unconfigured".
       await ensureCustomer();
       result = await fetchState();
       if (result.error) {
         const message =
           (result.error as { message?: string }).message ?? "Could not load billing details.";
+        if (looksLikePolarMisconfigured(message)) {
+          return { kind: "unconfigured", message };
+        }
         throw new Error(message);
       }
     }
@@ -68,15 +95,18 @@ export const billingApi = {
       product: { name: string };
     }>;
     const first = subs[0];
-    if (!first) return null;
+    if (!first) return { kind: "no-subscription" };
     return {
-      id: first.id,
-      productName: first.product.name,
-      status: first.status,
-      currentPeriodEnd: first.currentPeriodEnd,
-      amount: first.amount,
-      currency: first.currency,
-      recurringInterval: first.recurringInterval,
+      kind: "subscription",
+      subscription: {
+        id: first.id,
+        productName: first.product.name,
+        status: first.status,
+        currentPeriodEnd: first.currentPeriodEnd,
+        amount: first.amount,
+        currency: first.currency,
+        recurringInterval: first.recurringInterval,
+      },
     };
   },
 

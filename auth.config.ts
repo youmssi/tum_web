@@ -102,6 +102,29 @@ export const auth = betterAuth({
   database: pool,
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
   secret: process.env.BETTER_AUTH_SECRET,
+  user: {
+    // Enable Better Auth's built-in deleteUser flow. The UI lives in
+    // DeleteAccountCard on the profile page; this just opens the API. The
+    // afterDelete hook cleans up the user's Polar customer (and any active
+    // subscription) so we don't leak billing state. Failures here are logged
+    // but don't roll back the user deletion — the BA delete already
+    // succeeded by the time afterDelete runs.
+    deleteUser: {
+      enabled: true,
+      afterDelete: async (user) => {
+        if (!polarAccessToken) return;
+        try {
+          const polarClient = new Polar({
+            accessToken: polarAccessToken,
+            server: polarServer,
+          });
+          await polarClient.customers.deleteExternal({ externalId: user.id });
+        } catch (err) {
+          console.error("[polar] failed to delete customer for", user.id, err);
+        }
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,

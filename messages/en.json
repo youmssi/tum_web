@@ -141,6 +141,10 @@
       "title": "You're on the free plan",
       "description": "Upgrade to Pro to unlock workspace-wide automations, custom statuses with WIP limits, and the full project archive export.",
       "viewPlans": "View plans"
+    },
+    "unconfigured": {
+      "title": "Billing is temporarily unavailable",
+      "description": "We can't reach the billing provider with the current credentials. An admin needs to regenerate the Polar access token with the full scope set (customers, subscriptions, customer_sessions, checkouts). Your account and workspace data are unaffected."
     }
   },
   "dashboard": {

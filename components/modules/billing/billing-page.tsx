@@ -1,6 +1,12 @@
 "use client";
 
-import { ArrowUpRightIcon, CreditCardIcon, ExternalLinkIcon, Loader2Icon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  ArrowUpRightIcon,
+  CreditCardIcon,
+  ExternalLinkIcon,
+  Loader2Icon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -10,27 +16,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { ROUTES } from "@/lib/constants";
-import { useActiveSubscription, useOpenCustomerPortal } from "./use-billing";
+import { useBillingState, useOpenCustomerPortal } from "./use-billing";
 
 /**
- * Customer billing page. All data + side-effects live in {@code use-billing.ts}; the component
- * itself is presentation-only. When the user has no active subscription we show a clear upgrade
- * CTA pointing at the landing-page pricing section.
+ * Customer billing page. Three terminal states (besides loading): {@code no-subscription},
+ * {@code subscription} (active plan + portal), and {@code unconfigured} (Polar token missing
+ * or under-scoped — surface a clear admin-action notice instead of crashing).
  */
 export function BillingPage() {
   const t = useTranslations("billing");
-  const subscription = useActiveSubscription();
+  const billing = useBillingState();
   const openPortal = useOpenCustomerPortal();
 
-  // mutate() doesn't throw — error handling happens in onError. Removes the redundant try/catch
-  // around mutateAsync that previously duplicated TanStack Query's own error pipeline.
   function handleOpenPortal() {
     openPortal.mutate(undefined, {
       onError: (err) => toast.error(err instanceof Error ? err.message : t("portalFailed")),
     });
   }
 
-  if (subscription.isLoading) {
+  if (billing.isLoading) {
     return (
       <div className="mx-auto w-full max-w-2xl space-y-4">
         <Skeleton className="h-8 w-40" />
@@ -39,8 +43,6 @@ export function BillingPage() {
     );
   }
 
-  const errorMessage = subscription.error instanceof Error ? subscription.error.message : null;
-
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
       <div>
@@ -48,20 +50,14 @@ export function BillingPage() {
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      {errorMessage && (
-        <Card className="border-destructive/40">
-          <CardContent className="pt-6 text-sm text-destructive">{errorMessage}</CardContent>
-        </Card>
-      )}
-
-      {subscription.data ? (
+      {billing.data?.kind === "subscription" && (
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  {subscription.data.productName}
-                  <Badge variant="outline">{subscription.data.status}</Badge>
+                  {billing.data.subscription.productName}
+                  <Badge variant="outline">{billing.data.subscription.status}</Badge>
                 </CardTitle>
                 <CardDescription>{t("activePlan")}</CardDescription>
               </div>
@@ -70,24 +66,24 @@ export function BillingPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <dl className="grid grid-cols-2 gap-3 text-sm">
-              {subscription.data.amount !== null && subscription.data.currency && (
+              {billing.data.subscription.amount !== null && billing.data.subscription.currency && (
                 <div>
                   <dt className="text-muted-foreground">{t("amount")}</dt>
                   <dd className="font-medium">
-                    {(subscription.data.amount / 100).toLocaleString(undefined, {
+                    {(billing.data.subscription.amount / 100).toLocaleString(undefined, {
                       style: "currency",
-                      currency: subscription.data.currency.toUpperCase(),
+                      currency: billing.data.subscription.currency.toUpperCase(),
                     })}
-                    {subscription.data.recurringInterval &&
-                      ` / ${subscription.data.recurringInterval}`}
+                    {billing.data.subscription.recurringInterval &&
+                      ` / ${billing.data.subscription.recurringInterval}`}
                   </dd>
                 </div>
               )}
-              {subscription.data.currentPeriodEnd && (
+              {billing.data.subscription.currentPeriodEnd && (
                 <div>
                   <dt className="text-muted-foreground">{t("renewsOn")}</dt>
                   <dd className="font-medium">
-                    {new Date(subscription.data.currentPeriodEnd).toLocaleDateString()}
+                    {new Date(billing.data.subscription.currentPeriodEnd).toLocaleDateString()}
                   </dd>
                 </div>
               )}
@@ -107,7 +103,9 @@ export function BillingPage() {
             </Button>
           </CardContent>
         </Card>
-      ) : !errorMessage ? (
+      )}
+
+      {billing.data?.kind === "no-subscription" && (
         <Card>
           <CardHeader>
             <CardTitle>{t("noPlan.title")}</CardTitle>
@@ -122,7 +120,29 @@ export function BillingPage() {
             </Button>
           </CardContent>
         </Card>
-      ) : null}
+      )}
+
+      {billing.data?.kind === "unconfigured" && (
+        <Card className="border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20">
+          <CardHeader>
+            <div className="flex items-start gap-3">
+              <AlertTriangleIcon className="size-5 shrink-0 text-amber-600" />
+              <div>
+                <CardTitle className="text-base">{t("unconfigured.title")}</CardTitle>
+                <CardDescription>{t("unconfigured.description")}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
+      {billing.isError && (
+        <Card className="border-destructive/40">
+          <CardContent className="pt-6 text-sm text-destructive">
+            {billing.error instanceof Error ? billing.error.message : t("loadFailed")}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

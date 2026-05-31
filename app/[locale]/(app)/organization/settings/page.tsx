@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import { OrgSettingsForm } from "@/components/modules/organization";
+import { DeleteOrgCard, OrgSettingsForm } from "@/components/modules/organization";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("organizationPage.settings");
@@ -17,6 +17,7 @@ export default async function OrgSettingsPage() {
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
       <OrgSettingsForm />
+      <DeleteOrgCard />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { type ActiveSubscription, type CheckoutSlug, billingApi } from "./billing-api";
+import { type BillingState, type CheckoutSlug, billingApi } from "./billing-api";
 
 /**
  * TanStack Query hooks for the billing surface. Components import from here, never call
@@ -11,20 +11,19 @@ import { type ActiveSubscription, type CheckoutSlug, billingApi } from "./billin
  */
 
 export const BILLING_KEYS = {
-  customerState: ["billing", "customer-state"] as const,
+  state: ["billing", "state"] as const,
 };
 
 /**
- * Reads the user's active subscription. Cached for 30 s; auto-retries the backfill case via
- * {@link billingApi.getActiveSubscription}, so the consumer just sees a success/failure state.
+ * Reads the billing state. Resolves to one of three shapes — {@code no-subscription},
+ * {@code subscription} or {@code unconfigured}. The unconfigured shape captures Polar misconfig
+ * (missing token, missing scopes) so the UI can render a clean banner instead of crash-looping.
  */
-export function useActiveSubscription() {
-  return useQuery<ActiveSubscription | null>({
-    queryKey: BILLING_KEYS.customerState,
-    queryFn: () => billingApi.getActiveSubscription(),
+export function useBillingState() {
+  return useQuery<BillingState>({
+    queryKey: BILLING_KEYS.state,
+    queryFn: () => billingApi.getBillingState(),
     staleTime: 30_000,
-    // Subscription changes are rare; an aggressive retry just doubles 500s when Polar is mis-
-    // configured. One automatic retry is plenty.
     retry: 1,
   });
 }
@@ -42,7 +41,7 @@ export function useOpenCustomerPortal() {
 /**
  * Mutation that starts a checkout. Caller passes the slug AND the workspace id Polar should
  * tag the subscription with — Polar copies referenceId onto the subscription metadata which
- * the backend webhook bridge reads as {@code organizationId}. Invalidates the customer-state
+ * the backend webhook bridge reads as {@code organizationId}. Invalidates the billing-state
  * query on success so a return to {@code /billing} shows the new subscription immediately.
  */
 export function useStartCheckout() {
@@ -51,7 +50,7 @@ export function useStartCheckout() {
     mutationFn: (input: { slug: CheckoutSlug; organizationId: string }) =>
       billingApi.startCheckout(input),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: BILLING_KEYS.customerState });
+      qc.invalidateQueries({ queryKey: BILLING_KEYS.state });
     },
   });
 }

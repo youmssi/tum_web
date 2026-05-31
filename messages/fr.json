@@ -141,6 +141,10 @@
       "title": "Vous êtes sur le plan gratuit",
       "description": "Passez à Pro pour débloquer les automatisations, les statuts personnalisés avec limites WIP et l’export complet des archives de projet.",
       "viewPlans": "Voir les plans"
+    },
+    "unconfigured": {
+      "title": "La facturation est temporairement indisponible",
+      "description": "Nous ne pouvons pas joindre le fournisseur de paiement avec les identifiants actuels. Un administrateur doit régénérer le jeton Polar avec tous les scopes (customers, subscriptions, customer_sessions, checkouts). Votre compte et vos données restent intacts."
     }
   },
   "dashboard": {
