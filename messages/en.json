@@ -659,7 +659,7 @@
       "intro": "Tûm is open-source under a fair-code license. Self-host for free forever. Choose cloud hosting only when you want zero-ops convenience.",
       "monthly": "Monthly",
       "annual": "Annual",
-      "annualSavings": "Save 17%",
+      "annualSavings": "Save 15%",
       "perWorkspace": "/mo per workspace",
       "custom": "Custom",
       "footer": "All plans include unlimited users.",
@@ -672,12 +672,12 @@
           "features": [
             "Unlimited projects & tasks",
             "Unlimited team members",
-            "Gantt timeline & Kanban board",
-            "Task dependencies",
-            "Activity feed & @mentions",
-            "REST API access",
-            "Docker Compose deploy",
-            "Community forum support"
+            "Kanban, list & Gantt views",
+            "Task dependencies & subtasks",
+            "Custom statuses with WIP limits",
+            "Comments, @mentions & notifications",
+            "CSV import & Excel archive export",
+            "Docker Compose self-host"
           ]
         },
         "pro": {
@@ -688,12 +688,12 @@
           "features": [
             "Everything in Community",
             "Tûm Cloud hosting (zero ops)",
-            "Advanced analytics & trends",
-            "Export PNG / PDF",
-            "30-day execution history",
+            "Per-project dashboards & trends",
+            "Real-time updates across the team",
+            "Multi-workspace switcher",
             "Email support",
-            "Automatic updates",
-            "99.9% uptime SLA"
+            "Automatic updates & backups",
+            "14-day free trial · cancel anytime"
           ]
         },
         "enterprise": {
@@ -702,13 +702,13 @@
           "cta": "Start Enterprise",
           "features": [
             "Everything in Pro",
-            "SSO (SAML / LDAP)",
-            "Full audit logs",
-            "Custom data residency",
-            "Dedicated onboarding",
-            "SLA with priority support",
+            "Org-wide audit log",
+            "SSO via OAuth (Google, GitHub)",
+            "Self-host option included",
+            "Dedicated onboarding session",
+            "Priority email support",
             "Custom contracts & invoicing",
-            "OEM / white-label option"
+            "SAML / data residency on request"
           ]
         }
       }

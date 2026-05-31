@@ -659,7 +659,7 @@
       "intro": "Tûm est open source sous une licence fair-code. Auto-hébergez gratuitement à vie. Choisissez l’hébergement cloud uniquement si vous voulez le zéro-gestion.",
       "monthly": "Mensuel",
       "annual": "Annuel",
-      "annualSavings": "Économisez 17 %",
+      "annualSavings": "Économisez 15 %",
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
       "footer": "Toutes les formules incluent des utilisateurs illimités.",
@@ -672,12 +672,12 @@
           "features": [
             "Projets et tâches illimités",
             "Membres d’équipe illimités",
-            "Chronologie Gantt et tableau Kanban",
-            "Dépendances entre tâches",
-            "Flux d’activité et @mentions",
-            "Accès à l’API REST",
-            "Déploiement Docker Compose",
-            "Support via le forum communauté"
+            "Vues Kanban, liste et Gantt",
+            "Dépendances et sous-tâches",
+            "Statuts personnalisés avec limites WIP",
+            "Commentaires, @mentions et notifications",
+            "Import CSV et export Excel d’archive",
+            "Auto-hébergement via Docker Compose"
           ]
         },
         "pro": {
@@ -688,12 +688,12 @@
           "features": [
             "Tout ce qui est inclus dans Communauté",
             "Hébergement Tûm Cloud (zéro ops)",
-            "Analytiques et tendances avancées",
-            "Export PNG / PDF",
-            "Historique d’exécution sur 30 jours",
+            "Tableaux de bord et tendances par projet",
+            "Mises à jour temps réel pour toute l’équipe",
+            "Sélecteur multi-organisations",
             "Support par e-mail",
-            "Mises à jour automatiques",
-            "SLA de disponibilité 99,9 %"
+            "Mises à jour et sauvegardes automatiques",
+            "Essai gratuit 14 jours · annulable à tout moment"
           ]
         },
         "enterprise": {
@@ -702,13 +702,13 @@
           "cta": "Démarrer Entreprise",
           "features": [
             "Tout ce qui est inclus dans Pro",
-            "SSO (SAML / LDAP)",
-            "Journaux d’audit complets",
-            "Résidence des données personnalisée",
-            "Onboarding dédié",
-            "SLA avec support prioritaire",
+            "Journal d’audit à l’échelle de l’organisation",
+            "SSO via OAuth (Google, GitHub)",
+            "Option d’auto-hébergement incluse",
+            "Session d’onboarding dédiée",
+            "Support prioritaire par e-mail",
             "Contrats et facturation personnalisés",
-            "Option OEM / marque blanche"
+            "SAML / résidence des données sur demande"
           ]
         }
       }
