@@ -34,7 +34,9 @@ export type CheckoutSlug = "pro" | "enterprise";
  * better message if Polar still doesn't recognise the customer.
  */
 async function ensureCustomer(): Promise<void> {
-  await webApi.post("api/billing/ensure-customer").catch(() => null);
+  // Leading slash is required — ky's URL resolution treats a no-slash path as relative to the
+  // current page, which on a localised route like /fr/billing produces /fr/api/billing/... (404).
+  await webApi.post("/api/billing/ensure-customer").catch(() => null);
 }
 
 export const billingApi = {
