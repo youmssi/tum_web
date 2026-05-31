@@ -85,11 +85,17 @@ export function SignupForm() {
     );
   }
 
+  // Resolving the translations into local consts before render sidesteps a React Compiler /
+  // next-intl interaction where the inline {t("subtitle")} could be passed downstream as the
+  // translator function reference itself rather than the resolved string.
+  const heading = t("title");
+  const subtitle = t("subtitle");
+
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl">{t("title")}</CardTitle>
-        <CardDescription>{t("subtitle")}</CardDescription>
+        <CardTitle className="text-xl">{heading}</CardTitle>
+        <CardDescription>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>

@@ -1,5 +1,6 @@
 export { AcceptInvitationView } from "./accept-invitation-view";
 export { CreateOrgForm } from "./create-org-form";
+export { DeleteOrgCard } from "./delete-org-card";
 export { OnboardingChoice } from "./onboarding-choice";
 export { InviteMemberDialog } from "./invite-member-dialog";
 export { MemberList } from "./member-list";

@@ -52,11 +52,16 @@ export const metadata: Metadata = {
     title: "Tûm — Project execution & workflow visibility",
     description: "Tûm brings tasks, timelines, and team visibility into one coherent workspace.",
   },
-  // Icons: app/icon.svg is auto-served by Next.js as the favicon; public/icon.png and
-  // public/favicon.ico stay as bare-URL fallbacks for the web manifest and old links.
+  // Icons: served straight from public/. We don't use Next's app/icon.* convention because the
+  // metadata block needs an explicit list anyway (favicon, apple-touch, manifest icon all in
+  // different formats), and pointing at the static file is one less indirection.
   icons: {
-    icon: [{ url: "/icon", type: "image/svg+xml" }],
-    shortcut: "/icon",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
+    shortcut: "/favicon.ico",
   },
   robots: {
     index: true,

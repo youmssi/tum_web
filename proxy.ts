@@ -59,7 +59,9 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Run on everything except Next internals, static files, and API routes.
-    "/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|opengraph-image).*)",
+    // Run on everything except Next internals, static files, and API routes. Without the
+    // icon.svg / icon.png / apple-icon.png entries, next-intl's locale detection treats those
+    // static asset URLs as page routes and rewrites them to /{locale}/icon.svg which 404s.
+    "/((?!api|_next/static|_next/image|favicon\\.ico|icon\\.svg|icon\\.png|apple-icon\\.png|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|opengraph-image).*)",
   ],
 };

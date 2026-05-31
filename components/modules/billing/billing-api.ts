@@ -34,24 +34,75 @@ export type CheckoutSlug = "pro" | "enterprise";
  * better message if Polar still doesn't recognise the customer.
  */
 async function ensureCustomer(): Promise<void> {
-  await webApi.post("api/billing/ensure-customer").catch(() => null);
+  // Leading slash is required — ky's URL resolution treats a no-slash path as relative to the
+  // current page, which on a localised route like /fr/billing produces /fr/api/billing/... (404).
+  await webApi.post("/api/billing/ensure-customer").catch(() => null);
+}
+
+/**
+ * Distinct outcomes the billing surface can land in. The hooks use this so the UI can render
+ * each state as a different empty / banner / data view instead of conflating them all into a
+ * generic error.
+ */
+export type BillingState =
+  | { kind: "no-subscription" }
+  | { kind: "subscription"; subscription: ActiveSubscription }
+  | { kind: "unconfigured"; message: string }; // Polar misconfigured (no token, missing scopes,
+// bad server). User can keep using the app; billing is the only thing that's degraded.
+
+/**
+ * Best-effort plan name derived from the subscription amount (in cents) when the Polar
+ * customer-state response doesn't include the product name inline. Maps the four prices we sell
+ * (Pro monthly $20, Pro annual $204, Enterprise monthly $99, Enterprise annual $1008) to their
+ * marketing labels. Falls back to a neutral string for anything off-list — e.g. a custom price
+ * negotiated through sales.
+ */
+function planNameFromAmount(amountCents: number | null): string {
+  switch (amountCents) {
+    case 2000:
+      return "Tûm Pro · monthly";
+    case 20400:
+      return "Tûm Pro · annual";
+    case 9900:
+      return "Tûm Enterprise · monthly";
+    case 100800:
+      return "Tûm Enterprise · annual";
+    default:
+      return "Tûm subscription";
+  }
+}
+
+function looksLikePolarMisconfigured(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("insufficient_scope") ||
+    lower.includes("status 403") ||
+    lower.includes("subscriptions list failed") ||
+    lower.includes("polar customer creation failed")
+  );
 }
 
 export const billingApi = {
   /**
-   * Returns the active subscription (the first one), or {@code null} when the customer has no
-   * active subscription yet. Performs a single backfill retry if the first call fails — this
-   * covers the legacy-user case without leaking that detail to the UI.
+   * Returns the user's billing state. Resolves rather than throws when Polar is partially
+   * configured — the caller renders a friendly "billing temporarily unavailable" surface
+   * instead of treating misconfig as a crash.
    */
-  async getActiveSubscription(): Promise<ActiveSubscription | null> {
+  async getBillingState(): Promise<BillingState> {
     const fetchState = async () => authClient.customer.state();
     let result = await fetchState();
     if (result.error) {
+      // Backfill the Polar customer once and retry. ensureCustomer returns a polar-scope-missing
+      // status quietly when the token lacks customers:read/write; the retry below will surface
+      // the same shape so we map it to "unconfigured".
       await ensureCustomer();
       result = await fetchState();
       if (result.error) {
         const message =
           (result.error as { message?: string }).message ?? "Could not load billing details.";
+        if (looksLikePolarMisconfigured(message)) {
+          return { kind: "unconfigured", message };
+        }
         throw new Error(message);
       }
     }
@@ -63,18 +114,25 @@ export const billingApi = {
       amount: number | null;
       currency: string | null;
       recurringInterval: string | null;
-      product: { name: string };
+      // The state endpoint returns the lean subscription shape on the current Polar SDK —
+      // `productId` is always present, `product.name` is not. Both fields are optional so we
+      // can use whichever the SDK chooses to send.
+      product?: { name?: string } | null;
+      productId?: string | null;
     }>;
     const first = subs[0];
-    if (!first) return null;
+    if (!first) return { kind: "no-subscription" };
     return {
-      id: first.id,
-      productName: first.product.name,
-      status: first.status,
-      currentPeriodEnd: first.currentPeriodEnd,
-      amount: first.amount,
-      currency: first.currency,
-      recurringInterval: first.recurringInterval,
+      kind: "subscription",
+      subscription: {
+        id: first.id,
+        productName: first.product?.name ?? planNameFromAmount(first.amount),
+        status: first.status,
+        currentPeriodEnd: first.currentPeriodEnd,
+        amount: first.amount,
+        currency: first.currency,
+        recurringInterval: first.recurringInterval,
+      },
     };
   },
 
