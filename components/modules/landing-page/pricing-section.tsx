@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
+import { useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 
 type PlanKey = "community" | "pro" | "enterprise";
@@ -58,6 +59,8 @@ export function PricingSection() {
   const plans = useTranslations("landing.pricing.plans");
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  const startCheckout = useStartCheckout();
   const [annual, setAnnual] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
 
@@ -71,27 +74,35 @@ export function PricingSection() {
    * in fall through to the signup flow with an upgrade intent the post-signup page can pick up.
    * Polar handles the entire payment surface (card, PayPal, subscription management).
    */
-  async function handlePaidPlanClick(plan: "pro" | "enterprise") {
+  function handlePaidPlanClick(plan: "pro" | "enterprise") {
     if (!session) {
       router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
       return;
     }
-    setPendingPlan(plan);
-    try {
-      // Lazy-backfill the Polar customer record for users who signed up before Polar was wired.
-      // Same idea as the billing page — failure here is non-fatal, the checkout below will
-      // surface a useful error if Polar still can't find the customer.
-      await fetch("/api/billing/ensure-customer", { method: "POST" }).catch(() => null);
-      await authClient.checkout({ slug: plan });
-      // The SDK navigates the browser away on success; this line is only reached if the call
-      // resolved without redirecting (typically because the Polar product isn't configured yet,
-      // in which case the catch will fire instead).
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Could not start checkout. Try again.";
-      toast.error(message);
-      setPendingPlan(null);
+    // Subscriptions are per-workspace. Without an active org the resulting subscription would
+    // be orphaned (no organizationId to forward to the backend), so route the user through the
+    // workspace picker first — they'll land back on the pricing tile after creating / picking
+    // one.
+    if (!activeOrg?.id) {
+      router.push(`${ROUTES.WORKSPACES}?intent=upgrade-${plan}`);
+      return;
     }
+    setPendingPlan(plan);
+    // Delegates to the billing service — the hook handles the Polar customer backfill so the
+    // existing-user case (signed up before Polar was wired) succeeds on the first click. Polar
+    // SDK navigates the browser away on success, so onSuccess only fires when checkout resolved
+    // without redirect (which is the same failure surface as onError in practice).
+    startCheckout.mutate(
+      { slug: plan, organizationId: activeOrg.id },
+      {
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Could not start checkout. Try again.",
+          );
+          setPendingPlan(null);
+        },
+      },
+    );
   }
 
   return (

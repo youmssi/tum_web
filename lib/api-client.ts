@@ -60,3 +60,25 @@ export const api = ky.create({
     ],
   },
 });
+
+/**
+ * Same-origin ky client for Tûm's own Next.js {@code /api/**} routes (billing backfill, internal
+ * forwarders, etc.). Different from {@link api} in three ways: no Spring prefix, no JWT
+ * injection (Better Auth uses session cookies that the browser sends automatically), and no
+ * 401 redirect dance — these routes either succeed or surface a parseApiError that the calling
+ * hook can show. Use this everywhere we'd otherwise reach for plain {@code fetch} from the UI.
+ */
+export const webApi = ky.create({
+  // Same-origin, no prefix.
+  retry: { limit: 1 },
+  timeout: 20_000,
+  hooks: {
+    afterResponse: [
+      async ({ response }) => {
+        if (!response.ok) {
+          throw await parseApiError(response.clone());
+        }
+      },
+    ],
+  },
+});

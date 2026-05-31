@@ -1,14 +1,13 @@
 "use client";
 
 import { CheckCircle2Icon, ExternalLinkIcon } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROUTES } from "@/lib/constants";
-import { authClient } from "@/lib/auth-client";
+import { useOpenCustomerPortal } from "./use-billing";
 
 interface UpgradeSuccessProps {
   checkoutId?: string;
@@ -18,21 +17,17 @@ interface UpgradeSuccessProps {
  * Landing page for the Polar success_url ({@code /upgrade/success?checkout_id=...}). Confirms the
  * subscription kicked off and offers a one-click jump into the Polar-hosted customer portal where
  * the user can manage payment methods, invoices and cancellation. We deliberately don't try to
- * fetch the order — the order_created webhook lands on the backend a moment later and is the
- * authoritative source.
+ * fetch the order here — the webhook handler is the authoritative source and updates the backend
+ * a moment later.
  */
 export function UpgradeSuccess({ checkoutId }: UpgradeSuccessProps) {
-  const [portalPending, setPortalPending] = useState(false);
+  const openPortal = useOpenCustomerPortal();
 
-  async function handleOpenPortal() {
-    setPortalPending(true);
-    try {
-      await authClient.customer.portal();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not open the billing portal.";
-      toast.error(message);
-      setPortalPending(false);
-    }
+  function handleOpenPortal() {
+    openPortal.mutate(undefined, {
+      onError: (err) =>
+        toast.error(err instanceof Error ? err.message : "Could not open the billing portal."),
+    });
   }
 
   return (
@@ -65,9 +60,9 @@ export function UpgradeSuccess({ checkoutId }: UpgradeSuccessProps) {
       </Card>
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Button onClick={handleOpenPortal} disabled={portalPending}>
-          {portalPending ? "Opening portal…" : "Manage billing"}
-          {!portalPending && <ExternalLinkIcon className="ml-2 size-4" />}
+        <Button onClick={handleOpenPortal} disabled={openPortal.isPending}>
+          {openPortal.isPending ? "Opening portal…" : "Manage billing"}
+          {!openPortal.isPending && <ExternalLinkIcon className="ml-2 size-4" />}
         </Button>
         <Button variant="outline" asChild>
           <Link href={ROUTES.DASHBOARD}>Back to dashboard</Link>

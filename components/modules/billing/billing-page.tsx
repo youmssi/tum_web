@@ -2,7 +2,6 @@
 
 import { ArrowUpRightIcon, CreditCardIcon, ExternalLinkIcon, Loader2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -10,114 +9,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
-import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
-
-interface ActiveSubscription {
-  id: string;
-  productName: string;
-  status: string;
-  currentPeriodEnd: string | null;
-  amount: number | null;
-  currency: string | null;
-  recurringInterval: string | null;
-}
+import { useActiveSubscription, useOpenCustomerPortal } from "./use-billing";
 
 /**
- * Customer billing page. Reads {@code authClient.customer.state()} to display the active plan and
- * routes through the hosted Polar customer portal for invoice download / payment-method changes /
- * cancellation. When the user has no active subscription we show the upgrade CTAs that link back
- * to the landing-page pricing section.
+ * Customer billing page. All data + side-effects live in {@code use-billing.ts}; the component
+ * itself is presentation-only. When the user has no active subscription we show a clear upgrade
+ * CTA pointing at the landing-page pricing section.
  */
 export function BillingPage() {
   const t = useTranslations("billing");
-  const [state, setState] = useState<{
-    loading: boolean;
-    subscription: ActiveSubscription | null;
-    error: string | null;
-  }>({ loading: true, subscription: null, error: null });
-  const [portalPending, setPortalPending] = useState(false);
+  const subscription = useActiveSubscription();
+  const openPortal = useOpenCustomerPortal();
 
-  useEffect(() => {
-    let cancelled = false;
-    /**
-     * Loads the Polar customer state with a one-shot backfill retry. Users who signed up before
-     * Polar was wired (no Polar customer record exists) would otherwise see a 500 here forever —
-     * the retry creates the missing customer via /api/billing/ensure-customer and re-queries.
-     */
-    async function loadState() {
-      const first = await authClient.customer.state();
-      if (!first.error) return first;
-      // Single backfill attempt — if this succeeds and there's still no record on the retry, we
-      // treat it as a real "no subscription" state below.
-      try {
-        await fetch("/api/billing/ensure-customer", { method: "POST" });
-      } catch {
-        // Network error on the backfill is non-fatal; the retry below will surface the original
-        // 500 if Polar is still confused.
-      }
-      return authClient.customer.state();
-    }
-    (async () => {
-      try {
-        const { data, error } = await loadState();
-        if (cancelled) return;
-        if (error) {
-          setState({ loading: false, subscription: null, error: error.message ?? t("loadFailed") });
-          return;
-        }
-        // authClient.customer.state() returns the full customer payload — pick the first active
-        // subscription. The shape is shared with the Polar SDK; we keep our internal projection
-        // minimal so future Polar SDK changes don't ripple through the UI.
-        const subs = ((data as unknown as { activeSubscriptions?: unknown[] })
-          ?.activeSubscriptions ?? []) as Array<{
-          id: string;
-          status: string;
-          currentPeriodEnd: string | null;
-          amount: number | null;
-          currency: string | null;
-          recurringInterval: string | null;
-          product: { name: string };
-        }>;
-        const first = subs[0] ?? null;
-        setState({
-          loading: false,
-          subscription: first
-            ? {
-                id: first.id,
-                productName: first.product.name,
-                status: first.status,
-                currentPeriodEnd: first.currentPeriodEnd,
-                amount: first.amount,
-                currency: first.currency,
-                recurringInterval: first.recurringInterval,
-              }
-            : null,
-          error: null,
-        });
-      } catch (err) {
-        if (cancelled) return;
-        const message = err instanceof Error ? err.message : t("loadFailed");
-        setState({ loading: false, subscription: null, error: message });
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [t]);
-
-  async function handleOpenPortal() {
-    setPortalPending(true);
-    try {
-      await authClient.customer.portal();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : t("portalFailed");
-      toast.error(message);
-      setPortalPending(false);
-    }
+  // mutate() doesn't throw — error handling happens in onError. Removes the redundant try/catch
+  // around mutateAsync that previously duplicated TanStack Query's own error pipeline.
+  function handleOpenPortal() {
+    openPortal.mutate(undefined, {
+      onError: (err) => toast.error(err instanceof Error ? err.message : t("portalFailed")),
+    });
   }
 
-  if (state.loading) {
+  if (subscription.isLoading) {
     return (
       <div className="mx-auto w-full max-w-2xl space-y-4">
         <Skeleton className="h-8 w-40" />
@@ -126,6 +39,8 @@ export function BillingPage() {
     );
   }
 
+  const errorMessage = subscription.error instanceof Error ? subscription.error.message : null;
+
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
       <div>
@@ -133,20 +48,20 @@ export function BillingPage() {
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      {state.error && (
+      {errorMessage && (
         <Card className="border-destructive/40">
-          <CardContent className="pt-6 text-sm text-destructive">{state.error}</CardContent>
+          <CardContent className="pt-6 text-sm text-destructive">{errorMessage}</CardContent>
         </Card>
       )}
 
-      {state.subscription ? (
+      {subscription.data ? (
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  {state.subscription.productName}
-                  <Badge variant="outline">{state.subscription.status}</Badge>
+                  {subscription.data.productName}
+                  <Badge variant="outline">{subscription.data.status}</Badge>
                 </CardTitle>
                 <CardDescription>{t("activePlan")}</CardDescription>
               </div>
@@ -155,30 +70,30 @@ export function BillingPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <dl className="grid grid-cols-2 gap-3 text-sm">
-              {state.subscription.amount !== null && state.subscription.currency && (
+              {subscription.data.amount !== null && subscription.data.currency && (
                 <div>
                   <dt className="text-muted-foreground">{t("amount")}</dt>
                   <dd className="font-medium">
-                    {(state.subscription.amount / 100).toLocaleString(undefined, {
+                    {(subscription.data.amount / 100).toLocaleString(undefined, {
                       style: "currency",
-                      currency: state.subscription.currency.toUpperCase(),
+                      currency: subscription.data.currency.toUpperCase(),
                     })}
-                    {state.subscription.recurringInterval &&
-                      ` / ${state.subscription.recurringInterval}`}
+                    {subscription.data.recurringInterval &&
+                      ` / ${subscription.data.recurringInterval}`}
                   </dd>
                 </div>
               )}
-              {state.subscription.currentPeriodEnd && (
+              {subscription.data.currentPeriodEnd && (
                 <div>
                   <dt className="text-muted-foreground">{t("renewsOn")}</dt>
                   <dd className="font-medium">
-                    {new Date(state.subscription.currentPeriodEnd).toLocaleDateString()}
+                    {new Date(subscription.data.currentPeriodEnd).toLocaleDateString()}
                   </dd>
                 </div>
               )}
             </dl>
-            <Button onClick={handleOpenPortal} disabled={portalPending}>
-              {portalPending ? (
+            <Button onClick={handleOpenPortal} disabled={openPortal.isPending}>
+              {openPortal.isPending ? (
                 <>
                   <Loader2Icon className="mr-2 size-4 animate-spin" />
                   {t("openingPortal")}
@@ -192,7 +107,7 @@ export function BillingPage() {
             </Button>
           </CardContent>
         </Card>
-      ) : (
+      ) : !errorMessage ? (
         <Card>
           <CardHeader>
             <CardTitle>{t("noPlan.title")}</CardTitle>
@@ -207,7 +122,7 @@ export function BillingPage() {
             </Button>
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 }

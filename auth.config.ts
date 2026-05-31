@@ -55,15 +55,35 @@ const polarPlugin = polarAccessToken
           ? [
               webhooks({
                 secret: polarWebhookSecret,
-                // For now we just log lifecycle events; pipe these into the backend audit log
-                // once we have a Pro entitlement table to update.
+                // Subscription lifecycle events are forwarded to the backend billing module
+                // (Spring's /internal/billing/subscription) which is the single source of
+                // truth for entitlement gating. Handlers are intentionally thin — all the
+                // projection + HTTP lives in lib/billing-bridge.ts so this file stays
+                // declarative.
+                onSubscriptionCreated: async (payload) => {
+                  const bridge = await import("@/lib/billing-bridge");
+                  await bridge.forwardSubscriptionEvent(payload.data);
+                },
                 onSubscriptionActive: async (payload) => {
-                  console.info("[polar] subscription active", payload.data.id);
+                  const bridge = await import("@/lib/billing-bridge");
+                  await bridge.forwardSubscriptionEvent(payload.data);
+                },
+                onSubscriptionUpdated: async (payload) => {
+                  const bridge = await import("@/lib/billing-bridge");
+                  await bridge.forwardSubscriptionEvent(payload.data);
                 },
                 onSubscriptionCanceled: async (payload) => {
-                  console.info("[polar] subscription canceled", payload.data.id);
+                  const bridge = await import("@/lib/billing-bridge");
+                  await bridge.forwardSubscriptionEvent(payload.data);
+                },
+                onSubscriptionRevoked: async (payload) => {
+                  const bridge = await import("@/lib/billing-bridge");
+                  await bridge.forwardSubscriptionEvent(payload.data);
                 },
                 onOrderPaid: async (payload) => {
+                  // Order events don't update entitlement directly — the matching
+                  // subscription.active event handles that — but logging here lets us correlate
+                  // payments with subscriptions when a refund or dispute lands.
                   console.info("[polar] order paid", payload.data.id);
                 },
               }),
