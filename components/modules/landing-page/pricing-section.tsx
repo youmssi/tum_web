@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
+import { useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 
 type PlanKey = "community" | "pro" | "enterprise";
@@ -58,6 +59,8 @@ export function PricingSection() {
   const plans = useTranslations("landing.pricing.plans");
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  const startCheckout = useStartCheckout();
   const [annual, setAnnual] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
 
@@ -76,16 +79,22 @@ export function PricingSection() {
       router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
       return;
     }
+    // Subscriptions are per-workspace. Without an active org the resulting subscription would
+    // be orphaned (no organizationId to forward to the backend), so route the user through the
+    // workspace picker first — they'll land back on the pricing tile after creating / picking
+    // one.
+    if (!activeOrg?.id) {
+      router.push(`${ROUTES.WORKSPACES}?intent=upgrade-${plan}`);
+      return;
+    }
     setPendingPlan(plan);
     try {
-      // Lazy-backfill the Polar customer record for users who signed up before Polar was wired.
-      // Same idea as the billing page — failure here is non-fatal, the checkout below will
-      // surface a useful error if Polar still can't find the customer.
-      await fetch("/api/billing/ensure-customer", { method: "POST" }).catch(() => null);
-      await authClient.checkout({ slug: plan });
-      // The SDK navigates the browser away on success; this line is only reached if the call
-      // resolved without redirecting (typically because the Polar product isn't configured yet,
-      // in which case the catch will fire instead).
+      // Delegates to the billing service — the hook handles the Polar customer backfill so the
+      // existing-user case (signed up before Polar was wired) succeeds on the first click.
+      await startCheckout.mutateAsync({ slug: plan, organizationId: activeOrg.id });
+      // The Polar SDK navigates the browser away on success; we only reach the next line if it
+      // resolved without redirecting (e.g. product slug isn't configured), and in that case
+      // the catch fires.
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not start checkout. Try again.";
