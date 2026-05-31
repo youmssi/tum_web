@@ -119,12 +119,29 @@
     "audit": "Journal d’audit",
     "settings": "Paramètres",
     "profile": "Profil",
+    "billing": "Facturation",
     "signOut": "Se déconnecter",
     "switchOrganization": "Changer d’organisation",
     "newProject": "Nouveau projet",
     "skipToContent": "Aller au contenu",
     "openSidebar": "Ouvrir le menu",
     "closeSidebar": "Fermer le menu"
+  },
+  "billing": {
+    "title": "Facturation",
+    "subtitle": "Gérez votre abonnement, votre moyen de paiement et vos factures.",
+    "activePlan": "Plan actif",
+    "amount": "Montant",
+    "renewsOn": "Prochain renouvellement",
+    "openPortal": "Ouvrir le portail de facturation",
+    "openingPortal": "Ouverture du portail…",
+    "loadFailed": "Impossible de charger vos informations de facturation.",
+    "portalFailed": "Impossible d’ouvrir le portail de facturation.",
+    "noPlan": {
+      "title": "Vous êtes sur le plan gratuit",
+      "description": "Passez à Pro pour débloquer les automatisations, les statuts personnalisés avec limites WIP et l’export complet des archives de projet.",
+      "viewPlans": "Voir les plans"
+    }
   },
   "dashboard": {
     "title": "Mon travail",
@@ -568,13 +585,13 @@
       "tagline": "Exécution de projets & visibilité des équipes",
       "eyebrow": "Open source · Pour toutes les équipes · Tous profils",
       "heading": "Moins planifier. Plus livrer.",
-      "headingLine1": "Exécution de projet",
-      "headingLine2": "conçue pour aider les équipes à",
+      "headingLine1": "Pilotage de projets",
+      "headingLine2": "pour les équipes qui",
       "animatedWords": {
-        "execute": "exécuter",
-        "deliver": "livrer",
-        "track": "suivre",
-        "succeed": "réussir"
+        "execute": "exécutent",
+        "deliver": "livrent",
+        "track": "suivent",
+        "succeed": "réussissent"
       },
       "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Plus d’outils éparpillés — juste une exécution claire. Pour toute équipe, tout département, tout projet.",
       "ctaStartFree": "Démarrer gratuitement",
@@ -682,7 +699,7 @@
         "enterprise": {
           "name": "Entreprise",
           "description": "Pour les grandes équipes ou les secteurs régulés",
-          "cta": "Contacter le service commercial",
+          "cta": "Démarrer Entreprise",
           "features": [
             "Tout ce qui est inclus dans Pro",
             "SSO (SAML / LDAP)",

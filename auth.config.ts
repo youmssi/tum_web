@@ -19,6 +19,7 @@ export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // configured. server defaults to "sandbox"; switch to "production" via POLAR_SERVER on prod.
 const polarAccessToken = process.env.POLAR_ACCESS_TOKEN ?? "";
 const polarProProductId = process.env.POLAR_PRO_PRODUCT_ID ?? "";
+const polarEnterpriseProductId = process.env.POLAR_ENTERPRISE_PRODUCT_ID ?? "";
 const polarWebhookSecret = process.env.POLAR_WEBHOOK_SECRET ?? "";
 const polarServer = (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "production";
 
@@ -30,11 +31,18 @@ const polarPlugin = polarAccessToken
       // mapping table.
       createCustomerOnSignUp: true,
       use: [
-        // Pro plan checkout. Accessible from the client via authClient.checkout({ slug: "pro" }).
-        // On success the user lands on /upgrade/success?checkout_id=... where we show the new
-        // subscription state.
+        // Subscription checkouts. Each plan is exposed via a friendly slug that the UI calls with
+        // authClient.checkout({ slug: "pro" | "enterprise" }). Empty products list = the plan
+        // hasn't been provisioned in Polar yet — the SDK errors cleanly and the UI surfaces it.
+        // On success the user lands on /upgrade/success?checkout_id=... where we confirm and
+        // expose the customer portal.
         checkout({
-          products: polarProProductId ? [{ productId: polarProProductId, slug: "pro" }] : [],
+          products: [
+            ...(polarProProductId ? [{ productId: polarProProductId, slug: "pro" }] : []),
+            ...(polarEnterpriseProductId
+              ? [{ productId: polarEnterpriseProductId, slug: "enterprise" }]
+              : []),
+          ],
           successUrl: "/upgrade/success?checkout_id={CHECKOUT_ID}",
           authenticatedUsersOnly: true,
         }),

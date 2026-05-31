@@ -20,6 +20,7 @@ export const serverEnv = {
   polar: {
     accessToken: process.env.POLAR_ACCESS_TOKEN ?? "",
     proProductId: process.env.POLAR_PRO_PRODUCT_ID ?? "",
+    enterpriseProductId: process.env.POLAR_ENTERPRISE_PRODUCT_ID ?? "",
     webhookSecret: process.env.POLAR_WEBHOOK_SECRET ?? "",
     server: (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "production",
   },

@@ -41,8 +41,8 @@ const PLAN_CONFIG: {
   },
   {
     key: "enterprise",
-    monthly: null,
-    annual: null,
+    monthly: 99,
+    annual: 84,
     href: "mailto:mrvin100mail@gmail.com",
     external: true,
     popular: false,
@@ -56,34 +56,34 @@ export function PricingSection() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [annual, setAnnual] = useState(true);
-  const [proPending, setProPending] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>
     Array.from({ length: 8 }, (_, i) => plans(`${key}.features.${i}`));
 
   /**
-   * Pro CTA dispatch. Authenticated visitors go straight to a Polar checkout via the Better Auth
-   * adapter; visitors who aren't signed in are sent to the signup flow with an upgrade intent
-   * the post-signup page can pick up. Polar handles the entire payment surface (card, PayPal,
-   * subscription management).
+   * Plan CTA dispatch. Authenticated visitors are routed straight to a Polar checkout via the
+   * Better Auth adapter using the slug configured in auth.config.ts; visitors who aren't signed
+   * in fall through to the signup flow with an upgrade intent the post-signup page can pick up.
+   * Polar handles the entire payment surface (card, PayPal, subscription management).
    */
-  async function handleProClick() {
+  async function handlePaidPlanClick(plan: "pro" | "enterprise") {
     if (!session) {
-      router.push(`${ROUTES.SIGNUP}?intent=upgrade-pro`);
+      router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
       return;
     }
-    setProPending(true);
+    setPendingPlan(plan);
     try {
-      // The "pro" slug must match the slug configured in the checkout() plugin in auth.config.ts.
-      await authClient.checkout({ slug: "pro" });
-      // On success the SDK navigates the browser away; this line is only reached if the call
-      // resolved without redirecting (shouldn't happen in normal usage).
+      await authClient.checkout({ slug: plan });
+      // The SDK navigates the browser away on success; this line is only reached if the call
+      // resolved without redirecting (typically because the Polar product isn't configured yet,
+      // in which case the catch will fire instead).
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not start checkout. Try again.";
       toast.error(message);
-      setProPending(false);
+      setPendingPlan(null);
     }
   }
 
@@ -130,7 +130,8 @@ export function PricingSection() {
 
         <div className="grid md:grid-cols-3 gap-4">
           {PLAN_CONFIG.map((plan, idx) => {
-            const isPro = plan.key === "pro";
+            const isPaid = plan.key === "pro" || plan.key === "enterprise";
+            const pending = pendingPlan === plan.key;
             return (
               <div
                 key={plan.key}
@@ -178,24 +179,30 @@ export function PricingSection() {
                   ))}
                 </ul>
 
-                {isPro ? (
-                  <Button
-                    variant="default"
-                    className="w-full rounded-full group"
-                    onClick={handleProClick}
-                    disabled={proPending}
-                  >
-                    {proPending ? "Opening checkout…" : plans("pro.cta")}
-                    {!proPending && (
-                      <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                {isPaid ? (
+                  <div className="space-y-2">
+                    <Button
+                      variant={plan.popular ? "default" : "outline"}
+                      className="w-full rounded-full group"
+                      onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
+                      disabled={pending}
+                    >
+                      {pending ? "Opening checkout…" : plans(`${plan.key}.cta`)}
+                      {!pending && (
+                        <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                      )}
+                    </Button>
+                    {plan.key === "enterprise" && (
+                      <p className="text-center text-xs text-muted-foreground">
+                        Need a custom plan?{" "}
+                        <a className="underline hover:text-foreground" href={plan.href}>
+                          Talk to sales
+                        </a>
+                      </p>
                     )}
-                  </Button>
+                  </div>
                 ) : (
-                  <Button
-                    variant={plan.popular ? "default" : "outline"}
-                    className="w-full rounded-full group"
-                    asChild
-                  >
+                  <Button variant="outline" className="w-full rounded-full group" asChild>
                     <Link
                       href={plan.href}
                       target={plan.external ? "_blank" : undefined}
