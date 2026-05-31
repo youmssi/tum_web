@@ -23,13 +23,11 @@ interface UpgradeSuccessProps {
 export function UpgradeSuccess({ checkoutId }: UpgradeSuccessProps) {
   const openPortal = useOpenCustomerPortal();
 
-  async function handleOpenPortal() {
-    try {
-      await openPortal.mutateAsync();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Could not open the billing portal.";
-      toast.error(message);
-    }
+  function handleOpenPortal() {
+    openPortal.mutate(undefined, {
+      onError: (err) =>
+        toast.error(err instanceof Error ? err.message : "Could not open the billing portal."),
+    });
   }
 
   return (

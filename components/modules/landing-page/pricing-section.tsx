@@ -74,7 +74,7 @@ export function PricingSection() {
    * in fall through to the signup flow with an upgrade intent the post-signup page can pick up.
    * Polar handles the entire payment surface (card, PayPal, subscription management).
    */
-  async function handlePaidPlanClick(plan: "pro" | "enterprise") {
+  function handlePaidPlanClick(plan: "pro" | "enterprise") {
     if (!session) {
       router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
       return;
@@ -88,19 +88,21 @@ export function PricingSection() {
       return;
     }
     setPendingPlan(plan);
-    try {
-      // Delegates to the billing service — the hook handles the Polar customer backfill so the
-      // existing-user case (signed up before Polar was wired) succeeds on the first click.
-      await startCheckout.mutateAsync({ slug: plan, organizationId: activeOrg.id });
-      // The Polar SDK navigates the browser away on success; we only reach the next line if it
-      // resolved without redirecting (e.g. product slug isn't configured), and in that case
-      // the catch fires.
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Could not start checkout. Try again.";
-      toast.error(message);
-      setPendingPlan(null);
-    }
+    // Delegates to the billing service — the hook handles the Polar customer backfill so the
+    // existing-user case (signed up before Polar was wired) succeeds on the first click. Polar
+    // SDK navigates the browser away on success, so onSuccess only fires when checkout resolved
+    // without redirect (which is the same failure surface as onError in practice).
+    startCheckout.mutate(
+      { slug: plan, organizationId: activeOrg.id },
+      {
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Could not start checkout. Try again.",
+          );
+          setPendingPlan(null);
+        },
+      },
+    );
   }
 
   return (

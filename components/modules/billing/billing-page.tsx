@@ -22,13 +22,12 @@ export function BillingPage() {
   const subscription = useActiveSubscription();
   const openPortal = useOpenCustomerPortal();
 
-  async function handleOpenPortal() {
-    try {
-      await openPortal.mutateAsync();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : t("portalFailed");
-      toast.error(message);
-    }
+  // mutate() doesn't throw — error handling happens in onError. Removes the redundant try/catch
+  // around mutateAsync that previously duplicated TanStack Query's own error pipeline.
+  function handleOpenPortal() {
+    openPortal.mutate(undefined, {
+      onError: (err) => toast.error(err instanceof Error ? err.message : t("portalFailed")),
+    });
   }
 
   if (subscription.isLoading) {

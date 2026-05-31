@@ -1,3 +1,4 @@
+import { webApi } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 
 /**
@@ -28,14 +29,12 @@ export type CheckoutSlug = "pro" | "enterprise";
  * for the /billing flow — users who signed up before {@code POLAR_ACCESS_TOKEN} was wired have
  * no Polar customer, so {@code authClient.customer.state()} 500s on first call. This route is
  * a no-op when the customer already exists, so it's cheap to call pre-emptively.
+ *
+ * <p>Network failures are swallowed — the caller will retry the actual operation and surface a
+ * better message if Polar still doesn't recognise the customer.
  */
 async function ensureCustomer(): Promise<void> {
-  try {
-    await fetch("/api/billing/ensure-customer", { method: "POST" });
-  } catch {
-    // Network errors here are non-fatal — the caller will retry the actual operation and surface
-    // a better message if it still fails.
-  }
+  await webApi.post("api/billing/ensure-customer").catch(() => null);
 }
 
 export const billingApi = {
