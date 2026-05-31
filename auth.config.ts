@@ -1,5 +1,7 @@
 import { betterAuth } from "better-auth";
 import { jwt, organization } from "better-auth/plugins";
+import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
+import { Polar } from "@polar-sh/sdk";
 import { Pool } from "pg";
 
 // This file is the single source of truth for the Better Auth config.
@@ -9,6 +11,67 @@ import { Pool } from "pg";
 // Shared pool so definePayload can query member roles without a second connection.
 // Also re-exported so server routes (e.g. the internal directory endpoint) reuse the same pool.
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// ---- Polar plugin assembly --------------------------------------------------------------------
+// We only register the Polar plugin when an access token is present. Local dev installs (and the
+// initial deploy before the env vars are set) keep working — the checkout / portal calls just
+// fail gracefully until POLAR_ACCESS_TOKEN, POLAR_PRO_PRODUCT_ID and POLAR_WEBHOOK_SECRET are
+// configured. server defaults to "sandbox"; switch to "production" via POLAR_SERVER on prod.
+const polarAccessToken = process.env.POLAR_ACCESS_TOKEN ?? "";
+const polarProProductId = process.env.POLAR_PRO_PRODUCT_ID ?? "";
+const polarEnterpriseProductId = process.env.POLAR_ENTERPRISE_PRODUCT_ID ?? "";
+const polarWebhookSecret = process.env.POLAR_WEBHOOK_SECRET ?? "";
+const polarServer = (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "production";
+
+const polarPlugin = polarAccessToken
+  ? polar({
+      client: new Polar({ accessToken: polarAccessToken, server: polarServer }),
+      // Auto-create the Polar Customer when a new Better Auth user signs up. externalId is set
+      // to user.id so the backend can ingest usage / look up subscriptions without a separate
+      // mapping table.
+      createCustomerOnSignUp: true,
+      use: [
+        // Subscription checkouts. Each plan is exposed via a friendly slug that the UI calls with
+        // authClient.checkout({ slug: "pro" | "enterprise" }). Empty products list = the plan
+        // hasn't been provisioned in Polar yet — the SDK errors cleanly and the UI surfaces it.
+        // On success the user lands on /upgrade/success?checkout_id=... where we confirm and
+        // expose the customer portal.
+        checkout({
+          products: [
+            ...(polarProProductId ? [{ productId: polarProProductId, slug: "pro" }] : []),
+            ...(polarEnterpriseProductId
+              ? [{ productId: polarEnterpriseProductId, slug: "enterprise" }]
+              : []),
+          ],
+          successUrl: "/upgrade/success?checkout_id={CHECKOUT_ID}",
+          authenticatedUsersOnly: true,
+        }),
+        // Customer portal — authClient.customer.portal() redirects to Polar's hosted page where
+        // the customer can manage subscriptions / payment methods / view invoices.
+        portal(),
+        // Webhook receiver wired at /api/auth/polar/webhooks. We only attach handlers when the
+        // secret is present; without it the receiver would fail signature verification anyway.
+        ...(polarWebhookSecret
+          ? [
+              webhooks({
+                secret: polarWebhookSecret,
+                // For now we just log lifecycle events; pipe these into the backend audit log
+                // once we have a Pro entitlement table to update.
+                onSubscriptionActive: async (payload) => {
+                  console.info("[polar] subscription active", payload.data.id);
+                },
+                onSubscriptionCanceled: async (payload) => {
+                  console.info("[polar] subscription canceled", payload.data.id);
+                },
+                onOrderPaid: async (payload) => {
+                  console.info("[polar] order paid", payload.data.id);
+                },
+              }),
+            ]
+          : []),
+      ],
+    })
+  : null;
 
 export const auth = betterAuth({
   database: pool,
@@ -95,5 +158,8 @@ export const auth = betterAuth({
       },
       jwks: { keyPairConfig: { alg: "RS256" } },
     }),
+    // Polar plugin appended only when the access token is configured. See the assembly block at
+    // the top of this file for the conditional logic.
+    ...(polarPlugin ? [polarPlugin] : []),
   ],
 });

@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
+  CreditCardIcon,
   FolderKanbanIcon,
   LayoutDashboardIcon,
   LogOutIcon,
@@ -108,6 +109,18 @@ export function AppSidebar() {
               <Link href={ROUTES.PROFILE}>
                 <UserIcon />
                 <span>{t("profile")}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(ROUTES.BILLING)}
+              tooltip={t("billing")}
+            >
+              <Link href={ROUTES.BILLING}>
+                <CreditCardIcon />
+                <span>{t("billing")}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
