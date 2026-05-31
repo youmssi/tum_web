@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
-import { useStartCheckout } from "@/components/modules/billing";
+import { useBillingState, useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 
 type PlanKey = "community" | "pro" | "enterprise";
@@ -61,8 +61,16 @@ export function PricingSection() {
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();
   const startCheckout = useStartCheckout();
+  const billing = useBillingState();
   const [annual, setAnnual] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
+
+  // Role check: only the org owner can take on a subscription. Members + admins clicking the CTA
+  // would tie billing to a workspace they can't manage. The button stays visible but is disabled
+  // with an explainer for non-owners; only fully-anonymous visitors see no role gate.
+  const currentRole = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? null;
+  const isOwner = currentRole === "owner";
+  const hasActiveSubscription = billing.data?.kind === "subscription";
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>
@@ -85,6 +93,13 @@ export function PricingSection() {
     // one.
     if (!activeOrg?.id) {
       router.push(`${ROUTES.WORKSPACES}?intent=upgrade-${plan}`);
+      return;
+    }
+    // Already-subscribed dedupe: if the workspace has an active subscription, send the user
+    // straight to /billing where they can manage / change it. Stops a second click from
+    // creating a parallel Polar subscription.
+    if (hasActiveSubscription) {
+      router.push(ROUTES.BILLING);
       return;
     }
     setPendingPlan(plan);
@@ -199,17 +214,40 @@ export function PricingSection() {
 
                 {isPaid ? (
                   <div className="space-y-2">
-                    <Button
-                      variant={plan.popular ? "default" : "outline"}
-                      className="w-full rounded-full group"
-                      onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
-                      disabled={pending}
-                    >
-                      {pending ? "Opening checkout…" : plans(`${plan.key}.cta`)}
-                      {!pending && (
+                    {/* Three states for the paid CTA. Signed-in non-owners get a disabled button
+                        with a "ask your owner" hint; signed-in owners who already pay see "Manage
+                        billing" pointing at /billing; everyone else gets the upgrade button. */}
+                    {session && activeOrg?.id && !isOwner ? (
+                      <>
+                        <Button variant="outline" className="w-full rounded-full" disabled>
+                          {plans(`${plan.key}.cta`)}
+                        </Button>
+                        <p className="text-center text-xs text-muted-foreground">
+                          Only the workspace owner can upgrade. Ask them to start the checkout.
+                        </p>
+                      </>
+                    ) : hasActiveSubscription ? (
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-full group"
+                        onClick={() => router.push(ROUTES.BILLING)}
+                      >
+                        Manage billing
                         <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-                      )}
-                    </Button>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant={plan.popular ? "default" : "outline"}
+                        className="w-full rounded-full group"
+                        onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
+                        disabled={pending}
+                      >
+                        {pending ? "Opening checkout…" : plans(`${plan.key}.cta`)}
+                        {!pending && (
+                          <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                        )}
+                      </Button>
+                    )}
                     {plan.key === "enterprise" && (
                       <p className="text-center text-xs text-muted-foreground">
                         Need a custom plan?{" "}

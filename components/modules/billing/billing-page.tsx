@@ -6,6 +6,7 @@ import {
   CreditCardIcon,
   ExternalLinkIcon,
   Loader2Icon,
+  RefreshCwIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -45,9 +46,25 @@ export function BillingPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        {/* Manual refresh — useful when a payment has just completed and the Polar webhook is
+            taking a few seconds to land. Saves the user from refreshing the whole page. */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => billing.refetch()}
+          disabled={billing.isFetching}
+          title="Refresh billing state"
+        >
+          <RefreshCwIcon
+            className={`size-4 ${billing.isFetching ? "animate-spin" : ""}`}
+            aria-hidden
+          />
+        </Button>
       </div>
 
       {billing.data?.kind === "subscription" && (

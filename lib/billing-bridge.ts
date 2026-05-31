@@ -70,13 +70,19 @@ function normaliseStatus(raw: string): SubscriptionWebhookRequest["status"] | nu
 
 function planFromPayload(sub: PolarSubscriptionLike): "PRO" | "ENTERPRISE" | null {
   // Prefer the product slug we configured in the Polar dashboard ("pro" / "enterprise").
-  // Fall back to product metadata.plan if the slug isn't set.
+  // Fall back to product metadata.plan if the slug isn't set, and finally to a price-based
+  // heuristic for subscriptions created directly in the Polar dashboard (no slug, no metadata).
   const slug = sub.product?.slug ?? null;
   if (slug === "pro") return "PRO";
   if (slug === "enterprise") return "ENTERPRISE";
   const meta = sub.product?.metadata?.plan;
   if (meta === "pro") return "PRO";
   if (meta === "enterprise") return "ENTERPRISE";
+  // Price-based fallback — same mapping as planNameFromAmount in billing-api.ts. Only triggers
+  // when slug + metadata are both absent (manual Polar dashboard subscription, legacy data).
+  const amount = (sub as { amount?: number | null }).amount ?? null;
+  if (amount === 2000 || amount === 20400) return "PRO";
+  if (amount === 9900 || amount === 100800) return "ENTERPRISE";
   return null;
 }
 
@@ -95,7 +101,23 @@ function projectPayload(sub: PolarSubscriptionLike): SubscriptionWebhookRequest 
   const plan = planFromPayload(sub);
   const status = normaliseStatus(sub.status);
   const currentPeriodEnd = asInstant(sub.currentPeriodEnd);
+  // Detailed log when we drop an event — telling the operator exactly which field was missing
+  // beats a single "skipped" line they have to correlate with the Polar dashboard.
   if (!organizationId || !userId || !plan || !status || !currentPeriodEnd) {
+    console.warn(
+      "[billing-bridge] skipping subscription event",
+      sub.id,
+      "missing:",
+      [
+        !organizationId && "organizationId (metadata.referenceId)",
+        !userId && "userId (customer.externalId)",
+        !plan && "plan (product.slug / metadata.plan / known price)",
+        !status && "status",
+        !currentPeriodEnd && "currentPeriodEnd",
+      ]
+        .filter(Boolean)
+        .join(", "),
+    );
     return null;
   }
   return {
@@ -117,10 +139,8 @@ function projectPayload(sub: PolarSubscriptionLike): SubscriptionWebhookRequest 
  */
 export async function forwardSubscriptionEvent(sub: PolarSubscriptionLike): Promise<boolean> {
   const projected = projectPayload(sub);
-  if (!projected) {
-    console.warn("[billing-bridge] skipping subscription event with missing fields", sub.id);
-    return false;
-  }
+  // projectPayload already logs which fields were missing, so we don't double-warn here.
+  if (!projected) return false;
   try {
     const res = await fetch(`${serverEnv.internalApiUrl}/internal/billing/subscription`, {
       method: "POST",

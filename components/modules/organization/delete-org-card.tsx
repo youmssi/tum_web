@@ -1,7 +1,7 @@
 "use client";
 
-import { Trash2Icon } from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
+import { AlertTriangleIcon, Trash2Icon } from "lucide-react";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useBillingState } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -38,9 +39,11 @@ export function DeleteOrgCard() {
   const router = useRouter();
   const { data: activeOrg } = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
+  const billing = useBillingState();
   const currentRole =
     activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? "member";
   const isOwner = currentRole === "owner";
+  const hasActiveSubscription = billing.data?.kind === "subscription";
 
   const organizationId = activeOrg?.id ?? "";
   const organizationName = activeOrg?.name ?? "";
@@ -83,7 +86,22 @@ export function DeleteOrgCard() {
           action cannot be undone.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {hasActiveSubscription && (
+          <div className="flex items-start gap-3 rounded-md border border-amber-500/40 bg-amber-50/40 p-3 text-sm dark:bg-amber-950/20">
+            <AlertTriangleIcon className="size-4 shrink-0 text-amber-600" aria-hidden />
+            <div className="space-y-1">
+              <p className="font-medium">This workspace has an active subscription.</p>
+              <p className="text-muted-foreground">
+                Cancel it first in the billing portal so Polar stops billing your card. Deleting the
+                workspace doesn&rsquo;t cancel the subscription automatically.
+              </p>
+              <Button variant="link" className="h-auto p-0 text-sm" asChild>
+                <Link href={ROUTES.BILLING}>Open billing portal →</Link>
+              </Button>
+            </div>
+          </div>
+        )}
         <AlertDialog
           onOpenChange={(open) => {
             if (!open) setConfirmation("");

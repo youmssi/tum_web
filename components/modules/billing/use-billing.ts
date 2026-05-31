@@ -23,7 +23,11 @@ export function useBillingState() {
   return useQuery<BillingState>({
     queryKey: BILLING_KEYS.state,
     queryFn: () => billingApi.getBillingState(),
-    staleTime: 30_000,
+    // Short stale window — Polar webhooks land within a few seconds of checkout, so a user
+    // returning to /billing right after upgrade needs to see the new state quickly. We also
+    // refetch on focus so switching back to the tab picks up the latest.
+    staleTime: 5_000,
+    refetchOnWindowFocus: true,
     retry: 1,
   });
 }
