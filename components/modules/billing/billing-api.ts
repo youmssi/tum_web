@@ -50,6 +50,28 @@ export type BillingState =
   | { kind: "unconfigured"; message: string }; // Polar misconfigured (no token, missing scopes,
 // bad server). User can keep using the app; billing is the only thing that's degraded.
 
+/**
+ * Best-effort plan name derived from the subscription amount (in cents) when the Polar
+ * customer-state response doesn't include the product name inline. Maps the four prices we sell
+ * (Pro monthly $20, Pro annual $204, Enterprise monthly $99, Enterprise annual $1008) to their
+ * marketing labels. Falls back to a neutral string for anything off-list — e.g. a custom price
+ * negotiated through sales.
+ */
+function planNameFromAmount(amountCents: number | null): string {
+  switch (amountCents) {
+    case 2000:
+      return "Tûm Pro · monthly";
+    case 20400:
+      return "Tûm Pro · annual";
+    case 9900:
+      return "Tûm Enterprise · monthly";
+    case 100800:
+      return "Tûm Enterprise · annual";
+    default:
+      return "Tûm subscription";
+  }
+}
+
 function looksLikePolarMisconfigured(message: string): boolean {
   const lower = message.toLowerCase();
   return (
@@ -92,7 +114,11 @@ export const billingApi = {
       amount: number | null;
       currency: string | null;
       recurringInterval: string | null;
-      product: { name: string };
+      // The state endpoint returns the lean subscription shape on the current Polar SDK —
+      // `productId` is always present, `product.name` is not. Both fields are optional so we
+      // can use whichever the SDK chooses to send.
+      product?: { name?: string } | null;
+      productId?: string | null;
     }>;
     const first = subs[0];
     if (!first) return { kind: "no-subscription" };
@@ -100,7 +126,7 @@ export const billingApi = {
       kind: "subscription",
       subscription: {
         id: first.id,
-        productName: first.product.name,
+        productName: first.product?.name ?? planNameFromAmount(first.amount),
         status: first.status,
         currentPeriodEnd: first.currentPeriodEnd,
         amount: first.amount,
