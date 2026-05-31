@@ -26,10 +26,15 @@ const polarServer = (process.env.POLAR_SERVER ?? "sandbox") as "sandbox" | "prod
 const polarPlugin = polarAccessToken
   ? polar({
       client: new Polar({ accessToken: polarAccessToken, server: polarServer }),
-      // Auto-create the Polar Customer when a new Better Auth user signs up. externalId is set
-      // to user.id so the backend can ingest usage / look up subscriptions without a separate
-      // mapping table.
-      createCustomerOnSignUp: true,
+      // Polar customer creation is intentionally NOT tied to signup. Doing so makes Polar a
+      // hard dependency of every user creation — a token-scope misconfiguration or a Polar
+      // outage takes down signup too, which is unacceptable for a stateful auth flow.
+      //
+      // Customers are instead lazy-created by /api/billing/ensure-customer, which the billing
+      // page and the landing checkout call as needed. That endpoint is idempotent and runs
+      // outside the signup transaction so a Polar failure only affects the billing UX, never
+      // account creation.
+      createCustomerOnSignUp: false,
       use: [
         // Subscription checkouts. Each plan is exposed via a friendly slug that the UI calls with
         // authClient.checkout({ slug: "pro" | "enterprise" }). Empty products list = the plan
