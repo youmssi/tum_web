@@ -40,9 +40,27 @@ export function BillingPage() {
 
   useEffect(() => {
     let cancelled = false;
+    /**
+     * Loads the Polar customer state with a one-shot backfill retry. Users who signed up before
+     * Polar was wired (no Polar customer record exists) would otherwise see a 500 here forever —
+     * the retry creates the missing customer via /api/billing/ensure-customer and re-queries.
+     */
+    async function loadState() {
+      const first = await authClient.customer.state();
+      if (!first.error) return first;
+      // Single backfill attempt — if this succeeds and there's still no record on the retry, we
+      // treat it as a real "no subscription" state below.
+      try {
+        await fetch("/api/billing/ensure-customer", { method: "POST" });
+      } catch {
+        // Network error on the backfill is non-fatal; the retry below will surface the original
+        // 500 if Polar is still confused.
+      }
+      return authClient.customer.state();
+    }
     (async () => {
       try {
-        const { data, error } = await authClient.customer.state();
+        const { data, error } = await loadState();
         if (cancelled) return;
         if (error) {
           setState({ loading: false, subscription: null, error: error.message ?? t("loadFailed") });

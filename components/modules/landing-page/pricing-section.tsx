@@ -25,7 +25,10 @@ const PLAN_CONFIG: {
     key: "community",
     monthly: 0,
     annual: 0,
-    href: "https://github.com/youmssi/tum_infra",
+    // Community is invitation-only: visitors book a 15-min call where we collect their email and
+    // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
+    // MVP and lets us match contributors / reviewers / early adopters to the right room.
+    href: "https://cal.com/mrvin100/join-community",
     external: true,
     popular: false,
     hasBadge: false,
@@ -75,6 +78,10 @@ export function PricingSection() {
     }
     setPendingPlan(plan);
     try {
+      // Lazy-backfill the Polar customer record for users who signed up before Polar was wired.
+      // Same idea as the billing page — failure here is non-fatal, the checkout below will
+      // surface a useful error if Polar still can't find the customer.
+      await fetch("/api/billing/ensure-customer", { method: "POST" }).catch(() => null);
       await authClient.checkout({ slug: plan });
       // The SDK navigates the browser away on success; this line is only reached if the call
       // resolved without redirecting (typically because the Polar product isn't configured yet,

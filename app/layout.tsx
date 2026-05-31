@@ -52,8 +52,8 @@ export const metadata: Metadata = {
     title: "Tûm — Project execution & workflow visibility",
     description: "Tûm brings tasks, timelines, and team visibility into one coherent workspace.",
   },
-  // Icons: app/icon.svg is auto-served by Next.js as the favicon; public/favicon.svg stays as a
-  // bare-URL fallback for old links. No more .ico (the previous one was the Vercel default).
+  // Icons: app/icon.svg is auto-served by Next.js as the favicon; public/icon.png and
+  // public/favicon.ico stay as bare-URL fallbacks for the web manifest and old links.
   icons: {
     icon: [{ url: "/icon", type: "image/svg+xml" }],
     shortcut: "/icon",
