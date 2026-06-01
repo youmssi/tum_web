@@ -11,6 +11,11 @@ export const ROUTES = {
   ORGANIZATION_MEMBERS: "/organization/members",
   ORGANIZATION_SETTINGS: "/organization/settings",
   ORGANIZATION_AUDIT: "/organization/audit",
+  ADMIN: "/admin",
+  ADMIN_USERS: "/admin/users",
+  ADMIN_ORGS: "/admin/organisations",
+  ADMIN_SUBSCRIPTIONS: "/admin/subscriptions",
+  ADMIN_AUDIT: "/admin/audit",
   NOTIFICATION_PREFERENCES: "/notifications/preferences",
   INVITATIONS_ACCEPT: "/invitations/accept",
 } as const;
