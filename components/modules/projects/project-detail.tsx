@@ -148,7 +148,7 @@ export function ProjectDetail({ id }: { id: string }) {
               <XIcon className="size-4" />
             </Button>
           )}
-          <ExportProjectButton projectId={project.id} />
+          <ExportProjectButton projectId={project.id} projectName={project.name} />
           <Button
             variant="outline"
             size="sm"
