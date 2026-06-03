@@ -119,6 +119,7 @@
     "audit": "Audit log",
     "settings": "Settings",
     "profile": "Profile",
+    "admin": "Admin",
     "billing": "Billing",
     "signOut": "Sign out",
     "switchOrganization": "Switch organization",

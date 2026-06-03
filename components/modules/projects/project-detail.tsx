@@ -27,6 +27,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { ActivityFeed } from "@/components/modules/activity";
 import { ProjectDashboard } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
@@ -81,9 +82,11 @@ export function ProjectDetail({ id }: { id: string }) {
     );
   }
 
+  const isTimelineTab = activeTab === "timeline";
+
   return (
-    <div className="space-y-6">
-      <div>
+    <div className={cn("space-y-6", isTimelineTab && "flex min-h-0 flex-1 flex-col")}>
+      <div className={cn(isTimelineTab && "shrink-0")}>
         <Button variant="ghost" size="sm" className="-ml-2 mb-2 text-muted-foreground" asChild>
           <Link href={ROUTES.PROJECTS}>
             <ArrowLeftIcon className="mr-1 size-4" />
@@ -91,7 +94,7 @@ export function ProjectDetail({ id }: { id: string }) {
           </Link>
         </Button>
       </div>
-      <div className="flex items-start justify-between gap-4">
+      <div className={cn("flex items-start justify-between gap-4", isTimelineTab && "shrink-0")}>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-semibold">{project.name}</h1>
@@ -148,7 +151,7 @@ export function ProjectDetail({ id }: { id: string }) {
               <XIcon className="size-4" />
             </Button>
           )}
-          <ExportProjectButton projectId={project.id} />
+          <ExportProjectButton projectId={project.id} projectName={project.name} />
           <Button
             variant="outline"
             size="sm"
@@ -176,8 +179,12 @@ export function ProjectDetail({ id }: { id: string }) {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className={cn(isTimelineTab && "flex min-h-0 flex-1 flex-col")}
+      >
+        <TabsList className={cn(isTimelineTab && "shrink-0")}>
           <TabsTrigger value="overview" className="gap-1.5">
             <FolderKanbanIcon className="size-4" />
             {tabs("overview")}
@@ -212,7 +219,7 @@ export function ProjectDetail({ id }: { id: string }) {
           <KanbanBoard projectId={project.id} />
         </TabsContent>
 
-        <TabsContent value="timeline" className="mt-4">
+        <TabsContent value="timeline" className="mt-4 flex min-h-0 flex-1 flex-col">
           <ProjectTimeline
             projectId={project.id}
             projectName={project.name}

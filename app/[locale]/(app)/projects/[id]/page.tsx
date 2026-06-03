@@ -10,7 +10,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
 
   return (
-    <div className="p-6">
+    <div className="flex min-h-0 flex-1 flex-col">
       <ProjectDetail id={id} />
     </div>
   );

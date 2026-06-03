@@ -425,7 +425,11 @@ export function TimelineLeftPanel({
        * Unscheduled tasks are rendered below in a separate non-synced section
        * so that copying scrollTop between left and right panels stays correct.
        */}
-      <div ref={leftScrollRef} onScroll={onScroll} className="flex-1 min-h-0 overflow-y-scroll">
+      <div
+        ref={leftScrollRef}
+        onScroll={onScroll}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+      >
         {scheduled.map((task) => (
           <TaskRow
             key={task.id}

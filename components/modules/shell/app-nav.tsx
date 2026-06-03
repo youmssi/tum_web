@@ -25,6 +25,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { OrgSwitcher } from "@/components/modules/organization/org-switcher";
+import { useIsAdmin } from "@/components/modules/administration";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -36,7 +37,10 @@ export function AppSidebar() {
   const { data: session } = authClient.useSession();
   const currentRole =
     activeOrg?.members.find((m) => m.userId === session?.user?.id)?.role ?? "member";
-  const isAdmin = currentRole === "owner" || currentRole === "admin";
+  const isOrgAdmin = currentRole === "owner" || currentRole === "admin";
+  // App-wide admin — distinct from org admin. Drives the cross-tenant Admin link.
+  const { data: meAdmin } = useIsAdmin();
+  const isAppAdmin = meAdmin?.isAdmin === true;
 
   const navItems = [
     { href: ROUTES.DASHBOARD, label: t("dashboard"), icon: LayoutDashboardIcon },
@@ -74,7 +78,21 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <SidebarMenu className="gap-1">
-          {isAdmin && (
+          {isAppAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.startsWith(ROUTES.ADMIN)}
+                tooltip={t("admin")}
+              >
+                <Link href={ROUTES.ADMIN}>
+                  <ShieldIcon />
+                  <span>{t("admin")}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          {isOrgAdmin && (
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild

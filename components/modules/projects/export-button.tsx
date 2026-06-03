@@ -9,20 +9,25 @@ import { useExportProjectArchive } from "./use-export";
 
 interface ExportProjectButtonProps {
   projectId: string;
+  projectName: string;
 }
 
 /**
  * Downloads the project archive XLSX — every sheet (Cover, Tasks, Comments, Members, Activity,
  * Audit, Statuses) with Excel dropdowns, AutoFilter and computed columns. Audit rows are present
  * only when the caller is an org admin; member callers still get the rest of the workbook.
+ *
+ * <p>Filename derives from {@code projectName} on the client because the server's
+ * Content-Disposition header is usually hidden by CORS — without it the file would download as
+ * the generic fallback.
  */
-export function ExportProjectButton({ projectId }: ExportProjectButtonProps) {
+export function ExportProjectButton({ projectId, projectName }: ExportProjectButtonProps) {
   const t = useTranslations("projects.export");
   const exportArchive = useExportProjectArchive();
 
   async function handleClick() {
     try {
-      const filename = await exportArchive.mutateAsync(projectId);
+      const filename = await exportArchive.mutateAsync({ projectId, projectName });
       toast.success(t("ready", { filename }));
     } catch (error) {
       const message = error instanceof Error ? error.message : t("failed");

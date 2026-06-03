@@ -201,7 +201,29 @@ export const auth = betterAuth({
             }
           }
 
-          return { org: orgId, roles };
+          // App-wide admin lookup. Hits the backend's /internal/users/{id}/admin-status with
+          // the shared internal token. Failures are non-fatal — the user keeps a non-admin JWT
+          // and re-tries on the next refresh.
+          let isAdmin = false;
+          try {
+            const adminRes = await fetch(
+              `${process.env.INTERNAL_API_URL ?? "http://localhost:8080"}/internal/users/${user.id}/admin-status`,
+              {
+                method: "GET",
+                headers: {
+                  "X-Internal-Token": process.env.INTERNAL_SERVICE_TOKEN ?? "dev-internal-token",
+                },
+              },
+            );
+            if (adminRes.ok) {
+              const adminData = (await adminRes.json()) as { isAdmin?: boolean };
+              isAdmin = adminData.isAdmin === true;
+            }
+          } catch {
+            // non-fatal — fail closed (treat as non-admin).
+          }
+
+          return { org: orgId, roles, isAdmin };
         },
       },
       jwks: { keyPairConfig: { alg: "RS256" } },
