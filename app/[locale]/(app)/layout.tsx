@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <NotificationCenter />
           </div>
         </header>
-        <main id="main-content" className="flex-1 overflow-auto p-4 md:p-6">
+        <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-auto p-4 md:p-6">
           {children}
         </main>
       </SidebarInset>

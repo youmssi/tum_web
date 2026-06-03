@@ -292,7 +292,8 @@ export function ProjectTimeline({
   return (
     <div
       className={cn(
-        "space-y-3",
+        "flex min-h-0 flex-col gap-3",
+        !isFocused && "flex-1",
         isFocused && "fixed inset-0 z-50 flex flex-col overflow-hidden bg-background p-4",
       )}
     >
@@ -308,21 +309,29 @@ export function ProjectTimeline({
         .tum-near-due-milestone .bar { fill: ${colors.nearDueColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
         .tum-overdue-milestone .bar { fill: ${colors.overdueColor} !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important; }
         .gantt-container { cursor: ${linkMode ? "crosshair" : "default"}; }
+        /* Frappe ships overflow:auto on .gantt-container — we scroll the outer panel instead
+           so the chart doesn't stack a second vertical scrollbar beside the page. */
+        .project-timeline-chart .gantt-container {
+          overflow: visible !important;
+          height: auto !important;
+        }
       `}</style>
 
-      <TimelineToolbar
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        linkMode={linkMode}
-        onLinkModeChange={(active) => {
-          setLinkMode(active);
-          if (!active) setLinkSource(null);
-        }}
-        colors={colors}
-        isFocused={isFocused}
-        onFocusToggle={() => setIsFocused((f) => !f)}
-        onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
-      />
+      <div className="shrink-0">
+        <TimelineToolbar
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          linkMode={linkMode}
+          onLinkModeChange={(active) => {
+            setLinkMode(active);
+            if (!active) setLinkSource(null);
+          }}
+          colors={colors}
+          isFocused={isFocused}
+          onFocusToggle={() => setIsFocused((f) => !f)}
+          onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
+        />
+      </div>
 
       {ganttTasks.length === 0 && (tasks ?? []).length === 0 ? (
         <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
@@ -333,21 +342,15 @@ export function ProjectTimeline({
         </div>
       ) : (
         /*
-         * Height strategy:
-         *   normal  — fills the visible viewport below all page chrome (header +
-         *             project header + tabs + toolbar ≈ 22rem), capped with min-h.
-         *   focused — flex-1 inside the fixed full-screen overlay (set on outer div).
-         *
-         * Width strategy:
-         *   Left panel — pixel-based (340 px default), clamped [240, 600], resized
-         *                via a pointer-capture drag handle. No percentage constraints.
-         *   Right panel — flex-1 min-w-0: takes ALL remaining container width and
-         *                 scrolls horizontally for the Gantt SVG.
+         * Height: flex-1 min-h-0 inside the project tab column (no viewport calc) so only
+         * the chart panels scroll — not the whole page + chart at once.
+         * Width: right panel is the single scroll owner (horizontal + vertical); Frappe's
+         * .gantt-container overflow is disabled via .project-timeline-chart above.
          */
         <div
           className={cn(
-            "flex w-full overflow-hidden rounded-xl border",
-            isFocused ? "flex-1 min-h-0" : "h-[calc(100svh-22rem)] min-h-96",
+            "flex min-h-0 w-full flex-1 overflow-hidden rounded-xl border",
+            isFocused ? "min-h-0" : "min-h-96",
           )}
           ref={ganttContainerRef}
         >
@@ -446,18 +449,20 @@ export function ProjectTimeline({
           <div
             ref={rightScrollRef}
             onScroll={onRightScroll}
-            className="flex-1 min-w-0 overflow-auto"
+            className="flex-1 min-h-0 min-w-0 overflow-auto overscroll-contain"
           >
             {ganttTasks.length > 0 ? (
-              <GanttChart
-                ref={ganttHandleRef}
-                tasks={ganttTasks}
-                viewMode={viewMode}
-                onClick={handleGanttClick}
-                onDateChange={handleDateChange}
-                onProgressChange={handleProgressChange}
-                options={GANTT_OPTIONS}
-              />
+              <div className="project-timeline-chart min-w-max">
+                <GanttChart
+                  ref={ganttHandleRef}
+                  tasks={ganttTasks}
+                  viewMode={viewMode}
+                  onClick={handleGanttClick}
+                  onDateChange={handleDateChange}
+                  onProgressChange={handleProgressChange}
+                  options={GANTT_OPTIONS}
+                />
+              </div>
             ) : (
               <div
                 className="flex items-center justify-center text-sm text-muted-foreground"
