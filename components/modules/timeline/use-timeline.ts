@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  type CriticalPathResponse,
   type Dependency,
   type DependencyType,
   type ScheduleResult,
@@ -71,4 +72,18 @@ export function useAutoSchedule() {
   });
 }
 
-export type { Dependency, DependencyType, ScheduleResult };
+export const CRITICAL_PATH_KEYS = {
+  forProject: (projectId: string) => ["critical-path", projectId] as const,
+};
+
+/** Fetches the critical path analysis for a project. Returns undefined while loading. */
+export function useCriticalPath(projectId: string | undefined) {
+  return useQuery<CriticalPathResponse>({
+    queryKey: CRITICAL_PATH_KEYS.forProject(projectId ?? ""),
+    queryFn: () => dependencyApi.criticalPath(projectId!),
+    enabled: !!projectId,
+    staleTime: 30_000,
+  });
+}
+
+export type { CriticalPathResponse, Dependency, DependencyType, ScheduleResult };

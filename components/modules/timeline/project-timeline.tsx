@@ -37,9 +37,11 @@ import { dependencyApi } from "./dependency-api";
 import {
   DEP_KEYS,
   useCreateDependency,
+  useCriticalPath,
   useDeleteDependency,
   type DependencyType,
 } from "./use-timeline";
+import { BaselineVarianceDialog } from "./baseline-variance-view";
 import { TimelineToolbar } from "./timeline-toolbar";
 import { TimelineLeftPanel, GANTT_ROW_HEIGHT } from "./timeline-left-panel";
 
@@ -98,7 +100,15 @@ export function ProjectTimeline({
   const [linkLagDays, setLinkLagDays] = useState(0);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [criticalPathMode, setCriticalPathMode] = useState(false);
+  const [baselinesOpen, setBaselinesOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  const { data: criticalPathData } = useCriticalPath(criticalPathMode ? projectId : undefined);
+  const criticalTaskIds = useMemo(
+    () => new Set(criticalPathData?.criticalPathIds ?? []),
+    [criticalPathData],
+  );
 
   // Left panel width — "28%" initially (adapts to any viewport), pixel value after user drags.
   const [leftWidth, setLeftWidth] = useState<number | string>("28%");
@@ -183,6 +193,9 @@ export function ProjectTimeline({
       const start = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.startDate!;
       const end = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.endDate!;
       const colorClass = taskColorClass(t, colors.nearDueDays);
+      const isCritical = criticalTaskIds.has(t.id);
+      const cpClass = criticalPathMode && isCritical ? "tum-critical" : "";
+      const baseClass = t.milestone ? `${colorClass}-milestone` : colorClass;
       return {
         id: t.id,
         name: t.title,
@@ -190,10 +203,10 @@ export function ProjectTimeline({
         end,
         progress: t.progress,
         dependencies: depMap[t.id]?.join(",") ?? "",
-        custom_class: t.milestone ? `${colorClass}-milestone` : colorClass,
+        custom_class: cpClass ? `${baseClass} ${cpClass}` : baseClass,
       };
     });
-  }, [scheduledTasks, depMap, colors.nearDueDays]);
+  }, [scheduledTasks, depMap, colors.nearDueDays, criticalPathMode, criticalTaskIds]);
 
   const handleDateChange = useCallback(
     async (ganttTask: GanttTask, start: Date, end: Date) => {
@@ -339,6 +352,25 @@ export function ProjectTimeline({
            (vertical line on today's date) is drawn by Frappe Gantt's draw_today() and remains
            visible — only the interactive controls in the sticky header are suppressed. */
         .project-timeline-chart .gantt-container .side-header { display: none !important; }
+        /* Critical path: highlight bars with a distinct red stroke + subtle glow */
+        .tum-critical .bar {
+          stroke: #dc2626 !important;
+          stroke-width: 2px !important;
+          filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4)) !important;
+        }
+        .tum-critical .bar-progress {
+          stroke: #b91c1c !important;
+          stroke-width: 2px !important;
+        }
+        .tum-critical-milestone .bar {
+          stroke: #dc2626 !important;
+          stroke-width: 2px !important;
+          filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4)) !important;
+        }
+        /* Dim non-critical tasks when critical path mode is active */
+        .tum-critical-mode .bar { opacity: 0.5 !important; }
+        .tum-critical-mode .tum-critical .bar { opacity: 1 !important; }
+        .tum-critical-mode .tum-critical .bar-progress { opacity: 1 !important; }
       `}</style>
 
       <div className="shrink-0">
@@ -354,6 +386,10 @@ export function ProjectTimeline({
           isFocused={isFocused}
           onFocusToggle={() => setIsFocused((f) => !f)}
           onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
+          criticalPathMode={criticalPathMode}
+          onCriticalPathToggle={() => setCriticalPathMode((m) => !m)}
+          criticalPathCount={criticalTaskIds.size}
+          onBaselinesOpen={() => setBaselinesOpen(true)}
         />
       </div>
 
@@ -476,7 +512,9 @@ export function ProjectTimeline({
             className="flex-1 min-h-0 min-w-0 overflow-auto overscroll-contain"
           >
             {ganttTasks.length > 0 ? (
-              <div className="project-timeline-chart min-w-max">
+              <div
+                className={`project-timeline-chart min-w-max ${criticalPathMode ? "tum-critical-mode" : ""}`}
+              >
                 <GanttChart
                   ref={ganttHandleRef}
                   tasks={ganttTasks}
@@ -554,6 +592,12 @@ export function ProjectTimeline({
           </div>
         </DialogContent>
       </Dialog>
+
+      <BaselineVarianceDialog
+        projectId={projectId}
+        open={baselinesOpen}
+        onOpenChange={setBaselinesOpen}
+      />
 
       <TaskDetailSheet
         task={selectedTask}

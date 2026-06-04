@@ -27,6 +27,22 @@ export interface ScheduleResult {
   conflicts: string[];
 }
 
+export interface CriticalPathTask {
+  taskId: string;
+  title: string;
+  earliestStart: string | null;
+  earliestFinish: string | null;
+  latestStart: string | null;
+  latestFinish: string | null;
+  totalFloatDays: number;
+  critical: boolean;
+}
+
+export interface CriticalPathResponse {
+  tasks: CriticalPathTask[];
+  criticalPathIds: string[];
+}
+
 // Need to avoid circular imports — just the shape we need
 interface Task {
   id: string;
@@ -55,4 +71,7 @@ export const dependencyApi = {
 
   reschedule: (taskId: string, data: { startDate: string | null; endDate: string | null }) =>
     api.patch(`api/tasks/${taskId}/schedule`, { json: data }).json<ScheduleResult>(),
+
+  criticalPath: (projectId: string) =>
+    api.get(`api/projects/${projectId}/critical-path`).json<CriticalPathResponse>(),
 };

@@ -1,6 +1,13 @@
 "use client";
 
-import { CalendarCheck2Icon, LinkIcon, Maximize2Icon, Minimize2Icon } from "lucide-react";
+import {
+  CalendarCheck2Icon,
+  GanttChartIcon,
+  LinkIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+  RouteIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +23,10 @@ interface TimelineToolbarProps {
   isFocused: boolean;
   onFocusToggle: () => void;
   onJumpToToday: () => void;
+  criticalPathMode: boolean;
+  onCriticalPathToggle: () => void;
+  criticalPathCount: number;
+  onBaselinesOpen: () => void;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -29,6 +40,10 @@ export function TimelineToolbar({
   isFocused,
   onFocusToggle,
   onJumpToToday,
+  criticalPathMode,
+  onCriticalPathToggle,
+  criticalPathCount,
+  onBaselinesOpen,
 }: TimelineToolbarProps) {
   const t = useTranslations("timeline.toolbar");
   const viewModeT = useTranslations("timeline.viewMode");
@@ -77,6 +92,37 @@ export function TimelineToolbar({
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">{t("todayTooltip")}</TooltipContent>
+        </Tooltip>
+
+        {/* Baselines */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onBaselinesOpen}>
+              <GanttChartIcon className="size-3.5" />
+              Baselines
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Capture and compare schedule baselines</TooltipContent>
+        </Tooltip>
+
+        {/* Critical path toggle */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={criticalPathMode ? "default" : "outline"}
+              size="sm"
+              className="h-8 gap-1.5"
+              onClick={onCriticalPathToggle}
+            >
+              <RouteIcon className="size-3.5" />
+              {criticalPathMode ? `Critical (${criticalPathCount})` : "Critical"}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {criticalPathMode
+              ? "Hide critical path"
+              : "Show the critical path — tasks that directly determine the project duration"}
+          </TooltipContent>
         </Tooltip>
 
         {/* Link mode toggle */}

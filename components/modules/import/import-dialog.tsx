@@ -404,16 +404,19 @@ export function ImportProjectDialog() {
                       <TableHead>Status</TableHead>
                       <TableHead>Priority</TableHead>
                       <TableHead>Dates</TableHead>
+                      <TableHead>Labels</TableHead>
+                      <TableHead>Due</TableHead>
+                      <TableHead>Assignee</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {parsed.tasks.map((task, i) => (
                       <TableRow key={i}>
-                        <TableCell className="font-medium max-w-[160px] truncate">
+                        <TableCell className="font-medium max-w-[140px] truncate">
                           {task.parentTask && <span className="mr-1 text-muted-foreground">↳</span>}
                           {task.title}
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-xs max-w-[100px] truncate">
+                        <TableCell className="text-muted-foreground text-xs max-w-[80px] truncate">
                           {task.parentTask ?? "—"}
                         </TableCell>
                         <TableCell>
@@ -436,6 +439,15 @@ export function ImportProjectDialog() {
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                           {task.startDate ?? "—"} → {task.endDate ?? "—"}
+                        </TableCell>
+                        <TableCell className="max-w-[80px] truncate text-xs text-muted-foreground">
+                          {task.labels?.length ? task.labels.join(", ") : "—"}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                          {task.dueDate ?? "—"}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground max-w-[80px] truncate">
+                          {task.assignee ?? "—"}
                         </TableCell>
                       </TableRow>
                     ))}

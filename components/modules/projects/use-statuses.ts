@@ -5,6 +5,7 @@ import { useCallback } from "react";
 
 import { STATUS_LABELS, type TaskStatus } from "@/components/modules/tasks/task-api";
 import {
+  type CreateStatusPayload,
   type ReorderStatusesPayload,
   type StatusCategory,
   type TaskStatusConfig,
@@ -35,6 +36,26 @@ export function useUpdateStatus(projectId: string) {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateStatusPayload }) =>
       statusApi.update(id, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: STATUS_KEYS.forProject(projectId) });
+    },
+  });
+}
+
+export function useCreateStatus(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateStatusPayload) => statusApi.create(projectId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: STATUS_KEYS.forProject(projectId) });
+    },
+  });
+}
+
+export function useDeleteStatus(projectId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (statusId: string) => statusApi.delete(statusId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: STATUS_KEYS.forProject(projectId) });
     },
