@@ -10,6 +10,7 @@ export interface ParsedImport {
 
 const STATUSES = new Set(["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"]);
 const PRIORITIES = new Set(["LOW", "MEDIUM", "HIGH", "URGENT"]);
+const TRUTHY = new Set(["TRUE", "YES", "1"]);
 
 function normaliseStatus(s: string | undefined): string | null {
   if (!s) return null;
@@ -57,9 +58,18 @@ function normaliseProgress(s: string | undefined): number | null {
 function normaliseMilestone(s: string | undefined): boolean | null {
   if (!s || !s.trim()) return null;
   const upper = s.trim().toUpperCase();
-  if (upper === "TRUE" || upper === "YES" || upper === "1") return true;
+  if (TRUTHY.has(upper)) return true;
   if (upper === "FALSE" || upper === "NO" || upper === "0") return false;
   return null;
+}
+
+function normaliseLabels(s: string | undefined): string[] | null {
+  if (!s || !s.trim()) return null;
+  const parts = s
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return parts.length > 0 ? parts : null;
 }
 
 function normaliseDependsOn(s: string | undefined): string[] | null {
@@ -129,6 +139,9 @@ export function parseCsv(file: File): Promise<ParsedImport> {
             milestone: normaliseMilestone(row.milestone),
             parentTask: row.parent_task?.trim() || null,
             dependsOn: normaliseDependsOn(row.depends_on),
+            labels: normaliseLabels(row.labels),
+            dueDate: normaliseDate(row.due_date),
+            assignee: row.assignee?.trim() || null,
           });
         }
 

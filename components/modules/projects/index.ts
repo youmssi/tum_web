@@ -20,6 +20,7 @@ export {
   type TaskStatusConfig,
   type UpdateStatusPayload,
   type ReorderStatusesPayload,
+  type CreateStatusPayload,
 } from "./status-api";
 export {
   STATUS_KEYS,
@@ -27,6 +28,8 @@ export {
   useStatusColor,
   useStatusName,
   useUpdateStatus,
+  useCreateStatus,
+  useDeleteStatus,
   useReorderStatuses,
 } from "./use-statuses";
 export { ExportProjectButton } from "./export-button";
