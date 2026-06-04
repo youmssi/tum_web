@@ -133,6 +133,7 @@ function MemberTable({
     [canManage, currentUserId, onRoleChange, onRemove],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table returns non-memoizable functions; React Compiler aware
   const table = useReactTable({
     data: members,
     columns,
@@ -231,6 +232,7 @@ function InvitationTable({
     [canManage, onCancel],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table returns non-memoizable functions; React Compiler aware
   const table = useReactTable({
     data: invitations,
     columns,

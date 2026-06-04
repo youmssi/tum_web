@@ -6,10 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { type NotificationType } from "./notification-api";
-import {
-  useNotificationPreferences,
-  useUpdateNotificationPreference,
-} from "./use-notifications";
+import { useNotificationPreferences, useUpdateNotificationPreference } from "./use-notifications";
 
 const TYPE_LABELS: Record<NotificationType, string> = {
   TASK_ASSIGNED: "Task assigned to you",
@@ -51,9 +48,7 @@ export function NotificationPreferences() {
   }
 
   if (!prefs?.length) {
-    return (
-      <p className="text-sm text-muted-foreground">No preferences available.</p>
-    );
+    return <p className="text-sm text-muted-foreground">No preferences available.</p>;
   }
 
   return (

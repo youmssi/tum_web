@@ -29,8 +29,7 @@ export const projectApi = {
 
   get: (id: string) => api.get(`api/projects/${id}`).json<Project>(),
 
-  create: (data: CreateProjectPayload) =>
-    api.post("api/projects", { json: data }).json<Project>(),
+  create: (data: CreateProjectPayload) => api.post("api/projects", { json: data }).json<Project>(),
 
   update: (id: string, data: UpdateProjectPayload) =>
     api.patch(`api/projects/${id}`, { json: data }).json<Project>(),
@@ -39,5 +38,7 @@ export const projectApi = {
 
   unarchive: (id: string) => api.post(`api/projects/${id}/unarchive`).json<Project>(),
 
-  remove: async (id: string) => { await api.delete(`api/projects/${id}`); },
+  remove: async (id: string) => {
+    await api.delete(`api/projects/${id}`);
+  },
 };
