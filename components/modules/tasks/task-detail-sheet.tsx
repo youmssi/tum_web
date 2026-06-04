@@ -36,6 +36,9 @@ import { useDirectory } from "@/components/modules/organization";
 import { useStatusName } from "@/components/modules/projects";
 import { CommentThread } from "@/components/modules/comments";
 import { AttachmentList, FileUpload } from "@/components/modules/files";
+import { ChecklistView } from "@/components/modules/checklist";
+import { CustomFieldValues } from "@/components/modules/custom-fields";
+import { WatchToggle } from "@/components/modules/watchers";
 import {
   useCreateDependency,
   useDeleteDependency,
@@ -265,7 +268,10 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto px-6">
         <SheetHeader className="mb-4">
-          <SheetTitle className="sr-only">Task detail</SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle className="sr-only">Task detail</SheetTitle>
+            <WatchToggle taskId={task.id} />
+          </div>
         </SheetHeader>
 
         <form noValidate className="space-y-5">
@@ -536,6 +542,14 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
             />
           </FieldGroup>
         </form>
+
+        <Separator className="my-6" />
+
+        <CustomFieldValues taskId={task.id} projectId={projectId} />
+
+        <Separator className="my-6" />
+
+        <ChecklistView taskId={task.id} />
 
         {task &&
           (() => {

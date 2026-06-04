@@ -51,7 +51,17 @@ function CommentInput({ taskId, members }: CommentInputProps) {
     setMention(match ? { query: match[1], start: cursor - match[0].length } : null);
   }
 
-  function insertMention(member: DirectoryMember) {
+  function insertGroupMention(token: string) {
+    if (!mention || !textareaRef.current) return;
+    const cursor = textareaRef.current.selectionStart;
+    const after = content.slice(cursor);
+    setContent(`${content.slice(0, mention.start)}${token} ${after}`);
+    setMentionedUserIds((prev) => (prev.includes(token) ? prev : [...prev, token]));
+    setMention(null);
+    textareaRef.current.focus();
+  }
+
+  function insertMemberMention(member: DirectoryMember) {
     if (!mention || !textareaRef.current) return;
     const cursor = textareaRef.current.selectionStart;
     const after = content.slice(cursor);
@@ -74,9 +84,20 @@ function CommentInput({ taskId, members }: CommentInputProps) {
     }
   }
 
-  const suggestions = mention
+  const memberSuggestions = mention
     ? members.filter((m) => m.name.toLowerCase().includes(mention.query.toLowerCase()))
     : [];
+
+  // Show group-mention suggestions alongside member suggestions when the query starts with
+  // a relevant prefix: @t for @team, @a for @assignees
+  const groupSuggestions = mention
+    ? [
+        { id: "@team", label: "@team — Notify all project members and watchers" },
+        { id: "@assignees", label: "@assignees — Notify the task's assignees" },
+      ].filter((g) => g.id.toLowerCase().includes(mention.query.toLowerCase()))
+    : [];
+
+  const suggestions = [...groupSuggestions, ...memberSuggestions];
 
   return (
     <div className="space-y-2">
@@ -96,24 +117,40 @@ function CommentInput({ taskId, members }: CommentInputProps) {
         />
         {suggestions.length > 0 && (
           <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover shadow-md">
-            {suggestions.map((m) => (
-              <button
-                key={m.userId}
-                type="button"
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  insertMention(m);
-                }}
-              >
-                <Avatar className="size-5">
-                  <AvatarFallback className="text-xs">
-                    {m.name.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {m.name}
-              </button>
-            ))}
+            {suggestions.map((s) =>
+              "userId" in s ? (
+                <Button
+                  key={s.userId}
+                  variant="ghost"
+                  type="button"
+                  className="w-full justify-start gap-2 rounded-none px-3 py-2 h-auto text-sm font-normal"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    insertMemberMention(s);
+                  }}
+                >
+                  <Avatar className="size-5">
+                    <AvatarFallback className="text-xs">
+                      {s.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {s.name}
+                </Button>
+              ) : (
+                <Button
+                  key={s.id}
+                  variant="ghost"
+                  type="button"
+                  className="w-full justify-start gap-2 rounded-none px-3 py-2 h-auto text-sm font-medium"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    insertGroupMention(s.id);
+                  }}
+                >
+                  <span className="text-muted-foreground">{s.label}</span>
+                </Button>
+              ),
+            )}
           </div>
         )}
       </div>

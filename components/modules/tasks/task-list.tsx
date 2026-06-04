@@ -295,6 +295,7 @@ export function TaskList({ projectId }: { projectId: string }) {
     [resolveStatusName],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table returns functions that can't be memoized; known library limitation
   const table = useReactTable({
     data: filtered,
     columns,

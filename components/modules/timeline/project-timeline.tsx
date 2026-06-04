@@ -6,9 +6,10 @@ import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatLocalDate, parseLocalDate, todayLocalDate } from "@/lib/date";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -46,9 +47,9 @@ const GANTT_OPTIONS = {
   bar_height: 28,
   padding: 12,
   readonly_progress: false,
-  // Suppress Frappe Gantt's built-in "Today" button — we render our own in the toolbar (where
-  // users expect controls) and call scroll_current() via the GanttChart imperative handle.
-  today_button: false,
+  // Frappe Gantt's built-in today line + button are enabled so the vertical "today" reference
+  // line renders on the chart. The button element is hidden via CSS ('.gantt .side-header > *')
+  // because we have our own in the toolbar — see the .project-timeline-chart styles below.
 } as const;
 
 const LEFT_PANEL_MIN = 240;
@@ -75,8 +76,6 @@ export function ProjectTimeline({
   dateRange,
 }: {
   projectId: string;
-  /** Retained for callsite API stability; previously used by the in-browser Gantt export. */
-  projectName?: string;
   dateRange?: DateRange;
 }) {
   const { data: tasks, isLoading } = useTasks(projectId);
@@ -85,6 +84,7 @@ export function ProjectTimeline({
   const toggleMilestone = useToggleMilestone(projectId);
   const createDependency = useCreateDependency();
   const deleteDependency = useDeleteDependency();
+
   const { getConfig } = useTimelineColors();
   const colors = getConfig(projectId);
 
@@ -95,8 +95,10 @@ export function ProjectTimeline({
   const [linkSource, setLinkSource] = useState<string | null>(null);
   const [linkTarget, setLinkTarget] = useState<string | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkLagDays, setLinkLagDays] = useState(0);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const queryClient = useQueryClient();
 
   // Left panel width — "28%" initially (adapts to any viewport), pixel value after user drags.
   const [leftWidth, setLeftWidth] = useState<number | string>("28%");
@@ -196,16 +198,27 @@ export function ProjectTimeline({
   const handleDateChange = useCallback(
     async (ganttTask: GanttTask, start: Date, end: Date) => {
       try {
-        await reschedule.mutateAsync({
-          id: ganttTask.id as string,
+        const result = await dependencyApi.reschedule(ganttTask.id as string, {
           startDate: formatLocalDate(start),
           endDate: formatLocalDate(end),
         });
+        if (result.autoShiftedTasks.length > 0) {
+          toast.success(
+            `${result.autoShiftedTasks.length} dependent task${result.autoShiftedTasks.length === 1 ? " was" : "s were"} auto-shifted.`,
+          );
+        }
+        if (result.conflicts.length > 0) {
+          for (const conflict of result.conflicts) {
+            toast.warning(conflict, { duration: 8000 });
+          }
+        }
+        // Refresh tasks to reflect shifted dates
+        queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
       } catch {
         toast.error("Failed to reschedule task.");
       }
     },
-    [reschedule],
+    [projectId, queryClient],
   );
 
   const handleProgressChange = useCallback(
@@ -248,7 +261,12 @@ export function ProjectTimeline({
   async function confirmLink(type: DependencyType) {
     if (!linkSource || !linkTarget) return;
     try {
-      await createDependency.mutateAsync({ fromTaskId: linkSource, toTaskId: linkTarget, type });
+      await createDependency.mutateAsync({
+        fromTaskId: linkSource,
+        toTaskId: linkTarget,
+        type,
+        lagDays: linkLagDays > 0 ? linkLagDays : undefined,
+      });
       toast.success("Dependency created.");
     } catch {
       toast.error("Failed to create dependency.");
@@ -257,6 +275,7 @@ export function ProjectTimeline({
       setLinkSource(null);
       setLinkTarget(null);
       setLinkMode(false);
+      setLinkLagDays(0);
     }
   }
 
@@ -315,6 +334,11 @@ export function ProjectTimeline({
           overflow: visible !important;
           height: auto !important;
         }
+        /* Hide Frappe Gantt's built-in side-header toolbar (view-mode select + today button)
+           because we render our own in the TimelineToolbar component. The today reference line
+           (vertical line on today's date) is drawn by Frappe Gantt's draw_today() and remains
+           visible — only the interactive controls in the sticky header are suppressed. */
+        .project-timeline-chart .gantt-container .side-header { display: none !important; }
       `}</style>
 
       <div className="shrink-0">
@@ -489,6 +513,7 @@ export function ProjectTimeline({
           }
         }}
       >
+        {" "}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Create dependency</DialogTitle>
@@ -496,20 +521,35 @@ export function ProjectTimeline({
               {linkSourceTask?.title} → {linkTargetTask?.title}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 pt-2">
-            <p className="text-sm text-muted-foreground">Select dependency type:</p>
-            <div className="grid gap-2">
-              {DEP_TYPE_OPTIONS.map(({ value, label }) => (
-                <Button
-                  key={value}
-                  variant="outline"
-                  className="justify-start"
-                  onClick={() => confirmLink(value)}
-                  disabled={createDependency.isPending}
-                >
-                  {label}
-                </Button>
-              ))}
+          <div className="space-y-4 pt-2">
+            <div>
+              <p className="mb-3 text-sm text-muted-foreground">Select dependency type:</p>
+              <div className="grid gap-2">
+                {DEP_TYPE_OPTIONS.map(({ value, label }) => (
+                  <Button
+                    key={value}
+                    variant="outline"
+                    className="justify-start"
+                    onClick={() => confirmLink(value)}
+                    disabled={createDependency.isPending}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-muted-foreground">Lag / lead (days)</label>
+              <p className="mb-1.5 text-xs text-muted-foreground/70">
+                Positive = delay, negative = overlap. Zero is default.
+              </p>
+              <Input
+                type="number"
+                min={0}
+                value={linkLagDays}
+                onChange={(e) => setLinkLagDays(Math.max(0, parseInt(e.target.value) || 0))}
+                placeholder="0"
+              />
             </div>
           </div>
         </DialogContent>

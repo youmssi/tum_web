@@ -8,7 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskDetailSheet } from "@/components/modules/tasks/task-detail-sheet";
-import { type Task, type TaskStatus, STATUS_LABELS, PRIORITY_LABELS } from "@/components/modules/tasks/task-api";
+import {
+  type Task,
+  type TaskStatus,
+  STATUS_LABELS,
+  PRIORITY_LABELS,
+} from "@/components/modules/tasks/task-api";
 import { useMyTasks } from "@/components/modules/tasks/use-tasks";
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -33,7 +38,9 @@ function StatCard({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-        <Icon className={`size-4 ${highlight && value > 0 ? "text-destructive" : "text-muted-foreground"}`} />
+        <Icon
+          className={`size-4 ${highlight && value > 0 ? "text-destructive" : "text-muted-foreground"}`}
+        />
       </CardHeader>
       <CardContent>
         <p className={`text-2xl font-bold ${highlight && value > 0 ? "text-destructive" : ""}`}>
@@ -56,15 +63,23 @@ function TaskRow({ task, onClick }: { task: Task; onClick: () => void }) {
         {task.dueDate && (
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <CalendarIcon className="size-3" />
-            {new Date(task.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+            {new Date(task.dueDate).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}
           </p>
         )}
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <Badge variant={PRIORITY_COLORS[task.priority] as "secondary" | "outline" | "destructive"} className="text-xs">
+        <Badge
+          variant={PRIORITY_COLORS[task.priority] as "secondary" | "outline" | "destructive"}
+          className="text-xs"
+        >
           {PRIORITY_LABELS[task.priority]}
         </Badge>
-        <Badge variant="outline" className="text-xs">{STATUS_LABELS[task.status]}</Badge>
+        <Badge variant="outline" className="text-xs">
+          {STATUS_LABELS[task.status]}
+        </Badge>
       </div>
     </button>
   );
@@ -104,10 +119,14 @@ export function MyWorkDashboard() {
     return (
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-3">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
+          ))}
         </div>
         <div className="space-y-2">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-16 rounded-lg" />
+          ))}
         </div>
       </div>
     );
@@ -136,7 +155,9 @@ export function MyWorkDashboard() {
               <TabsTrigger value="overdue">
                 Overdue {stats.overdue > 0 && `(${stats.overdue})`}
               </TabsTrigger>
-              <TabsTrigger value="today">Today {stats.dueToday > 0 && `(${stats.dueToday})`}</TabsTrigger>
+              <TabsTrigger value="today">
+                Today {stats.dueToday > 0 && `(${stats.dueToday})`}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-4 space-y-6">
@@ -148,7 +169,9 @@ export function MyWorkDashboard() {
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       {STATUS_LABELS[status]} ({group.length})
                     </p>
-                    {group.map((t) => <TaskRow key={t.id} task={t} onClick={() => openTask(t)} />)}
+                    {group.map((t) => (
+                      <TaskRow key={t.id} task={t} onClick={() => openTask(t)} />
+                    ))}
                   </div>
                 );
               })}
@@ -157,7 +180,9 @@ export function MyWorkDashboard() {
             <TabsContent value="overdue" className="mt-4 space-y-2">
               {(tasks ?? [])
                 .filter((t) => t.dueDate && t.dueDate < today && t.status !== "DONE")
-                .map((t) => <TaskRow key={t.id} task={t} onClick={() => openTask(t)} />)}
+                .map((t) => (
+                  <TaskRow key={t.id} task={t} onClick={() => openTask(t)} />
+                ))}
               {stats.overdue === 0 && (
                 <p className="py-8 text-center text-sm text-muted-foreground">No overdue tasks.</p>
               )}
@@ -166,7 +191,9 @@ export function MyWorkDashboard() {
             <TabsContent value="today" className="mt-4 space-y-2">
               {(tasks ?? [])
                 .filter((t) => t.dueDate === today)
-                .map((t) => <TaskRow key={t.id} task={t} onClick={() => openTask(t)} />)}
+                .map((t) => (
+                  <TaskRow key={t.id} task={t} onClick={() => openTask(t)} />
+                ))}
               {stats.dueToday === 0 && (
                 <p className="py-8 text-center text-sm text-muted-foreground">Nothing due today.</p>
               )}

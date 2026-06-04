@@ -336,7 +336,8 @@ function TaskRow({
                       <span className="truncate flex-1">
                         → {target?.title ?? dep.toTaskId.slice(0, 8)}
                         <span className="ml-1 text-[10px] opacity-70">
-                          ({DEPENDENCY_TYPE_LABELS[dep.type]})
+                          ({DEPENDENCY_TYPE_LABELS[dep.type]}
+                          {dep.lagDays > 0 ? ` +${dep.lagDays}d` : ""})
                         </span>
                       </span>
                       <Button
