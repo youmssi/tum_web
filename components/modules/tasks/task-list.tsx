@@ -35,7 +35,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useDirectory } from "@/components/modules/organization";
-import { useStatusName } from "@/components/modules/projects";
+import { useStatusName, useStatuses } from "@/components/modules/projects";
 import {
   PRIORITY_LABELS,
   STATUS_LABELS,
@@ -91,9 +91,8 @@ function BulkActionsBar({
 }) {
   const t = useTranslations("tasks.list");
   const { data: directory } = useDirectory();
-  // Use the project-configured display name so the bulk dropdown reads "Shipped" after a rename,
-  // not the original "Done".
   const resolveStatusName = useStatusName(projectId);
+  const { data: statusConfigs } = useStatuses(projectId);
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2">
       <span className="text-sm font-medium">{t("selectedSummary", { count })}</span>
@@ -103,9 +102,16 @@ function BulkActionsBar({
           <SelectValue placeholder={t("setStatus")} />
         </SelectTrigger>
         <SelectContent>
-          {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-            <SelectItem key={s} value={s} className="text-xs">
-              {resolveStatusName(s)}
+          {(
+            statusConfigs ??
+            (Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => ({
+              id: s,
+              category: s,
+              name: STATUS_LABELS[s],
+            }))
+          ).map((cfg) => (
+            <SelectItem key={cfg.id} value={cfg.category} className="text-xs">
+              {cfg.name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -148,9 +154,8 @@ function BulkActionsBar({
 export function TaskList({ projectId }: { projectId: string }) {
   const { data: tasks, isLoading } = useTasks(projectId);
   const bulkUpdate = useBulkUpdateTasks(projectId);
-  // Project-scoped status display name resolver (E17 followup) — picks the configured name when
-  // available, falls back to STATUS_LABELS while the statuses query is loading or unseeded.
   const resolveStatusName = useStatusName(projectId);
+  const { data: statusConfigs } = useStatuses(projectId);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -379,9 +384,16 @@ export function TaskList({ projectId }: { projectId: string }) {
               <SelectItem value="ALL" className="text-xs">
                 All statuses
               </SelectItem>
-              {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-                <SelectItem key={s} value={s} className="text-xs">
-                  {resolveStatusName(s)}
+              {(
+                statusConfigs ??
+                (Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => ({
+                  id: s,
+                  category: s,
+                  name: STATUS_LABELS[s],
+                }))
+              ).map((cfg) => (
+                <SelectItem key={cfg.id} value={cfg.category} className="text-xs">
+                  {cfg.name}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -33,7 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useDirectory } from "@/components/modules/organization";
-import { useStatusName } from "@/components/modules/projects";
+import { useStatusName, useStatuses } from "@/components/modules/projects";
 import { CommentThread } from "@/components/modules/comments";
 import { AttachmentList, FileUpload } from "@/components/modules/files";
 import { ChecklistView } from "@/components/modules/checklist";
@@ -111,6 +111,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   // Use the project-configured status names — the detail sheet's Status select must show
   // "Backlog" / "Shipped" / whatever the owner has renamed the columns to.
   const resolveStatusName = useStatusName(projectId);
+  const { data: statusConfigs } = useStatuses(projectId);
   const { data: allTasks } = useTasks(projectId);
   const { data: deps } = useDependencies(task?.id);
   const createDep = useCreateDependency();
@@ -312,9 +313,16 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {resolveStatusName(s)}
+                        {(
+                          statusConfigs ??
+                          (Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => ({
+                            id: s,
+                            category: s,
+                            name: STATUS_LABELS[s],
+                          }))
+                        ).map((cfg) => (
+                          <SelectItem key={cfg.id} value={cfg.category}>
+                            {cfg.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

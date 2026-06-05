@@ -16,6 +16,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useDirectory } from "@/components/modules/organization";
+import { useDirectory } from "@/components/modules/organization";
 import { useWorkload } from "./use-workload";
 
 function weekLabel(weekStart: string): string {
@@ -34,6 +36,9 @@ interface WorkloadViewProps {
 
 export function WorkloadView({ projectId }: WorkloadViewProps) {
   const { data: workload, isLoading } = useWorkload(projectId);
+  const { data: directory } = useDirectory();
+  const memberName = (id: string) =>
+    directory?.find((m) => m.userId === id)?.name ?? id.slice(0, 8);
   const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
   const [selectedWeekStart, setSelectedWeekStart] = useState<string | null>(null);
 
@@ -125,10 +130,10 @@ export function WorkloadView({ projectId }: WorkloadViewProps) {
                       <td className="sticky left-0 bg-card py-2 pr-3">
                         <div className="flex items-center gap-2">
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
-                            {assignee.assigneeId.charAt(0).toUpperCase()}
+                            {memberName(assignee.assigneeId).charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-medium truncate max-w-[100px]">
-                            {assignee.assigneeId}
+                            {memberName(assignee.assigneeId)}
                           </span>
                           {assignee.overallocated && (
                             <AlertTriangleIcon className="size-3.5 shrink-0 text-destructive" />
@@ -218,7 +223,7 @@ export function WorkloadView({ projectId }: WorkloadViewProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserIcon className="size-4" />
-              {selectedAssignee}
+              {selectedAssignee ? memberName(selectedAssignee) : ""}
             </DialogTitle>
             <DialogDescription>
               Tasks for the week of {selectedWeekStart ? weekLabel(selectedWeekStart) : ""}
