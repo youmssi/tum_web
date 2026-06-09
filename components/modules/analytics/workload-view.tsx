@@ -4,7 +4,6 @@ import { AlertTriangleIcon, CheckCircle2Icon, Loader2Icon, UserIcon } from "luci
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -16,7 +15,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { useDirectory } from "@/components/modules/organization";
 import { useDirectory } from "@/components/modules/organization";
 import { useWorkload } from "./use-workload";
 
@@ -124,7 +122,6 @@ export function WorkloadView({ projectId }: WorkloadViewProps) {
               </thead>
               <tbody>
                 {workload.assignees.map((assignee) => {
-                  const barWidth = maxCount > 0 ? 100 / maxCount : 100;
                   return (
                     <tr key={assignee.assigneeId} className="group">
                       <td className="sticky left-0 bg-card py-2 pr-3">

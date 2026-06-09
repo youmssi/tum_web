@@ -33,7 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useDirectory } from "@/components/modules/organization";
-import { useStatusName, useStatuses } from "@/components/modules/projects";
+import { useStatuses } from "@/components/modules/projects";
 import { CommentThread } from "@/components/modules/comments";
 import { AttachmentList, FileUpload } from "@/components/modules/files";
 import { ChecklistView } from "@/components/modules/checklist";
@@ -110,7 +110,6 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   const members = directory ?? [];
   // Use the project-configured status names — the detail sheet's Status select must show
   // "Backlog" / "Shipped" / whatever the owner has renamed the columns to.
-  const resolveStatusName = useStatusName(projectId);
   const { data: statusConfigs } = useStatuses(projectId);
   const { data: allTasks } = useTasks(projectId);
   const { data: deps } = useDependencies(task?.id);

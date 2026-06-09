@@ -172,7 +172,7 @@ export function ProjectDetail({ id }: { id: string }) {
             )}
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/projects/${project.id}/settings`}>
+            <Link href={`${ROUTES.PROJECTS}/${project.id}/settings`}>
               <SlidersHorizontalIcon className="mr-2 size-4" />
               {tProjects("openSettings")}
             </Link>

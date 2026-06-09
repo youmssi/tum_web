@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 import { AppSidebar } from "@/components/modules/shell/app-nav";
+import { ErrorBoundaryWithI18n } from "@/components/ui/error-boundary-with-i18n";
 import { LocaleSwitcher } from "@/components/modules/shell/locale-switcher";
 import { NotificationCenter } from "@/components/modules/notifications";
 import { ThemeToggle } from "@/components/modules/shell/theme-toggle";
@@ -23,29 +24,31 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <SidebarProvider>
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
-      >
-        Skip to content
-      </a>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <div className="ml-auto flex items-center gap-2">
-            <SearchTrigger />
-            <ThemeToggle />
-            <LocaleSwitcher />
-            <NotificationCenter />
-          </div>
-        </header>
-        <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-auto p-4 md:p-6">
-          {children}
-        </main>
-      </SidebarInset>
-      <CommandPalette />
-    </SidebarProvider>
+    <ErrorBoundaryWithI18n>
+      <SidebarProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
+        >
+          Skip to content
+        </a>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <div className="ml-auto flex items-center gap-2">
+              <SearchTrigger />
+              <ThemeToggle />
+              <LocaleSwitcher />
+              <NotificationCenter />
+            </div>
+          </header>
+          <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-auto p-4 md:p-6">
+            {children}
+          </main>
+        </SidebarInset>
+        <CommandPalette />
+      </SidebarProvider>
+    </ErrorBoundaryWithI18n>
   );
 }

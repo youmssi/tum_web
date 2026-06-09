@@ -91,7 +91,6 @@ function BulkActionsBar({
 }) {
   const t = useTranslations("tasks.list");
   const { data: directory } = useDirectory();
-  const resolveStatusName = useStatusName(projectId);
   const { data: statusConfigs } = useStatuses(projectId);
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2">
