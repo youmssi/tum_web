@@ -114,6 +114,7 @@ export function ImportProjectDialog() {
   const [isDragging, setIsDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const dragDepthRef = useRef(0);
+  const [isImporting, setIsImporting] = useState(false);
 
   const importProject = useImportProject();
 
@@ -187,7 +188,8 @@ export function ImportProjectDialog() {
   }
 
   async function handleImport() {
-    if (!parsed) return;
+    if (!parsed || isImporting) return;
+    setIsImporting(true);
     try {
       const res = await importProject.mutateAsync({
         name: parsed.projectName,
@@ -198,6 +200,8 @@ export function ImportProjectDialog() {
       setStep("result");
     } catch {
       toast.error("Import failed. Please check the data and try again.");
+    } finally {
+      setIsImporting(false);
     }
   }
 
@@ -370,7 +374,7 @@ export function ImportProjectDialog() {
                 Cancel
               </Button>
               <Button onClick={() => setStep("preview")} disabled={!parsed}>
-                Preview
+                Preview · {parsed ? `${parsed.tasks.length} tasks` : ""}
               </Button>
             </div>
           </>
@@ -479,8 +483,8 @@ export function ImportProjectDialog() {
               <Button variant="outline" onClick={() => setStep("upload")}>
                 Back
               </Button>
-              <Button onClick={handleImport} disabled={importProject.isPending}>
-                {importProject.isPending ? "Importing…" : `Import ${parsed.tasks.length} tasks`}
+              <Button onClick={handleImport} disabled={isImporting}>
+                {isImporting ? "Importing…" : `Import ${parsed.tasks.length} tasks`}
               </Button>
             </div>
           </>
