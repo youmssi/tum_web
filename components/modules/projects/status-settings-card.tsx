@@ -1,6 +1,21 @@
 "use client";
 
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVerticalIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -37,7 +52,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useCreateStatus, useDeleteStatus, useStatuses, useUpdateStatus } from "./use-statuses";
+import {
+  useCreateStatus,
+  useDeleteStatus,
+  useReorderStatuses,
+  useStatuses,
+  useUpdateStatus,
+} from "./use-statuses";
 import type { StatusCategory, TaskStatusConfig } from "./status-api";
 
 interface StatusSettingsCardProps {
@@ -61,15 +82,36 @@ const DEFAULT_COLORS: Record<StatusCategory, string> = {
 };
 
 /**
- * Inline editor for the project's configured status columns (TUM-E17). Each row owns its own
- * local name/colour/WIP state so the input doesn't jitter while the user types; we persist on blur
- * (name / WIP) or change (colour). Supports adding new statuses and deleting existing ones.
+ * Inline editor for the project's configured status columns (TUM-E17). Supports rename,
+ * colour change, WIP limit, add, delete, and drag-to-reorder via dnd-kit SortableContext.
+ * Reorder calls the existing PATCH /api/projects/:id/statuses/reorder endpoint.
  */
 export function StatusSettingsCard({ projectId }: StatusSettingsCardProps) {
   const { data: statuses, isLoading } = useStatuses(projectId);
   const updateStatus = useUpdateStatus(projectId);
   const createStatus = useCreateStatus(projectId);
   const deleteStatus = useDeleteStatus(projectId);
+  const reorderStatuses = useReorderStatuses(projectId);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !statuses) return;
+
+    const oldIndex = statuses.findIndex((s) => s.id === active.id);
+    const newIndex = statuses.findIndex((s) => s.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(statuses, oldIndex, newIndex);
+    // Spacing matches the backend's SORT_SPACING = 65_536 constant.
+    const entries = reordered.map((s, i) => ({ id: s.id, sortOrder: (i + 1) * 65536 }));
+    try {
+      await reorderStatuses.mutateAsync({ entries });
+    } catch {
+      toast.error("Failed to reorder statuses.");
+    }
+  }
 
   return (
     <Card className="max-w-lg">
@@ -95,32 +137,44 @@ export function StatusSettingsCard({ projectId }: StatusSettingsCardProps) {
           </p>
         ) : (
           <div className="space-y-3">
-            <div className="hidden grid-cols-[2fr_1fr_auto_5rem_2rem] gap-3 text-xs font-medium text-muted-foreground sm:grid">
+            <div className="hidden grid-cols-[1.5rem_2fr_1fr_auto_5rem_2rem] gap-3 text-xs font-medium text-muted-foreground sm:grid">
+              <span />
               <span>Name</span>
               <span>Category</span>
               <span>Colour</span>
               <span>WIP limit</span>
               <span />
             </div>
-            {statuses.map((status) => (
-              <StatusRow
-                key={status.id}
-                status={status}
-                onUpdate={(payload) =>
-                  updateStatus.mutateAsync({ id: status.id, payload }).catch((err) => {
-                    const message = err instanceof Error ? err.message : "Failed to save status.";
-                    toast.error(message);
-                    throw err;
-                  })
-                }
-                onDelete={() =>
-                  deleteStatus.mutateAsync(status.id).then(() => {
-                    toast.success(`"${status.name}" deleted.`);
-                  })
-                }
-                canDelete={statuses.length > 1}
-              />
-            ))}
+
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={statuses.map((s) => s.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {statuses.map((status) => (
+                  <StatusRow
+                    key={status.id}
+                    status={status}
+                    onUpdate={(payload) =>
+                      updateStatus.mutateAsync({ id: status.id, payload }).catch((err) => {
+                        toast.error(err instanceof Error ? err.message : "Failed to save status.");
+                        throw err;
+                      })
+                    }
+                    onDelete={() =>
+                      deleteStatus.mutateAsync(status.id).then(() => {
+                        toast.success(`"${status.name}" deleted.`);
+                      })
+                    }
+                    canDelete={statuses.length > 1}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
 
             <AddStatusDialog
               onAdd={async (payload) => {
@@ -135,7 +189,7 @@ export function StatusSettingsCard({ projectId }: StatusSettingsCardProps) {
   );
 }
 
-/* ── Status row ─────────────────────────────────────── */
+/* ── Sortable status row ─────────────────────────────── */
 
 interface StatusRowProps {
   status: TaskStatusConfig;
@@ -149,12 +203,16 @@ interface StatusRowProps {
 }
 
 function StatusRow({ status, onUpdate, onDelete, canDelete }: StatusRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: status.id,
+  });
+
   const [name, setName] = useState(status.name);
   const [color, setColor] = useState(status.color);
   const [wipLimit, setWipLimit] = useState<string>(status.wipLimit?.toString() ?? "");
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  // Reset-on-prop-change pattern
+  // Reset local state when the server pushes updated props (e.g. after another client renames).
   const [snapshot, setSnapshot] = useState(status);
   if (snapshot !== status) {
     setSnapshot(status);
@@ -190,7 +248,24 @@ function StatusRow({ status, onUpdate, onDelete, canDelete }: StatusRowProps) {
   }
 
   return (
-    <div className="grid grid-cols-[2fr_1fr_auto_5rem_2rem] items-center gap-3">
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`grid grid-cols-[1.5rem_2fr_1fr_auto_5rem_2rem] items-center gap-3 ${
+        isDragging ? "opacity-50" : ""
+      }`}
+    >
+      {/* Drag handle */}
+      <button
+        type="button"
+        className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
+        aria-label="Drag to reorder"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVerticalIcon className="size-4" />
+      </button>
+
       <Input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -217,6 +292,7 @@ function StatusRow({ status, onUpdate, onDelete, canDelete }: StatusRowProps) {
         inputMode="numeric"
         aria-label={`WIP limit for ${status.name}`}
       />
+
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -294,13 +370,11 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
       toast.error("Status name is required.");
       return;
     }
-
     const parsedWip = wipLimit.trim() === "" ? undefined : Number(wipLimit.trim());
     if (parsedWip !== undefined && (Number.isNaN(parsedWip) || parsedWip < 1)) {
       toast.error("WIP limit must be a positive number or empty.");
       return;
     }
-
     try {
       await onAdd({ name: trimmed, color, category, wipLimit: parsedWip ?? null });
       setOpen(false);
@@ -371,8 +445,7 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              The category determines how the column behaves in reports and analytics. Tasks in this
-              column will have the category as their underlying status.
+              The category determines how the column behaves in reports and analytics.
             </p>
           </div>
           <div className="flex gap-4">

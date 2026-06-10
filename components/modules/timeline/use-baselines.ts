@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  baselineApi,
-  type BaselineResponse,
-  type CreateBaselinePayload,
-  type VarianceReport,
-} from "./baseline-api";
+import { baselineApi, type CreateBaselinePayload } from "./baseline-api";
 
 export const BASELINE_KEYS = {
   all: (projectId: string) => ["baselines", projectId] as const,

@@ -560,6 +560,12 @@
       "columnDetail": "Detail"
     }
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try refreshing the page.",
+    "refresh": "Refresh page",
+    "dashboard": "Go to dashboard"
+  },
   "activity": {
     "header": "Activity",
     "empty": "No activity yet.",

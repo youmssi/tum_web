@@ -107,7 +107,7 @@ export function ProjectSettingsForm({ id }: { id: string }) {
     <div className="space-y-6">
       <div>
         <Button variant="ghost" size="sm" className="-ml-2 mb-2 text-muted-foreground" asChild>
-          <Link href={`/projects/${id}`}>
+          <Link href={`${ROUTES.PROJECTS}/${id}`}>
             <ArrowLeftIcon className="mr-1 size-4" />
             Back to project
           </Link>

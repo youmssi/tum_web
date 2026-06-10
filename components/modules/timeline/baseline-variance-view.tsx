@@ -2,7 +2,6 @@
 
 import {
   AlertCircleIcon,
-  CalendarIcon,
   CheckCircle2Icon,
   ClockIcon,
   GanttChartIcon,
@@ -21,7 +20,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

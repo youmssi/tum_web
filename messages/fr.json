@@ -560,6 +560,12 @@
       "columnDetail": "Détail"
     }
   },
+  "errorBoundary": {
+    "title": "Une erreur s'est produite",
+    "description": "Une erreur inattendue est survenue. Veuillez actualiser la page.",
+    "refresh": "Actualiser la page",
+    "dashboard": "Aller au tableau de bord"
+  },
   "activity": {
     "header": "Activité",
     "empty": "Aucune activité pour l’instant.",
