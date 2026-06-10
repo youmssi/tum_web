@@ -16,8 +16,9 @@ import {
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useState } from "react";
-import { format } from "date-fns";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
+import { format, parseISO } from "date-fns";
 import { type DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
@@ -47,8 +48,38 @@ export function ProjectDetail({ id }: { id: string }) {
   const { data: activeOrg } = authClient.useActiveOrganization();
   useRealtimeTasks(id, activeOrg?.id ?? null);
 
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  // Persisted in URL search params so the timeline date filter survives page refresh.
+  const dateRange: DateRange | undefined = (() => {
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    // Range without a start is invalid — return undefined so the calendar shows no selection.
+    if (!from) return undefined;
+    return {
+      from: parseISO(from),
+      ...(to ? { to: parseISO(to) } : {}),
+    };
+  })();
+
+  const setDateRange = useCallback(
+    (range: DateRange | undefined) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (range?.from) {
+        params.set("from", format(range.from, "yyyy-MM-dd"));
+      } else {
+        params.delete("from");
+      }
+      if (range?.to) {
+        params.set("to", format(range.to, "yyyy-MM-dd"));
+      } else {
+        params.delete("to");
+      }
+      router.replace(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams],
+  );
 
   async function handleToggleArchive() {
     if (!project) return;

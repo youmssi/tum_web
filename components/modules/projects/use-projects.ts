@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { type CreateProjectPayload, type UpdateProjectPayload, projectApi } from "./project-api";
+import {
+  type CreateProjectPayload,
+  type UpdateProjectPayload,
+  type Project,
+  projectApi,
+} from "./project-api";
 
 export const PROJECT_KEYS = {
   all: ["projects"] as const,
@@ -50,8 +55,24 @@ export function useToggleArchive() {
   return useMutation({
     mutationFn: ({ id, archived }: { id: string; archived: boolean }) =>
       archived ? projectApi.unarchive(id) : projectApi.archive(id),
-    onSuccess: (updated) => {
-      queryClient.setQueryData(PROJECT_KEYS.detail(updated.id), updated);
+    onMutate: async ({ id, archived }) => {
+      await queryClient.cancelQueries({ queryKey: PROJECT_KEYS.detail(id) });
+      const previous = queryClient.getQueryData<Project>(PROJECT_KEYS.detail(id));
+      if (previous) {
+        queryClient.setQueryData<Project>(PROJECT_KEYS.detail(id), {
+          ...previous,
+          archived: !archived,
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, { id }, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(PROJECT_KEYS.detail(id), context.previous);
+      }
+    },
+    onSettled: (_data, _err, { id }) => {
+      queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.detail(id) });
       queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
     },
   });
