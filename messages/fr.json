@@ -585,12 +585,53 @@
     "tooLarge": "Le fichier est trop volumineux."
   },
   "landing": {
+    "builtFor": {
+      "sectionLabel": "Pour qui",
+      "heading": "Conçu pour toute équipe, tout flux de travail",
+      "subhead": "Des sprints d'ingénierie aux campagnes marketing — Tûm s'adapte à votre façon de travailler.",
+      "footer": "+ tous les services entre les deux. Aucun process rigide imposé.",
+      "teams": {
+        "engineering": { "label": "Ingénierie" },
+        "marketing": { "label": "Marketing" },
+        "operations": { "label": "Opérations" },
+        "events": { "label": "Événements" },
+        "research": { "label": "R&D" },
+        "community": { "label": "Communauté" },
+        "design": { "label": "Design" }
+      }
+    },
+    "comparison": {
+      "sectionLabel": "Comparer",
+      "heading": "Riche en fonctionnalités. Sans verrouillage.",
+      "subhead": "Tûm offre les capacités des outils premium — avec la liberté de l'open source.",
+      "headerFeature": "Fonctionnalité",
+      "footer": "Données issues des listes de fonctionnalités publiques en juin 2026. Consultez le site de chaque produit pour les détails les plus récents.",
+      "rows": {
+        "gantt": "Vue Gantt / Chronologie",
+        "dependencyScheduling": "Ordonnancement avec dépendances",
+        "criticalPath": "Analyse du chemin critique",
+        "customFields": "Champs personnalisés",
+        "customStatuses": "Statuts personnalisés + limites WIP",
+        "workloadView": "Vue charge de travail / capacité",
+        "selfHost": "Option auto-hébergement",
+        "fairCode": "Fair-code / pas de verrouillage fournisseur",
+        "unlimitedUsers": "Utilisateurs illimités sur tous les plans",
+        "realTime": "Collaboration en temps réel",
+        "openSource": "Code source ouvert"
+      }
+    },
     "nav": {
       "features": "Fonctionnalités",
       "howItWorks": "Comment ça marche",
       "pricing": "Tarifs",
       "signIn": "Se connecter",
       "getStarted": "Commencer"
+    },
+    "ganttDemo": {
+      "sectionLabel": "Démo interactive",
+      "heading": "Voyez le diagramme de Gantt",
+      "headingAccent": "en action.",
+      "subhead": "Glissez les barres, explorez les dépendances et voyez comment la planification intelligente fonctionne — directement dans votre navigateur, sans inscription."
     },
     "hero": {
       "tagline": "Exécution de projets & visibilité des équipes",
@@ -607,7 +648,18 @@
       "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Plus d’outils éparpillés — juste une exécution claire. Pour toute équipe, tout département, tout projet.",
       "ctaStartFree": "Démarrer gratuitement",
       "ctaSignIn": "Se connecter",
-      "microFooter": "Gratuit · Sans carte bancaire · Formules communauté et cloud"
+      "microFooter": "Gratuit · Sans carte bancaire · Formules communauté et cloud",
+      "capabilities": {
+        "label": "Fonctionnalités clés",
+        "items": {
+          "tasks": "Tâches et listes",
+          "timeline": "Chronologie Gantt",
+          "team": "Collaboration d'équipe",
+          "dependencies": "Dépendances de tâches",
+          "scheduling": "Planification intelligente"
+        },
+        "footer": "Planification glisser-déposer, flèches de dépendances, jalons et suivi en temps réel — tout dans un seul espace de travail."
+      }
     },
     "features": {
       "sectionLabel": "Capacités",
@@ -618,17 +670,29 @@
           "title": "Chronologie visuelle",
           "description": "Planification glisser-déposer avec flèches de dépendances, jalons et barres d’avancement par tâche. Voyez tout votre projet d’un coup d’œil — sans tableur."
         },
+        "scheduling": {
+          "title": "Planification intelligente",
+          "description": "Ordonnancement automatique tenant compte des dépendances avec chemin critique, sémantiques SS/FF/SF et décalages. Déplacez une tâche et les dépendantes se décalent automatiquement."
+        },
         "visibility": {
-          "title": "Visibilité immédiate",
-          "description": "Tableaux de bord en temps réel avec tendances d’achèvement, répartition par statut et compteurs de retards. Sachez ce qui avance et ce qui demande votre attention — sans réunion de point."
+          "title": "Tableaux de bord et analyses",
+          "description": "Tableaux de bord en temps réel avec tendances d’achèvement, répartition par statut, compteurs de retards et burndown. Sachez ce qui avance — sans réunion de point."
+        },
+        "workload": {
+          "title": "Vue charge de travail",
+          "description": "Répartition des tâches par responsable sur plusieurs semaines avec suivi de capacité et alertes de surcharge. Voyez qui a de la disponibilité avant d’assigner la prochaine tâche."
         },
         "dependencies": {
           "title": "Dépendances entre tâches",
           "description": "Liez les tâches pour que rien ne commence avant son heure. Modélisez étapes séquentielles, parcours parallèles et jalons — Tûm garde votre plan cohérent à mesure que tout évolue."
         },
+        "checklists": {
+          "title": "Checklists et sous-tâches",
+          "description": "Éléments ordonnés et cochables par tâche avec cumul d’avancement, plus arborescences de sous-tâches imbriquées. Décomposez le travail complexe sans perdre la vision d’ensemble."
+        },
         "mentions": {
-          "title": "@Mentions et fils de discussion",
-          "description": "Impliquez vos coéquipiers directement sur les tâches. Les notifications dans l’application font que rien ne passe à la trappe — peu importe le métier de votre équipe."
+          "title": "@Mentions et abonnements",
+          "description": "@mentionnez vos coéquipiers ou utilisez les mentions de groupe comme @team et @assignees. Abonnez-vous aux tâches pour être notifié de chaque changement."
         },
         "team": {
           "title": "Conçu pour toutes les équipes",

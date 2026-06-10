@@ -9,18 +9,33 @@ import {
   MessageSquare,
   ShieldCheck,
   Users,
+  Route,
+  BarChart3,
+  ListChecks,
   type LucideIcon,
 } from "lucide-react";
 
-type FeatureKey = "timeline" | "visibility" | "dependencies" | "mentions" | "team" | "selfHost";
+type FeatureKey =
+  | "timeline"
+  | "visibility"
+  | "dependencies"
+  | "mentions"
+  | "scheduling"
+  | "workload"
+  | "checklists"
+  | "team"
+  | "selfHost";
 
 const FEATURE_ORDER: { key: FeatureKey; number: string; icon: LucideIcon }[] = [
   { key: "timeline", number: "01", icon: CalendarDays },
-  { key: "visibility", number: "02", icon: LayoutDashboard },
-  { key: "dependencies", number: "03", icon: GitMerge },
-  { key: "mentions", number: "04", icon: MessageSquare },
-  { key: "team", number: "05", icon: Users },
-  { key: "selfHost", number: "06", icon: ShieldCheck },
+  { key: "scheduling", number: "02", icon: Route },
+  { key: "visibility", number: "03", icon: LayoutDashboard },
+  { key: "workload", number: "04", icon: BarChart3 },
+  { key: "dependencies", number: "05", icon: GitMerge },
+  { key: "checklists", number: "06", icon: ListChecks },
+  { key: "mentions", number: "07", icon: MessageSquare },
+  { key: "team", number: "08", icon: Users },
+  { key: "selfHost", number: "09", icon: ShieldCheck },
 ];
 
 function FeatureCard({
