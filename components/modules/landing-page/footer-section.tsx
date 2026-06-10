@@ -84,7 +84,7 @@ export async function FooterSection() {
           <p>
             © {new Date().getFullYear()} Tûm. {t("rights")}
           </p>
-          <p className="font-mono">v0.2 · phase-2b-gantt</p>
+          <p className="font-mono">v0.3 · phase-5-scheduling</p>
         </div>
       </div>
     </footer>
