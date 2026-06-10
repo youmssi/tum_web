@@ -43,7 +43,11 @@ export function CreateProjectDialog() {
 
   async function onSubmit({ name, description, memberRestricted }: CreateValues) {
     try {
-      await createProject.mutateAsync({ name, description: description || undefined, memberRestricted });
+      await createProject.mutateAsync({
+        name,
+        description: description || undefined,
+        memberRestricted,
+      });
       toast.success(`Project "${name}" created.`);
       form.reset();
       setOpen(false);

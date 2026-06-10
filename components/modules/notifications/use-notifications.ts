@@ -48,7 +48,6 @@ export function useUpdateNotificationPreference() {
       type: NotificationType;
       data: { emailEnabled?: boolean; inAppEnabled?: boolean };
     }) => notificationApi.updatePreference(type, data),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.preferences }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.preferences }),
   });
 }

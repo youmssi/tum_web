@@ -33,9 +33,12 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useDirectory } from "@/components/modules/organization";
-import { useStatusName } from "@/components/modules/projects";
+import { useStatuses } from "@/components/modules/projects";
 import { CommentThread } from "@/components/modules/comments";
 import { AttachmentList, FileUpload } from "@/components/modules/files";
+import { ChecklistView } from "@/components/modules/checklist";
+import { CustomFieldValues } from "@/components/modules/custom-fields";
+import { WatchToggle } from "@/components/modules/watchers";
 import {
   useCreateDependency,
   useDeleteDependency,
@@ -107,7 +110,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
   const members = directory ?? [];
   // Use the project-configured status names — the detail sheet's Status select must show
   // "Backlog" / "Shipped" / whatever the owner has renamed the columns to.
-  const resolveStatusName = useStatusName(projectId);
+  const { data: statusConfigs } = useStatuses(projectId);
   const { data: allTasks } = useTasks(projectId);
   const { data: deps } = useDependencies(task?.id);
   const createDep = useCreateDependency();
@@ -265,7 +268,10 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto px-6">
         <SheetHeader className="mb-4">
-          <SheetTitle className="sr-only">Task detail</SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle className="sr-only">Task detail</SheetTitle>
+            <WatchToggle taskId={task.id} />
+          </div>
         </SheetHeader>
 
         <form noValidate className="space-y-5">
@@ -306,9 +312,16 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {resolveStatusName(s)}
+                        {(
+                          statusConfigs ??
+                          (Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => ({
+                            id: s,
+                            category: s,
+                            name: STATUS_LABELS[s],
+                          }))
+                        ).map((cfg) => (
+                          <SelectItem key={cfg.id} value={cfg.category}>
+                            {cfg.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -536,6 +549,14 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
             />
           </FieldGroup>
         </form>
+
+        <Separator className="my-6" />
+
+        <CustomFieldValues taskId={task.id} projectId={projectId} />
+
+        <Separator className="my-6" />
+
+        <ChecklistView taskId={task.id} />
 
         {task &&
           (() => {

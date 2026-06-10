@@ -33,7 +33,7 @@ export function WorkspacePicker() {
   return (
     <div className="w-full max-w-md space-y-6">
       <Link
-        href="/"
+        href={ROUTES.HOME}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeftIcon className="size-3.5" />

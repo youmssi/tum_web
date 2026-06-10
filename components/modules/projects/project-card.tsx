@@ -3,6 +3,7 @@
 import { ArchiveIcon, LockIcon } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
+import { ROUTES } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Project } from "./project-api";
@@ -15,7 +16,7 @@ export function ProjectCard({ project }: { project: Project }) {
   });
 
   return (
-    <Link href={`/projects/${project.id}`} className="group block">
+    <Link href={`${ROUTES.PROJECTS}/${project.id}`} className="group block">
       <Card className="h-full transition-shadow group-hover:shadow-md">
         <CardHeader className="gap-3">
           <div className="flex items-start justify-between gap-2">

@@ -28,12 +28,24 @@ export interface ReorderStatusesPayload {
   entries: { id: string; sortOrder: number }[];
 }
 
+export interface CreateStatusPayload {
+  name: string;
+  color?: string;
+  category?: StatusCategory;
+  wipLimit?: number | null;
+}
+
 export const statusApi = {
   listForProject: (projectId: string) =>
     api.get(`api/projects/${projectId}/statuses`).json<TaskStatusConfig[]>(),
 
+  create: (projectId: string, body: CreateStatusPayload) =>
+    api.post(`api/projects/${projectId}/statuses`, { json: body }).json<TaskStatusConfig>(),
+
   update: (statusId: string, body: UpdateStatusPayload) =>
     api.patch(`api/statuses/${statusId}`, { json: body }).json<TaskStatusConfig>(),
+
+  delete: (statusId: string) => api.delete(`api/statuses/${statusId}`),
 
   reorder: (projectId: string, body: ReorderStatusesPayload) =>
     api

@@ -6,9 +6,10 @@ import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatLocalDate, parseLocalDate, todayLocalDate } from "@/lib/date";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -36,9 +37,11 @@ import { dependencyApi } from "./dependency-api";
 import {
   DEP_KEYS,
   useCreateDependency,
+  useCriticalPath,
   useDeleteDependency,
   type DependencyType,
 } from "./use-timeline";
+import { BaselineVarianceDialog } from "./baseline-variance-view";
 import { TimelineToolbar } from "./timeline-toolbar";
 import { TimelineLeftPanel, GANTT_ROW_HEIGHT } from "./timeline-left-panel";
 
@@ -46,9 +49,9 @@ const GANTT_OPTIONS = {
   bar_height: 28,
   padding: 12,
   readonly_progress: false,
-  // Suppress Frappe Gantt's built-in "Today" button — we render our own in the toolbar (where
-  // users expect controls) and call scroll_current() via the GanttChart imperative handle.
-  today_button: false,
+  // Frappe Gantt's built-in today line + button are enabled so the vertical "today" reference
+  // line renders on the chart. The button element is hidden via CSS ('.gantt .side-header > *')
+  // because we have our own in the toolbar — see the .project-timeline-chart styles below.
 } as const;
 
 const LEFT_PANEL_MIN = 240;
@@ -75,8 +78,6 @@ export function ProjectTimeline({
   dateRange,
 }: {
   projectId: string;
-  /** Retained for callsite API stability; previously used by the in-browser Gantt export. */
-  projectName?: string;
   dateRange?: DateRange;
 }) {
   const { data: tasks, isLoading } = useTasks(projectId);
@@ -85,6 +86,7 @@ export function ProjectTimeline({
   const toggleMilestone = useToggleMilestone(projectId);
   const createDependency = useCreateDependency();
   const deleteDependency = useDeleteDependency();
+
   const { getConfig } = useTimelineColors();
   const colors = getConfig(projectId);
 
@@ -95,8 +97,18 @@ export function ProjectTimeline({
   const [linkSource, setLinkSource] = useState<string | null>(null);
   const [linkTarget, setLinkTarget] = useState<string | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkLagDays, setLinkLagDays] = useState(0);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [criticalPathMode, setCriticalPathMode] = useState(false);
+  const [baselinesOpen, setBaselinesOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: criticalPathData } = useCriticalPath(criticalPathMode ? projectId : undefined);
+  const criticalTaskIds = useMemo(
+    () => new Set(criticalPathData?.criticalPathIds ?? []),
+    [criticalPathData],
+  );
 
   // Left panel width — "28%" initially (adapts to any viewport), pixel value after user drags.
   const [leftWidth, setLeftWidth] = useState<number | string>("28%");
@@ -181,6 +193,9 @@ export function ProjectTimeline({
       const start = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.startDate!;
       const end = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.endDate!;
       const colorClass = taskColorClass(t, colors.nearDueDays);
+      const isCritical = criticalTaskIds.has(t.id);
+      const cpClass = criticalPathMode && isCritical ? "tum-critical" : "";
+      const baseClass = t.milestone ? `${colorClass}-milestone` : colorClass;
       return {
         id: t.id,
         name: t.title,
@@ -188,24 +203,35 @@ export function ProjectTimeline({
         end,
         progress: t.progress,
         dependencies: depMap[t.id]?.join(",") ?? "",
-        custom_class: t.milestone ? `${colorClass}-milestone` : colorClass,
+        custom_class: cpClass ? `${baseClass} ${cpClass}` : baseClass,
       };
     });
-  }, [scheduledTasks, depMap, colors.nearDueDays]);
+  }, [scheduledTasks, depMap, colors.nearDueDays, criticalPathMode, criticalTaskIds]);
 
   const handleDateChange = useCallback(
     async (ganttTask: GanttTask, start: Date, end: Date) => {
       try {
-        await reschedule.mutateAsync({
-          id: ganttTask.id as string,
+        const result = await dependencyApi.reschedule(ganttTask.id as string, {
           startDate: formatLocalDate(start),
           endDate: formatLocalDate(end),
         });
+        if (result.autoShiftedTasks.length > 0) {
+          toast.success(
+            `${result.autoShiftedTasks.length} dependent task${result.autoShiftedTasks.length === 1 ? " was" : "s were"} auto-shifted.`,
+          );
+        }
+        if (result.conflicts.length > 0) {
+          for (const conflict of result.conflicts) {
+            toast.warning(conflict, { duration: 8000 });
+          }
+        }
+        // Refresh tasks to reflect shifted dates
+        queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
       } catch {
         toast.error("Failed to reschedule task.");
       }
     },
-    [reschedule],
+    [projectId, queryClient],
   );
 
   const handleProgressChange = useCallback(
@@ -248,7 +274,12 @@ export function ProjectTimeline({
   async function confirmLink(type: DependencyType) {
     if (!linkSource || !linkTarget) return;
     try {
-      await createDependency.mutateAsync({ fromTaskId: linkSource, toTaskId: linkTarget, type });
+      await createDependency.mutateAsync({
+        fromTaskId: linkSource,
+        toTaskId: linkTarget,
+        type,
+        lagDays: linkLagDays > 0 ? linkLagDays : undefined,
+      });
       toast.success("Dependency created.");
     } catch {
       toast.error("Failed to create dependency.");
@@ -257,6 +288,7 @@ export function ProjectTimeline({
       setLinkSource(null);
       setLinkTarget(null);
       setLinkMode(false);
+      setLinkLagDays(0);
     }
   }
 
@@ -315,6 +347,30 @@ export function ProjectTimeline({
           overflow: visible !important;
           height: auto !important;
         }
+        /* Hide Frappe Gantt's built-in side-header toolbar (view-mode select + today button)
+           because we render our own in the TimelineToolbar component. The today reference line
+           (vertical line on today's date) is drawn by Frappe Gantt's draw_today() and remains
+           visible — only the interactive controls in the sticky header are suppressed. */
+        .project-timeline-chart .gantt-container .side-header { display: none !important; }
+        /* Critical path: highlight bars with a distinct red stroke + subtle glow */
+        .tum-critical .bar {
+          stroke: #dc2626 !important;
+          stroke-width: 2px !important;
+          filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4)) !important;
+        }
+        .tum-critical .bar-progress {
+          stroke: #b91c1c !important;
+          stroke-width: 2px !important;
+        }
+        .tum-critical-milestone .bar {
+          stroke: #dc2626 !important;
+          stroke-width: 2px !important;
+          filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4)) !important;
+        }
+        /* Dim non-critical tasks when critical path mode is active */
+        .tum-critical-mode .bar { opacity: 0.5 !important; }
+        .tum-critical-mode .tum-critical .bar { opacity: 1 !important; }
+        .tum-critical-mode .tum-critical .bar-progress { opacity: 1 !important; }
       `}</style>
 
       <div className="shrink-0">
@@ -330,6 +386,10 @@ export function ProjectTimeline({
           isFocused={isFocused}
           onFocusToggle={() => setIsFocused((f) => !f)}
           onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
+          criticalPathMode={criticalPathMode}
+          onCriticalPathToggle={() => setCriticalPathMode((m) => !m)}
+          criticalPathCount={criticalTaskIds.size}
+          onBaselinesOpen={() => setBaselinesOpen(true)}
         />
       </div>
 
@@ -452,7 +512,9 @@ export function ProjectTimeline({
             className="flex-1 min-h-0 min-w-0 overflow-auto overscroll-contain"
           >
             {ganttTasks.length > 0 ? (
-              <div className="project-timeline-chart min-w-max">
+              <div
+                className={`project-timeline-chart min-w-max ${criticalPathMode ? "tum-critical-mode" : ""}`}
+              >
                 <GanttChart
                   ref={ganttHandleRef}
                   tasks={ganttTasks}
@@ -489,6 +551,7 @@ export function ProjectTimeline({
           }
         }}
       >
+        {" "}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Create dependency</DialogTitle>
@@ -496,24 +559,45 @@ export function ProjectTimeline({
               {linkSourceTask?.title} → {linkTargetTask?.title}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 pt-2">
-            <p className="text-sm text-muted-foreground">Select dependency type:</p>
-            <div className="grid gap-2">
-              {DEP_TYPE_OPTIONS.map(({ value, label }) => (
-                <Button
-                  key={value}
-                  variant="outline"
-                  className="justify-start"
-                  onClick={() => confirmLink(value)}
-                  disabled={createDependency.isPending}
-                >
-                  {label}
-                </Button>
-              ))}
+          <div className="space-y-4 pt-2">
+            <div>
+              <p className="mb-3 text-sm text-muted-foreground">Select dependency type:</p>
+              <div className="grid gap-2">
+                {DEP_TYPE_OPTIONS.map(({ value, label }) => (
+                  <Button
+                    key={value}
+                    variant="outline"
+                    className="justify-start"
+                    onClick={() => confirmLink(value)}
+                    disabled={createDependency.isPending}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-muted-foreground">Lag / lead (days)</label>
+              <p className="mb-1.5 text-xs text-muted-foreground/70">
+                Positive = delay, negative = overlap. Zero is default.
+              </p>
+              <Input
+                type="number"
+                min={0}
+                value={linkLagDays}
+                onChange={(e) => setLinkLagDays(Math.max(0, parseInt(e.target.value) || 0))}
+                placeholder="0"
+              />
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      <BaselineVarianceDialog
+        projectId={projectId}
+        open={baselinesOpen}
+        onOpenChange={setBaselinesOpen}
+      />
 
       <TaskDetailSheet
         task={selectedTask}

@@ -32,6 +32,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/lib/constants";
 import { StatusSettingsCard } from "./status-settings-card";
+import { CustomFieldsSettingsCard } from "@/components/modules/custom-fields";
+import { WorkingCalendarCard } from "@/components/modules/calendar";
 import { useDeleteProject, useProject, useUpdateProject } from "./use-projects";
 
 const settingsSchema = z.object({
@@ -105,7 +107,7 @@ export function ProjectSettingsForm({ id }: { id: string }) {
     <div className="space-y-6">
       <div>
         <Button variant="ghost" size="sm" className="-ml-2 mb-2 text-muted-foreground" asChild>
-          <Link href={`/projects/${id}`}>
+          <Link href={`${ROUTES.PROJECTS}/${id}`}>
             <ArrowLeftIcon className="mr-1 size-4" />
             Back to project
           </Link>
@@ -190,6 +192,14 @@ export function ProjectSettingsForm({ id }: { id: string }) {
       <Separator className="max-w-lg" />
 
       <StatusSettingsCard projectId={id} />
+
+      <Separator className="max-w-lg" />
+
+      <CustomFieldsSettingsCard projectId={id} />
+
+      <Separator className="max-w-lg" />
+
+      <WorkingCalendarCard projectId={id} />
 
       <Separator className="max-w-lg" />
 

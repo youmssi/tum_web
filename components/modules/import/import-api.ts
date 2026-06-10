@@ -11,6 +11,9 @@ export interface ImportTaskRow {
   milestone?: boolean | null;
   parentTask?: string | null;
   dependsOn?: string[] | null;
+  labels?: string[] | null;
+  dueDate?: string | null;
+  assignee?: string | null;
 }
 
 export interface ImportProjectPayload {

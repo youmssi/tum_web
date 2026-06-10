@@ -10,6 +10,7 @@ import {
   LayoutListIcon,
   SlidersHorizontalIcon,
   SquareKanbanIcon,
+  UsersIcon,
   XIcon,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -29,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ActivityFeed } from "@/components/modules/activity";
-import { ProjectDashboard } from "@/components/modules/analytics";
+import { ProjectDashboard, WorkloadView } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
@@ -171,7 +172,7 @@ export function ProjectDetail({ id }: { id: string }) {
             )}
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/projects/${project.id}/settings`}>
+            <Link href={`${ROUTES.PROJECTS}/${project.id}/settings`}>
               <SlidersHorizontalIcon className="mr-2 size-4" />
               {tProjects("openSettings")}
             </Link>
@@ -201,6 +202,10 @@ export function ProjectDetail({ id }: { id: string }) {
             <CalendarRangeIcon className="size-4" />
             {tabs("timeline")}
           </TabsTrigger>
+          <TabsTrigger value="workload" className="gap-1.5">
+            <UsersIcon className="size-4" />
+            Workload
+          </TabsTrigger>
           <TabsTrigger value="activity" className="gap-1.5">
             <ActivityIcon className="size-4" />
             {tabs("activity")}
@@ -220,11 +225,11 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4 flex min-h-0 flex-1 flex-col">
-          <ProjectTimeline
-            projectId={project.id}
-            projectName={project.name}
-            dateRange={dateRange}
-          />
+          <ProjectTimeline projectId={project.id} dateRange={dateRange} />
+        </TabsContent>
+
+        <TabsContent value="workload" className="mt-4">
+          <WorkloadView projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="activity" className="mt-4">
