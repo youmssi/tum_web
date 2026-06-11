@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -144,6 +145,7 @@ export function CreateTaskDialog({ projectId }: { projectId: string }) {
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting || createTask.isPending}>
+              {createTask.isPending && <Spinner data-icon="inline-start" />}
               {createTask.isPending ? "Creating…" : "Create task"}
             </Button>
           </div>

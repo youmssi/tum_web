@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { AvatarUpload } from "@/components/modules/files";
 
@@ -116,6 +117,7 @@ export function OrgSettingsForm() {
           </FieldGroup>
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Spinner data-icon="inline-start" />}
               {isSubmitting ? "Saving…" : "Save changes"}
             </Button>
             <Button

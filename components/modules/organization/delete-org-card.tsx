@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { useBillingState } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
@@ -141,6 +142,7 @@ export function DeleteOrgCard() {
                 disabled={!canDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
+                {pending && <Spinner data-icon="inline-start" />}
                 {pending ? "Deleting…" : "Delete organisation"}
               </AlertDialogAction>
             </AlertDialogFooter>

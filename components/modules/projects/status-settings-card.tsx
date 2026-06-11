@@ -60,6 +60,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   useCreateStatus,
@@ -541,6 +542,7 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
             Cancel
           </Button>
           <Button type="submit" form="add-status-form" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
             {form.formState.isSubmitting ? "Adding…" : "Add column"}
           </Button>
         </DialogFooter>

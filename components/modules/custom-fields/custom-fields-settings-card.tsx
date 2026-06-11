@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -351,6 +352,7 @@ function CreateFieldDialog({ projectId, onClose }: { projectId: string; onClose:
         {errors.root && <p className="text-sm text-destructive">{errors.root.message}</p>}
         <DialogFooter>
           <Button type="submit" disabled={createField.isPending || isSubmitting}>
+            {createField.isPending && <Spinner data-icon="inline-start" />}
             {createField.isPending ? "Creating…" : "Create field"}
           </Button>
         </DialogFooter>

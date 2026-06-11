@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/empty";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
@@ -171,6 +172,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
           disabled={!content.trim() || createComment.isPending}
           onClick={handleSubmit}
         >
+          {createComment.isPending && <Spinner data-icon="inline-start" />}
           {createComment.isPending ? t("submitting") : t("submit")}
         </Button>
       </div>

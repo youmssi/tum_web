@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -120,6 +121,7 @@ export function InviteMemberDialog({ onInvited }: { onInvited?: () => void }) {
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Spinner data-icon="inline-start" />}
               {isSubmitting ? "Sending…" : "Send invitation"}
             </Button>
           </div>
