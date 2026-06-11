@@ -9,6 +9,14 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -394,12 +402,17 @@ export function ProjectTimeline({
       </div>
 
       {ganttTasks.length === 0 && (tasks ?? []).length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-          <CalendarRangeIcon className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            No tasks yet. Create tasks and set dates to see them here.
-          </p>
-        </div>
+        <Empty className="min-h-48 border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <CalendarRangeIcon />
+            </EmptyMedia>
+            <EmptyTitle>No tasks yet</EmptyTitle>
+            <EmptyDescription>
+              Create tasks and set dates to see them on the timeline.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         /*
          * Height: flex-1 min-h-0 inside the project tab column (no viewport calc) so only
@@ -526,16 +539,25 @@ export function ProjectTimeline({
                 />
               </div>
             ) : (
-              <div
-                className="flex items-center justify-center text-sm text-muted-foreground"
+              <Empty
+                className="border-none"
                 style={{
                   height: Math.max(200, (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT),
                 }}
               >
-                {dateRange?.from || dateRange?.to
-                  ? "No tasks fall within the selected date range."
-                  : "Add start & end dates to tasks to see bars here."}
-              </div>
+                <EmptyHeader>
+                  <EmptyTitle>
+                    {dateRange?.from || dateRange?.to
+                      ? "No tasks in this date range"
+                      : "Set dates to see bars"}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {dateRange?.from || dateRange?.to
+                      ? "No tasks fall within the selected date range."
+                      : "Add start & end dates to tasks to see bars here."}
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
             )}
           </div>
         </div>

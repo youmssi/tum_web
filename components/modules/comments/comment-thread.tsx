@@ -7,6 +7,13 @@ import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -242,7 +249,11 @@ export function CommentThread({ taskId }: CommentThreadProps) {
           ))}
         </div>
       ) : comments?.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("empty")}</p>
+        <Empty className="py-6 border-none">
+          <EmptyHeader>
+            <EmptyTitle>{t("empty")}</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="space-y-4">
           {comments?.map((comment) => {

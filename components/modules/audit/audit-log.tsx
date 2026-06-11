@@ -6,6 +6,13 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -99,12 +106,17 @@ export function AuditLog() {
 
   if (!canView) {
     return (
-      <div className="flex min-h-64 flex-col items-center justify-center gap-2">
-        <ShieldAlertIcon className="size-8 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          Only admins and owners can view the audit log.
-        </p>
-      </div>
+      <Empty className="min-h-64 border-none">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <ShieldAlertIcon />
+          </EmptyMedia>
+          <EmptyTitle>Access restricted</EmptyTitle>
+          <EmptyDescription>
+            Only admins and owners can view the audit log.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
@@ -150,20 +162,31 @@ export function AuditLog() {
           ))}
         </div>
       ) : isError ? (
-        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-destructive/40">
-          <ShieldAlertIcon className="size-8 text-destructive" />
-          <p className="text-sm font-medium text-destructive">Failed to load audit log</p>
-          <p className="text-xs text-muted-foreground">
-            {error instanceof Error
-              ? error.message
-              : "An unexpected error occurred. Check your permissions."}
-          </p>
-        </div>
+        <Empty className="min-h-48 border border-dashed border-destructive/40">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ShieldAlertIcon className="text-destructive" />
+            </EmptyMedia>
+            <EmptyTitle className="text-destructive">Failed to load audit log</EmptyTitle>
+            <EmptyDescription>
+              {error instanceof Error
+                ? error.message
+                : "An unexpected error occurred. Check your permissions."}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : !entries.length ? (
-        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-          <ShieldAlertIcon className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">No audit entries found.</p>
-        </div>
+        <Empty className="min-h-48 border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ShieldAlertIcon />
+            </EmptyMedia>
+            <EmptyTitle>No audit entries</EmptyTitle>
+            <EmptyDescription>
+              No audit entries found. Actions will be logged here automatically.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className={isFetching ? "opacity-60 transition-opacity" : ""}>
           <Table>

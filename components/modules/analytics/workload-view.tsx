@@ -6,6 +6,13 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -69,8 +76,20 @@ export function WorkloadView({ projectId }: WorkloadViewProps) {
       <Card>
         <CardHeader>
           <CardTitle>Workload</CardTitle>
-          <CardDescription>No assigned tasks with dates to show.</CardDescription>
         </CardHeader>
+        <CardContent>
+          <Empty className="border-none py-4">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <UserIcon />
+              </EmptyMedia>
+              <EmptyTitle>No workload data</EmptyTitle>
+              <EmptyDescription>
+                No assigned tasks with dates to show.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </CardContent>
       </Card>
     );
   }

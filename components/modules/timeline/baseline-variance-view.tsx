@@ -15,6 +15,13 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -175,9 +182,14 @@ export function BaselineVarianceDialog({
                     </div>
                   </ScrollArea>
                 ) : (
-                  <div className="text-sm text-muted-foreground py-4 text-center">
-                    No baselines yet. Capture the current schedule to start tracking variance.
-                  </div>
+                  <Empty className="border-none py-4">
+                    <EmptyHeader>
+                      <EmptyTitle>No baselines yet</EmptyTitle>
+                      <EmptyDescription>
+                        Capture the current schedule to start tracking variance.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 )}
               </div>
             </div>
