@@ -19,6 +19,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -435,15 +443,26 @@ export function TaskList({ projectId }: { projectId: string }) {
       )}
 
       {filtered.length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-          <LayoutListIcon className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            {tasks?.length === 0
-              ? "No tasks yet. Create the first one."
-              : "No tasks match the current filters."}
-          </p>
-          {tasks?.length === 0 && <CreateTaskDialog projectId={projectId} />}
-        </div>
+        <Empty className="min-h-48 border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <LayoutListIcon />
+            </EmptyMedia>
+            <EmptyTitle>
+              {tasks?.length === 0 ? "No tasks yet" : "No tasks match the current filters"}
+            </EmptyTitle>
+            <EmptyDescription>
+              {tasks?.length === 0
+                ? "Create the first task to get started."
+                : "Try adjusting your filters."}
+            </EmptyDescription>
+          </EmptyHeader>
+          {tasks?.length === 0 && (
+            <EmptyContent>
+              <CreateTaskDialog projectId={projectId} />
+            </EmptyContent>
+          )}
+        </Empty>
       ) : (
         <>
           <div className="rounded-xl border">

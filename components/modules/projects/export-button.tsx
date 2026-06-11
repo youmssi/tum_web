@@ -1,10 +1,11 @@
 "use client";
 
-import { FileSpreadsheetIcon, Loader2Icon } from "lucide-react";
+import { FileSpreadsheetIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useExportProjectArchive } from "./use-export";
 
 interface ExportProjectButtonProps {
@@ -38,9 +39,9 @@ export function ExportProjectButton({ projectId, projectName }: ExportProjectBut
   return (
     <Button variant="outline" size="sm" onClick={handleClick} disabled={exportArchive.isPending}>
       {exportArchive.isPending ? (
-        <Loader2Icon className="mr-2 size-4 animate-spin" />
+        <Spinner data-icon="inline-start" />
       ) : (
-        <FileSpreadsheetIcon className="mr-2 size-4" />
+        <FileSpreadsheetIcon data-icon="inline-start" className="size-4" />
       )}
       {exportArchive.isPending ? t("preparing") : t("button")}
     </Button>

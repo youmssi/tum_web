@@ -25,6 +25,14 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -104,13 +112,22 @@ export function ProjectDetail({ id }: { id: string }) {
 
   if (!project) {
     return (
-      <div className="flex min-h-64 flex-col items-center justify-center gap-2">
-        <FolderKanbanIcon className="size-10 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Project not found.</p>
-        <Button variant="outline" onClick={() => router.push(ROUTES.PROJECTS)}>
-          Back to projects
-        </Button>
-      </div>
+      <Empty className="min-h-64 border-none">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FolderKanbanIcon />
+          </EmptyMedia>
+          <EmptyTitle>Project not found</EmptyTitle>
+          <EmptyDescription>
+            The project you&apos;re looking for doesn&apos;t exist or has been deleted.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button variant="outline" onClick={() => router.push(ROUTES.PROJECTS)}>
+            Back to projects
+          </Button>
+        </EmptyContent>
+      </Empty>
     );
   }
 

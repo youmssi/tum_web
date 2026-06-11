@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -94,11 +95,13 @@ export function ChecklistView({ taskId }: ChecklistViewProps) {
         </div>
       )}
 
-      <div className="flex gap-2">
+      <Field orientation="horizontal" className="gap-2">
+        <FieldLabel className="sr-only">Add checklist item</FieldLabel>
         <Input
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
           placeholder="Add checklist item…"
+          className="flex-1"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -115,7 +118,7 @@ export function ChecklistView({ taskId }: ChecklistViewProps) {
         >
           <PlusIcon className="size-4" />
         </Button>
-      </div>
+      </Field>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CheckIcon, XIcon, MinusIcon } from "lucide-react";
+import { CheckIcon, MinusIcon } from "lucide-react";
 
 const COMPARISON_ROWS = [
   { key: "gantt", tum: true, linear: false, asana: true, jira: true },

@@ -20,6 +20,7 @@ import {
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -181,6 +182,7 @@ export function SignupForm() {
 
       <CardContent className="pt-0">
         <Button type="submit" form="signup-form" className="w-full" disabled={isSubmitting}>
+          {isSubmitting && <Spinner data-icon="inline-start" />}
           {isSubmitting ? t("submitting") : t("submit")}
         </Button>
       </CardContent>

@@ -29,6 +29,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/lib/constants";
 import { StatusSettingsCard } from "./status-settings-card";
@@ -167,6 +168,7 @@ export function ProjectSettingsForm({ id }: { id: string }) {
             </FieldGroup>
             <div className="flex gap-2">
               <Button type="submit" disabled={isSubmitting || updateProject.isPending}>
+                {updateProject.isPending && <Spinner data-icon="inline-start" />}
                 {updateProject.isPending ? "Saving…" : "Save changes"}
               </Button>
               <Button

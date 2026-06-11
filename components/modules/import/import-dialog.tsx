@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
   DialogContent,
@@ -286,6 +287,7 @@ export function ImportProjectDialog() {
                     onClick={handleDownloadTemplate}
                     disabled={templateLoading}
                   >
+                    {templateLoading && <Spinner data-icon="inline-start" />}
                     {templateLoading ? "Generating…" : "Download template"}
                   </Button>
                 </div>
@@ -484,6 +486,7 @@ export function ImportProjectDialog() {
                 Back
               </Button>
               <Button onClick={handleImport} disabled={isImporting}>
+                {isImporting && <Spinner data-icon="inline-start" />}
                 {isImporting ? "Importing…" : `Import ${parsed.tasks.length} tasks`}
               </Button>
             </div>

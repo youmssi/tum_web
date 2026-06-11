@@ -7,6 +7,12 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -122,10 +128,14 @@ export function NotificationCenter() {
               ))}
             </div>
           ) : !notifications?.length ? (
-            <div className="flex min-h-32 flex-col items-center justify-center gap-1 text-center">
-              <BellIcon className="size-6 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{t("empty")}</p>
-            </div>
+            <Empty className="min-h-32 border-none gap-2">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <BellIcon />
+                </EmptyMedia>
+                <EmptyTitle>{t("empty")}</EmptyTitle>
+              </EmptyHeader>
+            </Empty>
           ) : (
             <div>
               {notifications.map((n) => (

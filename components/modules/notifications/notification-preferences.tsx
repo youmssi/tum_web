@@ -2,9 +2,16 @@
 
 import { toast } from "sonner";
 
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { type NotificationType } from "./notification-api";
 import { useNotificationPreferences, useUpdateNotificationPreference } from "./use-notifications";
 
@@ -52,34 +59,41 @@ export function NotificationPreferences() {
   }
 
   return (
-    <div className="space-y-1">
-      <div className="mb-3 flex items-center gap-4 pb-2">
+    <FieldSet className="w-full">
+      <FieldLegend variant="label">Notification Preferences</FieldLegend>
+      <FieldDescription>
+        Choose how you receive notifications for each event type.
+      </FieldDescription>
+      <div className="flex items-center gap-4 px-0.5 pb-1">
         <span className="flex-1 text-xs text-muted-foreground">Notification type</span>
-        <div className="flex gap-6 text-xs text-muted-foreground">
+        <div className="flex w-[92px] gap-6 text-xs text-muted-foreground">
           <span className="w-9 text-center">Email</span>
           <span className="w-9 text-center">In-app</span>
         </div>
       </div>
-      <Separator className="mb-3" />
-      {prefs.map((pref) => (
-        <div key={pref.type} className="flex items-center justify-between gap-4 py-2">
-          <span className="flex-1 text-sm">{TYPE_LABELS[pref.type] ?? pref.type}</span>
-          <div className="flex gap-6">
-            <Switch
-              checked={pref.emailEnabled}
-              onCheckedChange={() => toggle(pref.type, "emailEnabled", pref.emailEnabled)}
-              disabled={update.isPending}
-              aria-label={`Email for ${TYPE_LABELS[pref.type]}`}
-            />
-            <Switch
-              checked={pref.inAppEnabled}
-              onCheckedChange={() => toggle(pref.type, "inAppEnabled", pref.inAppEnabled)}
-              disabled={update.isPending}
-              aria-label={`In-app for ${TYPE_LABELS[pref.type]}`}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
+      <FieldGroup className="gap-0">
+        {prefs.map((pref) => (
+          <Field key={pref.type} orientation="horizontal" className="py-2">
+            <FieldLabel className="flex-1 font-normal text-sm">
+              {TYPE_LABELS[pref.type] ?? pref.type}
+            </FieldLabel>
+            <div className="flex gap-6">
+              <Switch
+                checked={pref.emailEnabled}
+                onCheckedChange={() => toggle(pref.type, "emailEnabled", pref.emailEnabled)}
+                disabled={update.isPending}
+                aria-label={`Email for ${TYPE_LABELS[pref.type]}`}
+              />
+              <Switch
+                checked={pref.inAppEnabled}
+                onCheckedChange={() => toggle(pref.type, "inAppEnabled", pref.inAppEnabled)}
+                disabled={update.isPending}
+                aria-label={`In-app for ${TYPE_LABELS[pref.type]}`}
+              />
+            </div>
+          </Field>
+        ))}
+      </FieldGroup>
+    </FieldSet>
   );
 }

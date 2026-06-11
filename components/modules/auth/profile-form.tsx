@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 import { AvatarUpload } from "@/components/modules/files";
@@ -126,6 +127,7 @@ export function ProfileForm() {
       <CardContent className="pt-0">
         <div className="flex items-center gap-2">
           <Button type="submit" form="profile-form" disabled={isSubmitting}>
+            {isSubmitting && <Spinner data-icon="inline-start" />}
             {isSubmitting ? t("saving") : t("save")}
           </Button>
           <Button

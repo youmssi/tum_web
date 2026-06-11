@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   DndContext,
   PointerSensor,
@@ -17,7 +18,9 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVerticalIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import {
   AlertDialog,
@@ -41,6 +44,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -49,8 +59,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   useCreateStatus,
@@ -348,37 +358,57 @@ interface AddStatusDialogProps {
   }) => Promise<unknown>;
 }
 
+const addStatusSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Status name is required.")
+    .max(60, "Name must be at most 60 characters."),
+  category: z.enum(["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"]),
+  color: z.string().min(1),
+  wipLimit: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || val === "" || (!Number.isNaN(Number(val)) && Number(val) >= 1),
+      "WIP limit must be a positive number or empty.",
+    ),
+});
+
+type AddStatusValues = z.infer<typeof addStatusSchema>;
+
 const DEFAULT_COLOR = "#6366f1";
 
 function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<StatusCategory>("TODO");
-  const [color, setColor] = useState(DEFAULT_COLOR);
-  const [wipLimit, setWipLimit] = useState("");
+  const form = useForm<AddStatusValues>({
+    resolver: zodResolver(addStatusSchema),
+    defaultValues: {
+      name: "",
+      category: "TODO",
+      color: DEFAULT_COLOR,
+      wipLimit: "",
+    },
+  });
 
-  function reset() {
-    setName("");
-    setCategory("TODO");
-    setColor(DEFAULT_COLOR);
-    setWipLimit("");
+  function resetAndClose() {
+    setOpen(false);
+    form.reset({
+      name: "",
+      category: "TODO",
+      color: DEFAULT_COLOR,
+      wipLimit: "",
+    });
   }
 
-  async function handleSubmit() {
-    const trimmed = name.trim();
-    if (!trimmed) {
-      toast.error("Status name is required.");
-      return;
-    }
-    const parsedWip = wipLimit.trim() === "" ? undefined : Number(wipLimit.trim());
-    if (parsedWip !== undefined && (Number.isNaN(parsedWip) || parsedWip < 1)) {
-      toast.error("WIP limit must be a positive number or empty.");
-      return;
-    }
+  async function onSubmit(data: AddStatusValues) {
     try {
-      await onAdd({ name: trimmed, color, category, wipLimit: parsedWip ?? null });
-      setOpen(false);
-      reset();
+      await onAdd({
+        name: data.name.trim(),
+        color: data.color,
+        category: data.category,
+        wipLimit: data.wipLimit && data.wipLimit.trim() !== "" ? Number(data.wipLimit) : null,
+      });
+      resetAndClose();
     } catch {
       toast.error("Failed to create status.");
     }
@@ -389,7 +419,7 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) reset();
+        if (!next) form.reset();
       }}
     >
       <DialogTrigger asChild>
@@ -406,76 +436,115 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
             how it behaves in analytics.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <Label htmlFor="add-status-name">Name</Label>
-            <Input
-              id="add-status-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Blocked, In QA, Needs review"
-              maxLength={60}
-              autoFocus
+        <form id="add-status-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup className="py-2 gap-4">
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="add-status-name">Name</FieldLabel>
+                  <Input
+                    {...field}
+                    id="add-status-name"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="e.g. Blocked, In QA, Needs review"
+                    maxLength={60}
+                    autoFocus
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="add-status-category">Category</Label>
-            <Select
-              value={category}
-              onValueChange={(v) => {
-                setCategory(v as StatusCategory);
-                setColor(DEFAULT_COLORS[v as StatusCategory] ?? DEFAULT_COLOR);
-              }}
-            >
-              <SelectTrigger id="add-status-category">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORY_LIST.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    <span className="flex items-center gap-2">
-                      <span
-                        className="size-2 rounded-full"
-                        style={{ backgroundColor: DEFAULT_COLORS[cat] }}
-                      />
-                      {CATEGORY_LABEL[cat]}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              The category determines how the column behaves in reports and analytics.
-            </p>
-          </div>
-          <div className="flex gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="add-status-color">Colour</Label>
-              <input
-                id="add-status-color"
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                className="h-9 w-14 cursor-pointer rounded-md border px-1 py-1"
+            <Controller
+              name="category"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="add-status-category">Category</FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => {
+                      field.onChange(v);
+                      // Auto-set colour when category changes
+                      form.setValue(
+                        "color",
+                        DEFAULT_COLORS[v as StatusCategory] ?? DEFAULT_COLOR,
+                      );
+                    }}
+                  >
+                    <SelectTrigger
+                      id="add-status-category"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORY_LIST.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          <span className="flex items-center gap-2">
+                            <span
+                              className="size-2 rounded-full"
+                              style={{ backgroundColor: DEFAULT_COLORS[cat] }}
+                            />
+                            {CATEGORY_LABEL[cat]}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldDescription>
+                    The category determines how the column behaves in reports and analytics.
+                  </FieldDescription>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+            <div className="flex gap-4">
+              <Controller
+                name="color"
+                control={form.control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel htmlFor="add-status-color">Colour</FieldLabel>
+                    <input
+                      id="add-status-color"
+                      type="color"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      className="h-9 w-14 cursor-pointer rounded-md border px-1 py-1"
+                    />
+                  </Field>
+                )}
+              />
+              <Controller
+                name="wipLimit"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field className="flex-1" data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="add-status-wip">WIP limit (optional)</FieldLabel>
+                    <Input
+                      {...field}
+                      id="add-status-wip"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="∞"
+                      inputMode="numeric"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
               />
             </div>
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="add-status-wip">WIP limit (optional)</Label>
-              <Input
-                id="add-status-wip"
-                value={wipLimit}
-                onChange={(e) => setWipLimit(e.target.value)}
-                placeholder="∞"
-                inputMode="numeric"
-              />
-            </div>
-          </div>
-        </div>
+          </FieldGroup>
+        </form>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>
+          <Button variant="ghost" type="button" onClick={resetAndClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Add column</Button>
+          <Button type="submit" form="add-status-form" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
+            {form.formState.isSubmitting ? "Adding…" : "Add column"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

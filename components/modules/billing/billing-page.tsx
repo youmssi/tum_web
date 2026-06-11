@@ -5,7 +5,6 @@ import {
   ArrowUpRightIcon,
   CreditCardIcon,
   ExternalLinkIcon,
-  Loader2Icon,
   RefreshCwIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -13,6 +12,7 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
@@ -108,13 +108,13 @@ export function BillingPage() {
             <Button onClick={handleOpenPortal} disabled={openPortal.isPending}>
               {openPortal.isPending ? (
                 <>
-                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  <Spinner data-icon="inline-start" />
                   {t("openingPortal")}
                 </>
               ) : (
                 <>
                   {t("openPortal")}
-                  <ExternalLinkIcon className="ml-2 size-4" />
+                  <ExternalLinkIcon data-icon="inline-end" className="size-4" />
                 </>
               )}
             </Button>

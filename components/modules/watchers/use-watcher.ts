@@ -20,7 +20,25 @@ export function useToggleWatch() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ taskId }: { taskId: string }) => watcherApi.toggle(taskId),
-    onSuccess: (_data, { taskId }) => {
+    onMutate: async ({ taskId }) => {
+      await queryClient.cancelQueries({ queryKey: WATCHER_KEYS.watching(taskId) });
+      const previous = queryClient.getQueryData<{ watching: boolean }>(
+        WATCHER_KEYS.watching(taskId),
+      );
+      // Optimistically toggle the watching state
+      if (previous) {
+        queryClient.setQueryData(WATCHER_KEYS.watching(taskId), {
+          watching: !previous.watching,
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, { taskId }, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(WATCHER_KEYS.watching(taskId), context.previous);
+      }
+    },
+    onSettled: (_data, _err, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: WATCHER_KEYS.watching(taskId) });
       queryClient.invalidateQueries({ queryKey: WATCHER_KEYS.list(taskId) });
     },

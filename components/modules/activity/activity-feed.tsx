@@ -5,6 +5,13 @@ import { ActivityIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirectory } from "@/components/modules/organization";
 import { useStatusName } from "@/components/modules/projects";
@@ -131,12 +138,17 @@ export function ActivityFeed({ projectId, limit }: ActivityFeedProps) {
 
   if (!entries?.length) {
     return (
-      <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-        <ActivityIcon className="size-8 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          No activity yet. Create tasks and add comments to see the feed.
-        </p>
-      </div>
+      <Empty className="min-h-48 border border-dashed">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <ActivityIcon />
+          </EmptyMedia>
+          <EmptyTitle>No activity yet</EmptyTitle>
+          <EmptyDescription>
+            Create tasks and add comments to see the feed.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
