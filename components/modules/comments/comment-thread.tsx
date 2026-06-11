@@ -9,11 +9,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
-  EmptyDescription,
   EmptyHeader,
-  EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -107,7 +106,8 @@ function CommentInput({ taskId, members }: CommentInputProps) {
   const suggestions = [...groupSuggestions, ...memberSuggestions];
 
   return (
-    <div className="space-y-2">
+    <Field>
+      <FieldLabel>{t("submit")}</FieldLabel>
       <div className="relative">
         <Textarea
           ref={textareaRef}
@@ -162,10 +162,10 @@ function CommentInput({ taskId, members }: CommentInputProps) {
         )}
       </div>
       <div className="flex items-center justify-between gap-2">
-        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        <FieldDescription className="flex items-center gap-1">
           <AtSignIcon className="size-3" />
           {t("mentionTip")}
-        </p>
+        </FieldDescription>
         <Button
           size="sm"
           disabled={!content.trim() || createComment.isPending}
@@ -174,7 +174,7 @@ function CommentInput({ taskId, members }: CommentInputProps) {
           {createComment.isPending ? t("submitting") : t("submit")}
         </Button>
       </div>
-    </div>
+    </Field>
   );
 }
 
@@ -276,7 +276,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
                     )}
                   </div>
                   {editingId === comment.id ? (
-                    <div className="space-y-1">
+                    <Field>
                       <Textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
@@ -302,7 +302,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
                           <XIcon className="size-3" />
                         </Button>
                       </div>
-                    </div>
+                    </Field>
                   ) : (
                     <div className="group/comment flex items-start gap-1">
                       <p className="flex-1 text-sm whitespace-pre-wrap">{comment.content}</p>
