@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BuildingIcon, CheckCircleIcon, InboxIcon, XCircleIcon } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -208,14 +208,18 @@ export function AcceptInvitationView({ token }: { token?: string }) {
   const [invitation, setInvitation] = useState<InvitationDetail | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isBusy, setIsBusy] = useState(false);
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
 
   useEffect(() => {
     if (!token) return;
+    // Wait for session to resolve before deciding the flow.
+    if (sessionPending) return;
     // If user isn't authenticated, show the sign-in prompt instead of calling the API
     // (getInvitation requires auth and returns 401 without a session).
     if (!session) {
-      setStatus("ready");
+      startTransition(() => {
+        setStatus("ready");
+      });
       return;
     }
     authClient.organization.getInvitation({ query: { id: token } }).then(({ data, error }) => {
@@ -238,7 +242,7 @@ export function AcceptInvitationView({ token }: { token?: string }) {
       });
       setStatus("ready");
     });
-  }, [token, session]);
+  }, [token, session, sessionPending]);
 
   async function handleAccept() {
     if (!token) return;
