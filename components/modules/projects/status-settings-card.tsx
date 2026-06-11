@@ -540,8 +540,8 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
           <Button variant="ghost" type="button" onClick={resetAndClose}>
             Cancel
           </Button>
-          <Button type="submit" form="add-status-form">
-            Add column
+          <Button type="submit" form="add-status-form" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Adding…" : "Add column"}
           </Button>
         </DialogFooter>
       </DialogContent>
