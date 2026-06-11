@@ -85,6 +85,41 @@ export const taskApi = {
     return data.content;
   },
 
+  searchWithFilters: async ({
+    statuses,
+    priorities,
+    assigneeIds,
+    labels,
+    dueFrom,
+    dueTo,
+    q,
+    projectId,
+  }: {
+    statuses?: string[];
+    priorities?: string[];
+    assigneeIds?: string[];
+    labels?: string[];
+    dueFrom?: string;
+    dueTo?: string;
+    q?: string;
+    projectId?: string;
+  }): Promise<Task[]> => {
+    const params: Record<string, string> = {};
+    if (statuses?.length) params.status = statuses[0];
+    if (priorities?.length) params.priority = priorities[0];
+    if (assigneeIds?.length) {
+      // "me" resolves server-side; otherwise use first member id
+      params.assignee = assigneeIds.includes("__me__") ? "me" : assigneeIds[0];
+    }
+    if (labels?.length) params.label = labels[0];
+    if (dueFrom) params.dueFrom = dueFrom;
+    if (dueTo) params.dueTo = dueTo;
+    if (projectId) params.projectId = projectId;
+    if (q) params.q = q;
+    const data = await api.get("api/tasks", { searchParams: params }).json<{ content: Task[] }>();
+    return data.content;
+  },
+
   create: (projectId: string, data: CreateTaskPayload) =>
     api.post(`api/projects/${projectId}/tasks`, { json: data }).json<Task>(),
 

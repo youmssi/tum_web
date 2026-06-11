@@ -51,6 +51,9 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from "./task-api";
+import { SavedFilterBar, SavedFilterDialog, type SavedFilterConfig } from "@/components/modules/filters";
+import { authClient } from "@/lib/auth-client";
+
 import { TaskDetailSheet } from "./task-detail-sheet";
 import { CreateTaskDialog } from "./create-task-dialog";
 import { useBulkUpdateTasks, useTasks } from "./use-tasks";
@@ -169,16 +172,64 @@ export function TaskList({ projectId }: { projectId: string }) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "ALL">("ALL");
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | "ALL">("ALL");
+  const [savedFilterConfig, setSavedFilterConfig] = useState<SavedFilterConfig | null>(null);
+  const [activeFilterName, setActiveFilterName] = useState<string | undefined>();
+  const { data: session } = authClient.useSession();
+  const currentUserId = session?.user?.id;
 
   const filtered = useMemo(
     () =>
       (tasks ?? []).filter((t) => {
         if (statusFilter !== "ALL" && t.status !== statusFilter) return false;
         if (priorityFilter !== "ALL" && t.priority !== priorityFilter) return false;
+        if (savedFilterConfig) {
+          if (savedFilterConfig.statuses?.length && !savedFilterConfig.statuses.includes(t.status)) return false;
+          if (savedFilterConfig.priorities?.length && !savedFilterConfig.priorities.includes(t.priority)) return false;
+          if (savedFilterConfig.assigneeIds?.length) {
+            const matches = savedFilterConfig.assigneeIds.some((id) => {
+              if (id === "__me__") return currentUserId ? t.assigneeId === currentUserId : true;
+              return t.assigneeId === id;
+            });
+            if (!matches) return false;
+          }
+          if (savedFilterConfig.labels?.length) {
+            const hasAll = savedFilterConfig.labels.every((l) => t.labels.includes(l));
+            if (!hasAll) return false;
+          }
+          if (savedFilterConfig.dueFrom && t.dueDate && t.dueDate < savedFilterConfig.dueFrom) return false;
+          if (savedFilterConfig.dueTo && t.dueDate && t.dueDate > savedFilterConfig.dueTo) return false;
+          if (savedFilterConfig.q && !t.title.toLowerCase().includes(savedFilterConfig.q.toLowerCase())) return false;
+        }
         return true;
       }),
-    [tasks, statusFilter, priorityFilter],
+    [tasks, statusFilter, priorityFilter, savedFilterConfig, currentUserId],
   );
+
+  function handleApplySavedFilter(config: SavedFilterConfig, name?: string) {
+    setSavedFilterConfig(config);
+    setActiveFilterName(name);
+    setStatusFilter("ALL");
+    setPriorityFilter("ALL");
+    table.setPageIndex(0);
+  }
+
+  function handleClearSavedFilter() {
+    setSavedFilterConfig(null);
+    setActiveFilterName(undefined);
+  }
+
+  function handleClearFilterDimension(key: keyof SavedFilterConfig) {
+    if (!savedFilterConfig) return;
+    const rest = Object.fromEntries(
+      Object.entries(savedFilterConfig).filter(([k]) => k !== key)
+    );
+    const hasKeys = Object.keys(rest).length > 0;
+    if (!hasKeys) {
+      handleClearSavedFilter();
+    } else {
+      setSavedFilterConfig(rest as SavedFilterConfig);
+    }
+  }
 
   const selectedIds = Object.entries(rowSelection)
     .filter(([, v]) => v)
@@ -427,8 +478,25 @@ export function TaskList({ projectId }: { projectId: string }) {
             </SelectContent>
           </Select>
         </div>
-        <CreateTaskDialog projectId={projectId} />
+        <div className="flex items-center gap-2">
+          <SavedFilterDialog
+            projectId={projectId}
+            currentConfig={savedFilterConfig ?? {}}
+            onApplyFilter={(config, name) => handleApplySavedFilter(config, name)}
+            onClearFilter={handleClearSavedFilter}
+            activeFilterName={activeFilterName}
+          />
+          <CreateTaskDialog projectId={projectId} />
+        </div>
       </div>
+
+      {savedFilterConfig && (
+        <SavedFilterBar
+          config={savedFilterConfig}
+          onClearDimension={handleClearFilterDimension}
+          onClearAll={handleClearSavedFilter}
+        />
+      )}
 
       {selectedIds.length > 0 && (
         <BulkActionsBar
