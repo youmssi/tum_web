@@ -95,7 +95,10 @@
       "failed": "L’inscription a échoué. Veuillez réessayer.",
       "checkEmailTitle": "Vérifiez votre boîte e-mail",
       "checkEmailBody": "Nous avons envoyé un lien de vérification à {email}. Cliquez dessus pour activer votre compte.",
-      "backToSignIn": "Retour à la connexion"
+      "backToSignIn": "Retour à la connexion",
+      "continueWith": "ou continuer avec",
+      "google": "Continuer avec Google",
+      "github": "Continuer avec GitHub"
     },
     "profile": {
       "nameLabel": "Nom affiché",

@@ -95,7 +95,10 @@
       "failed": "Sign-up failed. Please try again.",
       "checkEmailTitle": "Check your email",
       "checkEmailBody": "We sent a verification link to {email}. Click it to activate your account.",
-      "backToSignIn": "Back to sign in"
+      "backToSignIn": "Back to sign in",
+      "continueWith": "or continue with",
+      "google": "Continue with Google",
+      "github": "Continue with GitHub"
     },
     "profile": {
       "nameLabel": "Display name",

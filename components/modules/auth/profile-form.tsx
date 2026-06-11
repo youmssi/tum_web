@@ -126,7 +126,7 @@ export function ProfileForm() {
 
       <CardContent className="pt-0">
         <div className="flex items-center gap-2">
-          <Button type="submit" form="profile-form" disabled={isSubmitting}>
+          <Button type="submit" form="profile-form" disabled={!form.formState.isDirty || isSubmitting}>
             {isSubmitting && <Spinner data-icon="inline-start" />}
             {isSubmitting ? t("saving") : t("save")}
           </Button>

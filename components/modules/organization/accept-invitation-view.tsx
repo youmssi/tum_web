@@ -212,6 +212,12 @@ export function AcceptInvitationView({ token }: { token?: string }) {
 
   useEffect(() => {
     if (!token) return;
+    // If user isn't authenticated, show the sign-in prompt instead of calling the API
+    // (getInvitation requires auth and returns 401 without a session).
+    if (!session) {
+      setStatus("ready");
+      return;
+    }
     authClient.organization.getInvitation({ query: { id: token } }).then(({ data, error }) => {
       if (error || !data) {
         const msg = (error as { message?: string })?.message?.toLowerCase().includes("recipient")
@@ -232,7 +238,7 @@ export function AcceptInvitationView({ token }: { token?: string }) {
       });
       setStatus("ready");
     });
-  }, [token]);
+  }, [token, session]);
 
   async function handleAccept() {
     if (!token) return;

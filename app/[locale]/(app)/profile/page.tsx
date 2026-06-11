@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import { ProfileForm } from "@/components/modules/auth";
+import { DeleteAccountCard, ProfileForm } from "@/components/modules/auth";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -17,6 +17,7 @@ export default async function ProfilePage() {
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
       <ProfileForm />
+      <DeleteAccountCard />
     </div>
   );
 }

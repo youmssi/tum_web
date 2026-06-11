@@ -116,7 +116,7 @@ export function OrgSettingsForm() {
             />
           </FieldGroup>
           <div className="flex gap-2">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={!form.formState.isDirty || isSubmitting}>
               {isSubmitting && <Spinner data-icon="inline-start" />}
               {isSubmitting ? "Saving…" : "Save changes"}
             </Button>

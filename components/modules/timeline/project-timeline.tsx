@@ -201,8 +201,10 @@ export function ProjectTimeline({
       const end = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.endDate!;
       const colorClass = taskColorClass(t, colors.nearDueDays);
       const isCritical = criticalTaskIds.has(t.id);
-      const cpClass = criticalPathMode && isCritical ? "tum-critical" : "";
       const baseClass = t.milestone ? `${colorClass}-milestone` : colorClass;
+      const cpClass = criticalPathMode && isCritical
+        ? (t.milestone ? "tum-critical-milestone" : "tum-critical")
+        : "";
       return {
         id: t.id,
         name: t.title,
@@ -210,7 +212,9 @@ export function ProjectTimeline({
         end,
         progress: t.progress,
         dependencies: depMap[t.id]?.join(",") ?? "",
-        custom_class: cpClass ? `${baseClass} ${cpClass}` : baseClass,
+        // Frappe Gantt uses classList.add(custom_class) which rejects space-separated tokens.
+        // Use a single class: critical-path class when active, otherwise color/milestone class.
+        custom_class: cpClass || baseClass,
       };
     });
   }, [scheduledTasks, depMap, colors.nearDueDays, criticalPathMode, criticalTaskIds]);

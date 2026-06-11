@@ -167,7 +167,7 @@ export function ProjectSettingsForm({ id }: { id: string }) {
               />
             </FieldGroup>
             <div className="flex gap-2">
-              <Button type="submit" disabled={isSubmitting || updateProject.isPending}>
+              <Button type="submit" disabled={!form.formState.isDirty || isSubmitting || updateProject.isPending}>
                 {updateProject.isPending && <Spinner data-icon="inline-start" />}
                 {updateProject.isPending ? "Saving…" : "Save changes"}
               </Button>
