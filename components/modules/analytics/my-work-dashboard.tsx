@@ -5,6 +5,13 @@ import { AlertCircleIcon, CalendarIcon, CheckCircle2Icon, ListTodoIcon } from "l
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskDetailSheet } from "@/components/modules/tasks/task-detail-sheet";
@@ -144,10 +151,17 @@ export function MyWorkDashboard() {
         </div>
 
         {!tasks?.length ? (
-          <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-            <CheckCircle2Icon className="size-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">No tasks assigned to you.</p>
-          </div>
+          <Empty className="min-h-48 border border-dashed">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <CheckCircle2Icon />
+              </EmptyMedia>
+              <EmptyTitle>No tasks assigned to you</EmptyTitle>
+              <EmptyDescription>
+                Tasks will appear here once they&apos;re assigned to you.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <Tabs defaultValue="all">
             <TabsList>

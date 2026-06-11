@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 import { clearOrgCache } from "@/lib/org-switch";
@@ -96,6 +97,7 @@ export function CreateOrgForm() {
             />
           </FieldGroup>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting && <Spinner data-icon="inline-start" />}
             {isSubmitting ? "Creating…" : "Create organisation"}
           </Button>
         </form>

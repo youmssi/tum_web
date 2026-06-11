@@ -9,6 +9,13 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -194,8 +201,10 @@ export function ProjectTimeline({
       const end = t.milestone ? (t.startDate ?? t.endDate ?? today) : t.endDate!;
       const colorClass = taskColorClass(t, colors.nearDueDays);
       const isCritical = criticalTaskIds.has(t.id);
-      const cpClass = criticalPathMode && isCritical ? "tum-critical" : "";
       const baseClass = t.milestone ? `${colorClass}-milestone` : colorClass;
+      const cpClass = criticalPathMode && isCritical
+        ? (t.milestone ? "tum-critical-milestone" : "tum-critical")
+        : "";
       return {
         id: t.id,
         name: t.title,
@@ -203,7 +212,9 @@ export function ProjectTimeline({
         end,
         progress: t.progress,
         dependencies: depMap[t.id]?.join(",") ?? "",
-        custom_class: cpClass ? `${baseClass} ${cpClass}` : baseClass,
+        // Frappe Gantt uses classList.add(custom_class) which rejects space-separated tokens.
+        // Use a single class: critical-path class when active, otherwise color/milestone class.
+        custom_class: cpClass || baseClass,
       };
     });
   }, [scheduledTasks, depMap, colors.nearDueDays, criticalPathMode, criticalTaskIds]);
@@ -394,12 +405,17 @@ export function ProjectTimeline({
       </div>
 
       {ganttTasks.length === 0 && (tasks ?? []).length === 0 ? (
-        <div className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-xl border border-dashed">
-          <CalendarRangeIcon className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            No tasks yet. Create tasks and set dates to see them here.
-          </p>
-        </div>
+        <Empty className="min-h-48 border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <CalendarRangeIcon />
+            </EmptyMedia>
+            <EmptyTitle>No tasks yet</EmptyTitle>
+            <EmptyDescription>
+              Create tasks and set dates to see them on the timeline.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         /*
          * Height: flex-1 min-h-0 inside the project tab column (no viewport calc) so only
@@ -526,16 +542,25 @@ export function ProjectTimeline({
                 />
               </div>
             ) : (
-              <div
-                className="flex items-center justify-center text-sm text-muted-foreground"
+              <Empty
+                className="border-none"
                 style={{
                   height: Math.max(200, (tasks ?? []).length * GANTT_ROW_HEIGHT + GANTT_ROW_HEIGHT),
                 }}
               >
-                {dateRange?.from || dateRange?.to
-                  ? "No tasks fall within the selected date range."
-                  : "Add start & end dates to tasks to see bars here."}
-              </div>
+                <EmptyHeader>
+                  <EmptyTitle>
+                    {dateRange?.from || dateRange?.to
+                      ? "No tasks in this date range"
+                      : "Set dates to see bars"}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {dateRange?.from || dateRange?.to
+                      ? "No tasks fall within the selected date range."
+                      : "Add start & end dates to tasks to see bars here."}
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
             )}
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCalendarConfig, useUpdateCalendar } from "./use-calendar";
@@ -171,17 +172,17 @@ export function WorkingCalendarCard({ projectId }: WorkingCalendarCardProps) {
 
               {/* Add holiday form */}
               <div className="flex items-end gap-2">
-                <div className="space-y-1 flex-1">
-                  <label className="text-xs text-muted-foreground">Date</label>
+                <Field className="flex-1">
+                  <FieldLabel>Date</FieldLabel>
                   <Input
                     type="date"
                     value={holidayDate}
                     onChange={(e) => setHolidayDate(e.target.value)}
                     className="h-9"
                   />
-                </div>
-                <div className="space-y-1 flex-1">
-                  <label className="text-xs text-muted-foreground">Name (optional)</label>
+                </Field>
+                <Field className="flex-1">
+                  <FieldLabel>Name (optional)</FieldLabel>
                   <Input
                     type="text"
                     placeholder="e.g. Christmas"
@@ -189,7 +190,7 @@ export function WorkingCalendarCard({ projectId }: WorkingCalendarCardProps) {
                     onChange={(e) => setHolidayName(e.target.value)}
                     className="h-9"
                   />
-                </div>
+                </Field>
                 <Button
                   type="button"
                   size="sm"

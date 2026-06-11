@@ -20,6 +20,7 @@ import {
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -107,6 +108,7 @@ export function LoginForm() {
       <CardContent className="pt-0">
         <FieldGroup className="gap-3">
           <Button type="submit" form="login-form" className="w-full" disabled={isSubmitting}>
+            {isSubmitting && <Spinner data-icon="inline-start" />}
             {isSubmitting ? t("submitting") : t("submit")}
           </Button>
 

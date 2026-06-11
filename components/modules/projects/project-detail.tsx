@@ -16,14 +16,23 @@ import {
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useState } from "react";
-import { format } from "date-fns";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
+import { format, parseISO } from "date-fns";
 import { type DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -47,8 +56,38 @@ export function ProjectDetail({ id }: { id: string }) {
   const { data: activeOrg } = authClient.useActiveOrganization();
   useRealtimeTasks(id, activeOrg?.id ?? null);
 
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  // Persisted in URL search params so the timeline date filter survives page refresh.
+  const dateRange: DateRange | undefined = (() => {
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    // Range without a start is invalid — return undefined so the calendar shows no selection.
+    if (!from) return undefined;
+    return {
+      from: parseISO(from),
+      ...(to ? { to: parseISO(to) } : {}),
+    };
+  })();
+
+  const setDateRange = useCallback(
+    (range: DateRange | undefined) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (range?.from) {
+        params.set("from", format(range.from, "yyyy-MM-dd"));
+      } else {
+        params.delete("from");
+      }
+      if (range?.to) {
+        params.set("to", format(range.to, "yyyy-MM-dd"));
+      } else {
+        params.delete("to");
+      }
+      router.replace(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams],
+  );
 
   async function handleToggleArchive() {
     if (!project) return;
@@ -73,13 +112,22 @@ export function ProjectDetail({ id }: { id: string }) {
 
   if (!project) {
     return (
-      <div className="flex min-h-64 flex-col items-center justify-center gap-2">
-        <FolderKanbanIcon className="size-10 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Project not found.</p>
-        <Button variant="outline" onClick={() => router.push(ROUTES.PROJECTS)}>
-          Back to projects
-        </Button>
-      </div>
+      <Empty className="min-h-64 border-none">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FolderKanbanIcon />
+          </EmptyMedia>
+          <EmptyTitle>Project not found</EmptyTitle>
+          <EmptyDescription>
+            The project you&apos;re looking for doesn&apos;t exist or has been deleted.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button variant="outline" onClick={() => router.push(ROUTES.PROJECTS)}>
+            Back to projects
+          </Button>
+        </EmptyContent>
+      </Empty>
     );
   }
 

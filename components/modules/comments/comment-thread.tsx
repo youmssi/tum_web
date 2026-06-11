@@ -7,7 +7,14 @@ import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
@@ -100,7 +107,8 @@ function CommentInput({ taskId, members }: CommentInputProps) {
   const suggestions = [...groupSuggestions, ...memberSuggestions];
 
   return (
-    <div className="space-y-2">
+    <Field>
+      <FieldLabel>{t("submit")}</FieldLabel>
       <div className="relative">
         <Textarea
           ref={textareaRef}
@@ -155,19 +163,20 @@ function CommentInput({ taskId, members }: CommentInputProps) {
         )}
       </div>
       <div className="flex items-center justify-between gap-2">
-        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        <FieldDescription className="flex items-center gap-1">
           <AtSignIcon className="size-3" />
           {t("mentionTip")}
-        </p>
+        </FieldDescription>
         <Button
           size="sm"
           disabled={!content.trim() || createComment.isPending}
           onClick={handleSubmit}
         >
+          {createComment.isPending && <Spinner data-icon="inline-start" />}
           {createComment.isPending ? t("submitting") : t("submit")}
         </Button>
       </div>
-    </div>
+    </Field>
   );
 }
 
@@ -242,7 +251,11 @@ export function CommentThread({ taskId }: CommentThreadProps) {
           ))}
         </div>
       ) : comments?.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("empty")}</p>
+        <Empty className="py-6 border-none">
+          <EmptyHeader>
+            <EmptyTitle>{t("empty")}</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="space-y-4">
           {comments?.map((comment) => {
@@ -265,7 +278,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
                     )}
                   </div>
                   {editingId === comment.id ? (
-                    <div className="space-y-1">
+                    <Field>
                       <Textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
@@ -291,7 +304,7 @@ export function CommentThread({ taskId }: CommentThreadProps) {
                           <XIcon className="size-3" />
                         </Button>
                       </div>
-                    </div>
+                    </Field>
                   ) : (
                     <div className="group/comment flex items-start gap-1">
                       <p className="flex-1 text-sm whitespace-pre-wrap">{comment.content}</p>

@@ -1,6 +1,21 @@
 "use client";
 
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVerticalIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -31,6 +46,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -45,6 +61,7 @@ import {
   useCreateCustomField,
   useCustomFieldDefinitions,
   useDeleteCustomField,
+  useUpdateCustomField,
 } from "./use-custom-fields";
 
 const FIELD_TYPE_LABELS: Record<CustomFieldType, string> = {
@@ -69,7 +86,32 @@ interface CustomFieldsSettingsCardProps {
 export function CustomFieldsSettingsCard({ projectId }: CustomFieldsSettingsCardProps) {
   const { data: fields, isLoading } = useCustomFieldDefinitions(projectId);
   const deleteField = useDeleteCustomField();
+  const updateField = useUpdateCustomField();
   const [createOpen, setCreateOpen] = useState(false);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !fields) return;
+
+    const oldIndex = fields.findIndex((f) => f.id === active.id);
+    const newIndex = fields.findIndex((f) => f.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(fields, oldIndex, newIndex);
+    const entries = reordered.map((f, i) => ({ id: f.id, sortOrder: (i + 1) * 65536 }));
+
+    try {
+      await Promise.all(
+        entries.map(({ id, sortOrder }) =>
+          updateField.mutateAsync({ fieldId: id, data: { sortOrder } }),
+        ),
+      );
+    } catch {
+      toast.error("Failed to reorder fields.");
+    }
+  }
 
   return (
     <Card className="max-w-lg">
@@ -93,18 +135,29 @@ export function CustomFieldsSettingsCard({ projectId }: CustomFieldsSettingsCard
           </p>
         ) : (
           <div className="mb-4 space-y-2">
-            {fields.map((field) => (
-              <FieldRow
-                key={field.id}
-                field={field}
-                onDelete={() =>
-                  deleteField
-                    .mutateAsync(field.id)
-                    .then(() => toast.success("Field deleted."))
-                    .catch(() => toast.error("Failed to delete field."))
-                }
-              />
-            ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={fields.map((f) => f.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {fields.map((field) => (
+                  <SortableFieldRow
+                    key={field.id}
+                    field={field}
+                    onDelete={() =>
+                      deleteField
+                        .mutateAsync(field.id)
+                        .then(() => toast.success("Field deleted."))
+                        .catch(() => toast.error("Failed to delete field."))
+                    }
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 
@@ -122,15 +175,40 @@ export function CustomFieldsSettingsCard({ projectId }: CustomFieldsSettingsCard
   );
 }
 
-function FieldRow({
+function SortableFieldRow({
   field,
   onDelete,
 }: {
-  field: { id: string; name: string; fieldType: CustomFieldType; options: string[] | null };
+  field: {
+    id: string;
+    name: string;
+    fieldType: CustomFieldType;
+    options: string[] | null;
+    sortOrder: number;
+  };
   onDelete: () => void;
 }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
+
   return (
-    <div className="flex items-center justify-between rounded-md border px-3 py-2">
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-center justify-between rounded-md border px-3 py-2 ${
+        isDragging ? "opacity-50" : ""
+      }`}
+    >
+      <button
+        type="button"
+        className="mr-2 cursor-grab touch-none text-muted-foreground hover:text-foreground"
+        aria-label={`Drag to reorder ${field.name}`}
+        {...attributes}
+        {...listeners}
+      >
+        <GripVerticalIcon className="size-4" />
+      </button>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{field.name}</p>
         <p className="text-xs text-muted-foreground">
@@ -274,6 +352,7 @@ function CreateFieldDialog({ projectId, onClose }: { projectId: string; onClose:
         {errors.root && <p className="text-sm text-destructive">{errors.root.message}</p>}
         <DialogFooter>
           <Button type="submit" disabled={createField.isPending || isSubmitting}>
+            {createField.isPending && <Spinner data-icon="inline-start" />}
             {createField.isPending ? "Creating…" : "Create field"}
           </Button>
         </DialogFooter>

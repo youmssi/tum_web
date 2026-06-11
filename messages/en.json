@@ -95,7 +95,10 @@
       "failed": "Sign-up failed. Please try again.",
       "checkEmailTitle": "Check your email",
       "checkEmailBody": "We sent a verification link to {email}. Click it to activate your account.",
-      "backToSignIn": "Back to sign in"
+      "backToSignIn": "Back to sign in",
+      "continueWith": "or continue with",
+      "google": "Continue with Google",
+      "github": "Continue with GitHub"
     },
     "profile": {
       "nameLabel": "Display name",
@@ -585,12 +588,53 @@
     "tooLarge": "File is too large."
   },
   "landing": {
+    "builtFor": {
+      "sectionLabel": "Who it's for",
+      "heading": "Built for any team, any workflow",
+      "subhead": "From engineering sprints to marketing campaigns — Tûm adapts to how your team works.",
+      "footer": "+ every department in between. No rigid process imposed.",
+      "teams": {
+        "engineering": { "label": "Engineering" },
+        "marketing": { "label": "Marketing" },
+        "operations": { "label": "Operations" },
+        "events": { "label": "Events" },
+        "research": { "label": "R&D" },
+        "community": { "label": "Community" },
+        "design": { "label": "Design" }
+      }
+    },
+    "comparison": {
+      "sectionLabel": "Compare",
+      "heading": "Full-featured. Without the lock-in.",
+      "subhead": "Tûm gives you the capabilities of premium tools — with the freedom of open source.",
+      "headerFeature": "Feature",
+      "footer": "Data gathered from public feature listings as of June 2026. Check each product's website for the latest details.",
+      "rows": {
+        "gantt": "Gantt / Timeline view",
+        "dependencyScheduling": "Dependency-aware scheduling",
+        "criticalPath": "Critical path analysis",
+        "customFields": "Custom fields",
+        "customStatuses": "Custom statuses + WIP limits",
+        "workloadView": "Workload / capacity view",
+        "selfHost": "Self-host option",
+        "fairCode": "Fair-code / no vendor lock-in",
+        "unlimitedUsers": "Unlimited users on all plans",
+        "realTime": "Real-time collaboration",
+        "openSource": "Open-source codebase"
+      }
+    },
     "nav": {
       "features": "Features",
       "howItWorks": "How it works",
       "pricing": "Pricing",
       "signIn": "Sign in",
       "getStarted": "Get started"
+    },
+    "ganttDemo": {
+      "sectionLabel": "Interactive Demo",
+      "heading": "See the Gantt chart",
+      "headingAccent": "in action.",
+      "subhead": "Drag bars, explore dependencies, and see how smart scheduling works — right in your browser, no sign-up required."
     },
     "hero": {
       "tagline": "Project execution & workflow visibility",
@@ -607,7 +651,18 @@
       "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools — just clear execution. For any team, any department, any project.",
       "ctaStartFree": "Start free",
       "ctaSignIn": "Sign in",
-      "microFooter": "Free to use · No credit card required · Community & cloud plans"
+      "microFooter": "Free to use · No credit card required · Community & cloud plans",
+      "capabilities": {
+        "label": "Key Capabilities",
+        "items": {
+          "tasks": "Tasks & Lists",
+          "timeline": "Gantt Timeline",
+          "team": "Team Collaboration",
+          "dependencies": "Task Dependencies",
+          "scheduling": "Smart Scheduling"
+        },
+        "footer": "Drag-and-drop scheduling, dependency arrows, milestone markers, and real-time progress tracking — all in one workspace."
+      }
     },
     "features": {
       "sectionLabel": "Capabilities",
@@ -618,17 +673,29 @@
           "title": "Visual Timeline",
           "description": "Drag-and-drop scheduling with dependency arrows, milestone markers, and per-task progress bars. See your whole project at a glance — no spreadsheet required."
         },
+        "scheduling": {
+          "title": "Smart Scheduling",
+          "description": "Dependency-aware auto-scheduling with critical path highlighting, SS/FF/SF semantics, and lag/lead offsets. Move one task and dependents shift automatically — no manual rework."
+        },
         "visibility": {
-          "title": "Instant Visibility",
-          "description": "Real-time dashboards with completion trends, status breakdowns, and overdue counters. Know what's on track and what needs attention — without a status meeting."
+          "title": "Dashboards & Analytics",
+          "description": "Real-time dashboards with completion trends, status breakdowns, overdue counters, and burndown. Know what's on track and what needs attention — without a status meeting."
+        },
+        "workload": {
+          "title": "Workload View",
+          "description": "Per-assignee task distribution across weeks with capacity tracking and overallocation alerts. See who has bandwidth before assigning the next task."
         },
         "dependencies": {
           "title": "Task Dependencies",
           "description": "Link tasks so nothing starts before it should. Model sequential steps, parallel tracks, and milestones — Tûm keeps your plan coherent as things shift."
         },
+        "checklists": {
+          "title": "Checklists & Subtasks",
+          "description": "Ordered checkable sub-items per task with progress rollups, plus nested subtask trees. Break down complex work without losing the big picture."
+        },
         "mentions": {
-          "title": "@Mention & Threads",
-          "description": "Loop teammates in directly on tasks. In-app notifications mean nothing falls through the cracks — whether your team is in operations, HR, marketing, or anything else."
+          "title": "@Mention & Watchers",
+          "description": "@mention teammates or use group mentions like @team and @assignees. Watch tasks to get notified on every change — nothing falls through the cracks."
         },
         "team": {
           "title": "Built for Every Team",

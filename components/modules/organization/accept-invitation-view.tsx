@@ -3,12 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { BuildingIcon, CheckCircleIcon, InboxIcon, XCircleIcon } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
@@ -172,13 +173,15 @@ function InvitationInbox() {
 
       <div className="space-y-2">
         <p className="text-xs text-muted-foreground">Have an invitation link? Paste it below.</p>
-        <form onSubmit={handlePaste} className="flex gap-2">
-          <Input
-            placeholder="https://…/invitations/accept?token=…"
-            value={pasteInput}
-            onChange={(e) => setPasteInput(e.target.value)}
-            className="flex-1"
-          />
+        <form onSubmit={handlePaste} className="flex gap-2 items-end">
+          <Field className="flex-1">
+            <FieldLabel>Paste invitation link</FieldLabel>
+            <Input
+              placeholder="https://…/invitations/accept?token=…"
+              value={pasteInput}
+              onChange={(e) => setPasteInput(e.target.value)}
+            />
+          </Field>
           <Button type="submit" variant="outline" disabled={!pasteInput.trim()}>
             Go
           </Button>
@@ -205,10 +208,20 @@ export function AcceptInvitationView({ token }: { token?: string }) {
   const [invitation, setInvitation] = useState<InvitationDetail | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isBusy, setIsBusy] = useState(false);
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
 
   useEffect(() => {
     if (!token) return;
+    // Wait for session to resolve before deciding the flow.
+    if (sessionPending) return;
+    // If user isn't authenticated, show the sign-in prompt instead of calling the API
+    // (getInvitation requires auth and returns 401 without a session).
+    if (!session) {
+      startTransition(() => {
+        setStatus("ready");
+      });
+      return;
+    }
     authClient.organization.getInvitation({ query: { id: token } }).then(({ data, error }) => {
       if (error || !data) {
         const msg = (error as { message?: string })?.message?.toLowerCase().includes("recipient")
@@ -229,7 +242,7 @@ export function AcceptInvitationView({ token }: { token?: string }) {
       });
       setStatus("ready");
     });
-  }, [token]);
+  }, [token, session, sessionPending]);
 
   async function handleAccept() {
     if (!token) return;

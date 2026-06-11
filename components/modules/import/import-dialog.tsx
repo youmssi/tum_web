@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
   DialogContent,
@@ -114,6 +115,7 @@ export function ImportProjectDialog() {
   const [isDragging, setIsDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const dragDepthRef = useRef(0);
+  const [isImporting, setIsImporting] = useState(false);
 
   const importProject = useImportProject();
 
@@ -187,7 +189,8 @@ export function ImportProjectDialog() {
   }
 
   async function handleImport() {
-    if (!parsed) return;
+    if (!parsed || isImporting) return;
+    setIsImporting(true);
     try {
       const res = await importProject.mutateAsync({
         name: parsed.projectName,
@@ -198,6 +201,8 @@ export function ImportProjectDialog() {
       setStep("result");
     } catch {
       toast.error("Import failed. Please check the data and try again.");
+    } finally {
+      setIsImporting(false);
     }
   }
 
@@ -282,6 +287,7 @@ export function ImportProjectDialog() {
                     onClick={handleDownloadTemplate}
                     disabled={templateLoading}
                   >
+                    {templateLoading && <Spinner data-icon="inline-start" />}
                     {templateLoading ? "Generating…" : "Download template"}
                   </Button>
                 </div>
@@ -370,7 +376,7 @@ export function ImportProjectDialog() {
                 Cancel
               </Button>
               <Button onClick={() => setStep("preview")} disabled={!parsed}>
-                Preview
+                Preview · {parsed ? `${parsed.tasks.length} tasks` : ""}
               </Button>
             </div>
           </>
@@ -479,8 +485,9 @@ export function ImportProjectDialog() {
               <Button variant="outline" onClick={() => setStep("upload")}>
                 Back
               </Button>
-              <Button onClick={handleImport} disabled={importProject.isPending}>
-                {importProject.isPending ? "Importing…" : `Import ${parsed.tasks.length} tasks`}
+              <Button onClick={handleImport} disabled={isImporting}>
+                {isImporting && <Spinner data-icon="inline-start" />}
+                {isImporting ? "Importing…" : `Import ${parsed.tasks.length} tasks`}
               </Button>
             </div>
           </>

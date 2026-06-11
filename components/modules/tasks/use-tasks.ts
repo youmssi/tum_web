@@ -158,7 +158,31 @@ export function useBulkUpdateTasks(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: BulkTaskPayload) => taskApi.bulk(data),
-    onSuccess: () => {
+    onMutate: async (data: BulkTaskPayload) => {
+      await qc.cancelQueries({ queryKey: TASK_KEYS.byProject(projectId) });
+      const previous = qc.getQueryData<Task[]>(TASK_KEYS.byProject(projectId));
+      if (previous) {
+        const updated = previous
+          .map((task) => {
+            if (!data.ids.includes(task.id)) return task;
+            if (data.action === "DELETE") return null;
+            return {
+              ...task,
+              ...(data.status ? { status: data.status } : {}),
+              ...(data.assigneeId !== undefined ? { assigneeId: data.assigneeId } : {}),
+            };
+          })
+          .filter((t): t is Task => t !== null);
+        qc.setQueryData(TASK_KEYS.byProject(projectId), updated);
+      }
+      return { previous };
+    },
+    onError: (_err, _data, context) => {
+      if (context?.previous) {
+        qc.setQueryData(TASK_KEYS.byProject(projectId), context.previous);
+      }
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });
       qc.invalidateQueries({ queryKey: TASK_KEYS.all });
     },

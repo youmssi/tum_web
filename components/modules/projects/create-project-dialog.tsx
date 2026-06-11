@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateProject } from "./use-projects";
 
@@ -120,6 +121,7 @@ export function CreateProjectDialog() {
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting || createProject.isPending}>
+              {createProject.isPending && <Spinner data-icon="inline-start" />}
               {createProject.isPending ? "Creating…" : "Create project"}
             </Button>
           </div>
