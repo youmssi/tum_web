@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
@@ -172,13 +173,15 @@ function InvitationInbox() {
 
       <div className="space-y-2">
         <p className="text-xs text-muted-foreground">Have an invitation link? Paste it below.</p>
-        <form onSubmit={handlePaste} className="flex gap-2">
-          <Input
-            placeholder="https://…/invitations/accept?token=…"
-            value={pasteInput}
-            onChange={(e) => setPasteInput(e.target.value)}
-            className="flex-1"
-          />
+        <form onSubmit={handlePaste} className="flex gap-2 items-end">
+          <Field className="flex-1">
+            <FieldLabel>Paste invitation link</FieldLabel>
+            <Input
+              placeholder="https://…/invitations/accept?token=…"
+              value={pasteInput}
+              onChange={(e) => setPasteInput(e.target.value)}
+            />
+          </Field>
           <Button type="submit" variant="outline" disabled={!pasteInput.trim()}>
             Go
           </Button>

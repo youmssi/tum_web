@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/constants";
 import { CreateOrgForm } from "./create-org-form";
@@ -51,12 +52,15 @@ export function OnboardingChoice() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleJoinSubmit} className="space-y-4">
-            <Input
-              autoFocus
-              placeholder="https://…/invitations/accept?token=…"
-              value={inviteInput}
-              onChange={(e) => setInviteInput(e.target.value)}
-            />
+            <Field>
+              <FieldLabel>Invitation link</FieldLabel>
+              <Input
+                autoFocus
+                placeholder="https://…/invitations/accept?token=…"
+                value={inviteInput}
+                onChange={(e) => setInviteInput(e.target.value)}
+              />
+            </Field>
             <div className="flex gap-2">
               <Button type="submit" disabled={!inviteInput.trim()} className="flex-1">
                 Continue

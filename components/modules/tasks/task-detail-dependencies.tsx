@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -87,19 +88,22 @@ export function TaskDetailDependencies({ task, allTasks }: TaskDetailDependencie
         </div>
       )}
       {available.length > 0 && (
-        <div className="flex gap-2">
-          <Select value={newPredecessorId} onValueChange={setNewPredecessorId}>
-            <SelectTrigger className="flex-1 text-sm">
-              <SelectValue placeholder="Depends on…" />
-            </SelectTrigger>
-            <SelectContent>
-              {available.map((t) => (
-                <SelectItem key={t.id} value={t.id}>
-                  {t.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex gap-2 items-end">
+          <Field className="flex-1">
+            <FieldLabel>Add dependency</FieldLabel>
+            <Select value={newPredecessorId} onValueChange={setNewPredecessorId}>
+              <SelectTrigger className="text-sm">
+                <SelectValue placeholder="Depends on…" />
+              </SelectTrigger>
+              <SelectContent>
+                {available.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
           <Button
             variant="outline"
             size="sm"

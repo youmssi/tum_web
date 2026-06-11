@@ -41,6 +41,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -49,7 +55,6 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -406,9 +411,9 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
             how it behaves in analytics.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <Label htmlFor="add-status-name">Name</Label>
+        <FieldGroup className="py-2 gap-4">
+          <Field>
+            <FieldLabel htmlFor="add-status-name">Name</FieldLabel>
             <Input
               id="add-status-name"
               value={name}
@@ -417,9 +422,9 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
               maxLength={60}
               autoFocus
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="add-status-category">Category</Label>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="add-status-category">Category</FieldLabel>
             <Select
               value={category}
               onValueChange={(v) => {
@@ -444,13 +449,13 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
+            <FieldDescription>
               The category determines how the column behaves in reports and analytics.
-            </p>
-          </div>
+            </FieldDescription>
+          </Field>
           <div className="flex gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="add-status-color">Colour</Label>
+            <Field>
+              <FieldLabel htmlFor="add-status-color">Colour</FieldLabel>
               <input
                 id="add-status-color"
                 type="color"
@@ -458,9 +463,9 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
                 onChange={(e) => setColor(e.target.value)}
                 className="h-9 w-14 cursor-pointer rounded-md border px-1 py-1"
               />
-            </div>
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="add-status-wip">WIP limit (optional)</Label>
+            </Field>
+            <Field className="flex-1">
+              <FieldLabel htmlFor="add-status-wip">WIP limit (optional)</FieldLabel>
               <Input
                 id="add-status-wip"
                 value={wipLimit}
@@ -468,9 +473,9 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
                 placeholder="∞"
                 inputMode="numeric"
               />
-            </div>
+            </Field>
           </div>
-        </div>
+        </FieldGroup>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>
             Cancel

@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
+import {
+  Field,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -98,8 +102,8 @@ function CustomFieldInput({ name, fieldType, options, value, onChange }: CustomF
   switch (fieldType) {
     case "TEXT":
       return (
-        <div>
-          <label className="mb-1 block text-xs text-muted-foreground">{name}</label>
+        <Field>
+          <FieldLabel>{name}</FieldLabel>
           <Input
             value={localValue}
             onChange={(e) => setLocalValue(e.target.value)}
@@ -108,12 +112,12 @@ function CustomFieldInput({ name, fieldType, options, value, onChange }: CustomF
             }}
             placeholder={`Enter ${name.toLowerCase()}…`}
           />
-        </div>
+        </Field>
       );
     case "NUMBER":
       return (
-        <div>
-          <label className="mb-1 block text-xs text-muted-foreground">{name}</label>
+        <Field>
+          <FieldLabel>{name}</FieldLabel>
           <Input
             type="number"
             value={localValue}
@@ -123,12 +127,12 @@ function CustomFieldInput({ name, fieldType, options, value, onChange }: CustomF
             }}
             placeholder={`Enter ${name.toLowerCase()}…`}
           />
-        </div>
+        </Field>
       );
     case "SINGLE_SELECT":
       return (
-        <div>
-          <label className="mb-1 block text-xs text-muted-foreground">{name}</label>
+        <Field>
+          <FieldLabel>{name}</FieldLabel>
           <Select
             value={localValue}
             onValueChange={(v) => {
@@ -147,12 +151,12 @@ function CustomFieldInput({ name, fieldType, options, value, onChange }: CustomF
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </Field>
       );
     case "DATE":
       return (
-        <div>
-          <label className="mb-1 block text-xs text-muted-foreground">{name}</label>
+        <Field>
+          <FieldLabel>{name}</FieldLabel>
           <Input
             type="date"
             value={localValue}
@@ -161,7 +165,7 @@ function CustomFieldInput({ name, fieldType, options, value, onChange }: CustomF
               onChange(e.target.value);
             }}
           />
-        </div>
+        </Field>
       );
     default:
       return null;
