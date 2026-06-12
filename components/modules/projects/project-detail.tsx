@@ -5,6 +5,7 @@ import {
   ArchiveIcon,
   ArchiveRestoreIcon,
   ArrowLeftIcon,
+  BarChart3Icon,
   CalendarRangeIcon,
   FolderKanbanIcon,
   LayoutListIcon,
@@ -39,7 +40,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ActivityFeed } from "@/components/modules/activity";
-import { ProjectDashboard, WorkloadView } from "@/components/modules/analytics";
+import { AnalyticsPage, ProjectDashboard, WorkloadView } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
@@ -250,6 +251,10 @@ export function ProjectDetail({ id }: { id: string }) {
             <CalendarRangeIcon className="size-4" />
             {tabs("timeline")}
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-1.5">
+            <BarChart3Icon className="size-4" />
+            Analytics
+          </TabsTrigger>
           <TabsTrigger value="workload" className="gap-1.5">
             <UsersIcon className="size-4" />
             Workload
@@ -274,6 +279,10 @@ export function ProjectDetail({ id }: { id: string }) {
 
         <TabsContent value="timeline" className="mt-4 flex min-h-0 flex-1 flex-col">
           <ProjectTimeline projectId={project.id} dateRange={dateRange} />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-4">
+          <AnalyticsPage projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="workload" className="mt-4">
