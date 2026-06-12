@@ -7,6 +7,7 @@ import {
   CreditCardIcon,
   FolderKanbanIcon,
   LayoutDashboardIcon,
+  LayoutGridIcon,
   LogOutIcon,
   ShieldIcon,
   SettingsIcon,
@@ -44,6 +45,7 @@ export function AppSidebar() {
 
   const navItems = [
     { href: ROUTES.DASHBOARD, label: t("dashboard"), icon: LayoutDashboardIcon },
+    { href: ROUTES.PORTFOLIO, label: "Portfolio", icon: LayoutGridIcon },
     { href: ROUTES.PROJECTS, label: t("projects"), icon: FolderKanbanIcon },
     { href: ROUTES.ORGANIZATION_MEMBERS, label: t("members"), icon: UsersIcon },
   ];

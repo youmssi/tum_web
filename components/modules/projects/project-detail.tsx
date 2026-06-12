@@ -6,6 +6,7 @@ import {
   ArchiveRestoreIcon,
   ArrowLeftIcon,
   BarChart3Icon,
+  CalendarDaysIcon,
   CalendarRangeIcon,
   FolderKanbanIcon,
   LayoutListIcon,
@@ -42,6 +43,7 @@ import { cn } from "@/lib/utils";
 import { ActivityFeed } from "@/components/modules/activity";
 import { AnalyticsPage, ProjectDashboard, WorkloadView } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
+import { CalendarView } from "@/components/modules/calendar";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
 import { authClient } from "@/lib/auth-client";
@@ -247,6 +249,10 @@ export function ProjectDetail({ id }: { id: string }) {
             <SquareKanbanIcon className="size-4" />
             {tabs("board")}
           </TabsTrigger>
+          <TabsTrigger value="calendar" className="gap-1.5">
+            <CalendarDaysIcon className="size-4" />
+            Calendar
+          </TabsTrigger>
           <TabsTrigger value="timeline" className="gap-1.5">
             <CalendarRangeIcon className="size-4" />
             {tabs("timeline")}
@@ -275,6 +281,10 @@ export function ProjectDetail({ id }: { id: string }) {
 
         <TabsContent value="board" className="mt-4">
           <KanbanBoard projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="calendar" className="mt-4">
+          <CalendarView projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4 flex min-h-0 flex-1 flex-col">
