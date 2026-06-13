@@ -791,6 +791,59 @@
         }
       }
     },
+    "testimonials": {
+      "sectionLabel": "Témoignages",
+      "heading": "Adoré par les équipes qui livrent",
+      "headingAccent": "des projets concrets",
+      "subhead": "Des startups aux grandes entreprises, découvrez pourquoi les équipes choisissent Tûm pour l'exécution et la visibilité de leurs projets.",
+      "items": [
+        {
+          "name": "Sarah Chen",
+          "role": "Engineering Manager chez NovaPay",
+          "quote": "Nous avons remplacé trois outils distincts par Tûm. Le diagramme de Gantt avec analyse du chemin critique nous fait gagner des heures à chaque sprint planning."
+        },
+        {
+          "name": "Marcus Rivera",
+          "role": "Product Lead chez Flowstate",
+          "quote": "La collaboration en temps réel est fluide. Notre équipe répartie sur 4 fuseaux horaires a enfin une source unique de vérité pour l'avancement des projets."
+        },
+        {
+          "name": "Aisha Patel",
+          "role": "Head of Operations chez Bloom Health",
+          "quote": "L'auto-hébergement a changé la donne. Nous avions besoin d'une gestion de projet conforme HIPAA et Tûm nous a donné le contrôle total sans le prix des solutions enterprise."
+        },
+        {
+          "name": "James Okonkwo",
+          "role": "CTO chez AgriTech Africa",
+          "quote": "Le suivi des dépendances et la vue charge de travail nous ont permis d'identifier des goulots d'étranglement que nous n'avions jamais vus. Les délais de livraison se sont améliorés de 30 % dès le premier trimestre."
+        },
+        {
+          "name": "Elena Kowalski",
+          "role": "Directrice Créative chez PixelForge",
+          "quote": "Enfin un outil de projet qui ne donne pas l'impression d'avoir été conçu par des comptables. Le tableau Kanban est magnifique et la vue chronologie est vraiment utile."
+        },
+        {
+          "name": "David Kim",
+          "role": "Staff Engineer chez CloudBase",
+          "quote": "L'architecture API-first m'a convaincu. Nous avons intégré Tûm à notre pipeline CI/CD pour que les statuts des tâches se mettent à jour automatiquement lors des déploiements."
+        },
+        {
+          "name": "Fatima Al-Rashid",
+          "role": "Directrice PMO chez Gulf Ventures",
+          "quote": "Gérer un portefeuille de 12 projets était un chaos. Le tableau de bord portfolio me donne une visibilité instantanée sur toutes les initiatives en cours."
+        },
+        {
+          "name": "Tom Andersson",
+          "role": "Fondateur de Startup chez NordicLabs",
+          "quote": "L'open source avec une licence fair-code — c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
+        },
+        {
+          "name": "Priya Sharma",
+          "role": "Scrum Master chez FinEdge",
+          "quote": "Les graphiques burndown et throughput sont exactement ce dont j'avais besoin pour les rapports aux parties prenantes. Fini les tableurs manuels tous les vendredis."
+        }
+      ]
+    },
     "cta": {
       "heading": "Vos projets.",
       "headingAccent": "Enfin maîtrisés.",

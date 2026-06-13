@@ -791,6 +791,59 @@
         }
       }
     },
+    "testimonials": {
+      "sectionLabel": "Testimonials",
+      "heading": "Loved by teams shipping",
+      "headingAccent": "real projects",
+      "subhead": "From startups to enterprises, see why teams choose Tûm for project execution and visibility.",
+      "items": [
+        {
+          "name": "Sarah Chen",
+          "role": "Engineering Manager at NovaPay",
+          "quote": "We replaced three separate tools with Tûm. The Gantt chart with critical path analysis alone saved us hours every sprint planning session."
+        },
+        {
+          "name": "Marcus Rivera",
+          "role": "Product Lead at Flowstate",
+          "quote": "The real-time collaboration is seamless. Our distributed team across 4 time zones finally has a single source of truth for project status."
+        },
+        {
+          "name": "Aisha Patel",
+          "role": "Head of Operations at Bloom Health",
+          "quote": "Self-hosting was a game changer for us. We needed HIPAA-compliant project management and Tûm gave us full control without the enterprise price tag."
+        },
+        {
+          "name": "James Okonkwo",
+          "role": "CTO at AgriTech Africa",
+          "quote": "The dependency tracking and workload views helped us identify bottlenecks we never saw before. Delivery timelines improved by 30% in the first quarter."
+        },
+        {
+          "name": "Elena Kowalski",
+          "role": "Creative Director at PixelForge",
+          "quote": "Finally a project tool that doesn't feel like it was designed by accountants. The Kanban board is beautiful and the timeline view is genuinely useful."
+        },
+        {
+          "name": "David Kim",
+          "role": "Staff Engineer at CloudBase",
+          "quote": "The API-first architecture sold me. We integrated Tûm with our CI/CD pipeline so task status updates automatically when deploys ship."
+        },
+        {
+          "name": "Fatima Al-Rashid",
+          "role": "PMO Director at Gulf Ventures",
+          "quote": "Managing a portfolio of 12 projects used to be chaos. The portfolio dashboard gives me instant visibility across all active initiatives."
+        },
+        {
+          "name": "Tom Andersson",
+          "role": "Startup Founder at NordicLabs",
+          "quote": "Open-source with a fair license — that's rare for something this polished. We contribute back fixes and the community has been incredibly responsive."
+        },
+        {
+          "name": "Priya Sharma",
+          "role": "Scrum Master at FinEdge",
+          "quote": "The burndown and throughput charts are exactly what I needed for stakeholder reporting. No more manual spreadsheets every Friday."
+        }
+      ]
+    },
     "cta": {
       "heading": "Your projects.",
       "headingAccent": "Finally under control.",
