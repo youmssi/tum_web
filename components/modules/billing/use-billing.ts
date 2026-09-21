@@ -19,7 +19,7 @@ export const BILLING_KEYS = {
  * {@code subscription} or {@code unconfigured}. The unconfigured shape captures Polar misconfig
  * (missing token, missing scopes) so the UI can render a clean banner instead of crash-looping.
  */
-export function useBillingState() {
+export function useBillingState(options?: { enabled?: boolean }) {
   return useQuery<BillingState>({
     queryKey: BILLING_KEYS.state,
     queryFn: () => billingApi.getBillingState(),
@@ -29,6 +29,11 @@ export function useBillingState() {
     staleTime: 5_000,
     refetchOnWindowFocus: true,
     retry: 1,
+    // Anonymous visitors can't have a subscription — skip the customer.state /
+    // ensure-customer round trip entirely instead of letting it fail with 401 on every mount
+    // and every window refocus (this was the source of the repeated failed-request noise on
+    // the public landing page).
+    enabled: options?.enabled ?? true,
   });
 }
 
