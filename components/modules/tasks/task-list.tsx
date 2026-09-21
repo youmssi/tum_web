@@ -10,7 +10,14 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, CircleIcon, LayoutListIcon, Trash2Icon, XIcon } from "lucide-react";
+import {
+  ArrowUpDownIcon,
+  CircleIcon,
+  LayoutListIcon,
+  RotateCcwIcon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -51,7 +58,11 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from "./task-api";
-import { SavedFilterBar, SavedFilterDialog, type SavedFilterConfig } from "@/components/modules/filters";
+import {
+  SavedFilterBar,
+  SavedFilterDialog,
+  type SavedFilterConfig,
+} from "@/components/modules/filters";
 import { authClient } from "@/lib/auth-client";
 
 import { TaskDetailSheet } from "./task-detail-sheet";
@@ -174,6 +185,18 @@ export function TaskList({ projectId }: { projectId: string }) {
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | "ALL">("ALL");
   const [savedFilterConfig, setSavedFilterConfig] = useState<SavedFilterConfig | null>(null);
   const [activeFilterName, setActiveFilterName] = useState<string | undefined>();
+
+  // Derive the current filter config from both manual dropdowns and any applied saved filter.
+  // This is what gets passed to the Save-filter dialog so it captures the REAL active filters.
+  const liveFilterConfig = useMemo<SavedFilterConfig>(() => {
+    const config: SavedFilterConfig = { ...(savedFilterConfig ?? {}) };
+    if (statusFilter !== "ALL") config.statuses = [statusFilter];
+    if (priorityFilter !== "ALL") config.priorities = [priorityFilter];
+    return config;
+  }, [statusFilter, priorityFilter, savedFilterConfig]);
+
+  const hasActiveFilters =
+    statusFilter !== "ALL" || priorityFilter !== "ALL" || savedFilterConfig !== null;
   const { data: session } = authClient.useSession();
   const currentUserId = session?.user?.id;
 
@@ -183,8 +206,13 @@ export function TaskList({ projectId }: { projectId: string }) {
         if (statusFilter !== "ALL" && t.status !== statusFilter) return false;
         if (priorityFilter !== "ALL" && t.priority !== priorityFilter) return false;
         if (savedFilterConfig) {
-          if (savedFilterConfig.statuses?.length && !savedFilterConfig.statuses.includes(t.status)) return false;
-          if (savedFilterConfig.priorities?.length && !savedFilterConfig.priorities.includes(t.priority)) return false;
+          if (savedFilterConfig.statuses?.length && !savedFilterConfig.statuses.includes(t.status))
+            return false;
+          if (
+            savedFilterConfig.priorities?.length &&
+            !savedFilterConfig.priorities.includes(t.priority)
+          )
+            return false;
           if (savedFilterConfig.assigneeIds?.length) {
             const matches = savedFilterConfig.assigneeIds.some((id) => {
               if (id === "__me__") return currentUserId ? t.assigneeId === currentUserId : true;
@@ -196,9 +224,15 @@ export function TaskList({ projectId }: { projectId: string }) {
             const hasAll = savedFilterConfig.labels.every((l) => t.labels.includes(l));
             if (!hasAll) return false;
           }
-          if (savedFilterConfig.dueFrom && t.dueDate && t.dueDate < savedFilterConfig.dueFrom) return false;
-          if (savedFilterConfig.dueTo && t.dueDate && t.dueDate > savedFilterConfig.dueTo) return false;
-          if (savedFilterConfig.q && !t.title.toLowerCase().includes(savedFilterConfig.q.toLowerCase())) return false;
+          if (savedFilterConfig.dueFrom && t.dueDate && t.dueDate < savedFilterConfig.dueFrom)
+            return false;
+          if (savedFilterConfig.dueTo && t.dueDate && t.dueDate > savedFilterConfig.dueTo)
+            return false;
+          if (
+            savedFilterConfig.q &&
+            !t.title.toLowerCase().includes(savedFilterConfig.q.toLowerCase())
+          )
+            return false;
         }
         return true;
       }),
@@ -220,9 +254,7 @@ export function TaskList({ projectId }: { projectId: string }) {
 
   function handleClearFilterDimension(key: keyof SavedFilterConfig) {
     if (!savedFilterConfig) return;
-    const rest = Object.fromEntries(
-      Object.entries(savedFilterConfig).filter(([k]) => k !== key)
-    );
+    const rest = Object.fromEntries(Object.entries(savedFilterConfig).filter(([k]) => k !== key));
     const hasKeys = Object.keys(rest).length > 0;
     if (!hasKeys) {
       handleClearSavedFilter();
@@ -479,9 +511,25 @@ export function TaskList({ projectId }: { projectId: string }) {
           </Select>
         </div>
         <div className="flex items-center gap-2">
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                setStatusFilter("ALL");
+                setPriorityFilter("ALL");
+                handleClearSavedFilter();
+                table.setPageIndex(0);
+              }}
+            >
+              <RotateCcwIcon className="size-3.5" />
+              Clear filters
+            </Button>
+          )}
           <SavedFilterDialog
             projectId={projectId}
-            currentConfig={savedFilterConfig ?? {}}
+            currentConfig={liveFilterConfig}
             onApplyFilter={(config, name) => handleApplySavedFilter(config, name)}
             onClearFilter={handleClearSavedFilter}
             activeFilterName={activeFilterName}

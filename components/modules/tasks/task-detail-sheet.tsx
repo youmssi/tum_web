@@ -311,11 +311,19 @@ export function TaskDetailSheet({ task, open, onOpenChange, projectId }: TaskDet
                             category: s,
                             name: STATUS_LABELS[s],
                           }))
-                        ).map((cfg) => (
-                          <SelectItem key={cfg.id} value={cfg.category}>
-                            {cfg.name}
-                          </SelectItem>
-                        ))}
+                        )
+                          // Deduplicate by category — multiple custom statuses can share the
+                          // same category (e.g. two IN_REVIEW statuses) which would produce
+                          // duplicate React keys in the SelectItem list.
+                          .filter(
+                            (cfg, i, arr) =>
+                              arr.findIndex((c) => c.category === cfg.category) === i,
+                          )
+                          .map((cfg) => (
+                            <SelectItem key={cfg.category} value={cfg.category}>
+                              {cfg.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </Field>
