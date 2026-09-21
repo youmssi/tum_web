@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminPlaceholder } from "@/components/modules/administration";
+import { AdminAudit } from "@/components/modules/administration";
 
 export const metadata: Metadata = {
   title: "Admin · Audit log",
@@ -8,9 +8,14 @@ export const metadata: Metadata = {
 
 export default function AdminAuditPage() {
   return (
-    <AdminPlaceholder
-      title="Audit log"
-      description="Cross-tenant audit trail of admin and security-relevant actions."
-    />
+    <div className="space-y-6 p-6">
+      <div>
+        <h1 className="text-xl font-semibold">Audit log</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Cross-tenant audit trail of admin and security-relevant actions.
+        </p>
+      </div>
+      <AdminAudit />
+    </div>
   );
 }
