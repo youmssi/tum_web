@@ -10,4 +10,9 @@ export const env = {
   // search.google.com/search-console — set on Vercel as NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.
   // When unset, app/layout.tsx omits the verification meta tag entirely (no stale token leaks).
   googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? null,
+  // Umami analytics — website ID for this project in the (already-hosted) Umami instance, and
+  // that instance's tracking script URL. Both must be set for the script to load; leaving either
+  // blank disables analytics entirely (no script injected, no requests made).
+  umamiWebsiteId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? null,
+  umamiSrc: process.env.NEXT_PUBLIC_UMAMI_SRC ?? null,
 } as const;

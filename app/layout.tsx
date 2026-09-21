@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s · Tûm",
   },
   description:
-    "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools — just clear execution.",
+    "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools, just clear execution.",
   applicationName: "Tûm",
   keywords: [
     "project management",
@@ -43,13 +43,13 @@ export const metadata: Metadata = {
     type: "website",
     url: env.siteUrl,
     siteName: "Tûm",
-    title: "Tûm — Project execution & workflow visibility",
+    title: "Tûm: Project execution & workflow visibility",
     description:
-      "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools — just clear execution.",
+      "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools, just clear execution.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tûm — Project execution & workflow visibility",
+    title: "Tûm: Project execution & workflow visibility",
     description: "Tûm brings tasks, timelines, and team visibility into one coherent workspace.",
   },
   // Icons: served straight from public/. We don't use Next's app/icon.* convention because the

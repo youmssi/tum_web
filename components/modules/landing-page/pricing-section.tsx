@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 import { useBillingState, useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
+import { trackEvent } from "@/lib/analytics";
 
 type PlanKey = "community" | "pro" | "enterprise";
 
@@ -29,7 +30,7 @@ const PLAN_CONFIG: {
     // Community is invitation-only: visitors book a 15-min call where we collect their email and
     // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
     // MVP and lets us match contributors / reviewers / early adopters to the right room.
-    href: "https://cal.com/mrvin100/join-community",
+    href: "https://cal.com/mrvin100/collective",
     external: true,
     popular: false,
     hasBadge: false,
@@ -61,7 +62,7 @@ export function PricingSection() {
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();
   const startCheckout = useStartCheckout();
-  const billing = useBillingState();
+  const billing = useBillingState({ enabled: !!session });
   const [annual, setAnnual] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
 
@@ -83,6 +84,7 @@ export function PricingSection() {
    * Polar handles the entire payment surface (card, PayPal, subscription management).
    */
   function handlePaidPlanClick(plan: "pro" | "enterprise") {
+    trackEvent("pricing_cta_click", { plan, annual, signedIn: !!session });
     if (!session) {
       router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
       return;
@@ -263,6 +265,7 @@ export function PricingSection() {
                       href={plan.href}
                       target={plan.external ? "_blank" : undefined}
                       rel={plan.external ? "noopener noreferrer" : undefined}
+                      onClick={() => trackEvent("pricing_cta_click", { plan: plan.key, annual })}
                     >
                       {plans(`${plan.key}.cta`)}
                       {plan.external ? (

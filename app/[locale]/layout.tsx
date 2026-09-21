@@ -3,8 +3,10 @@ import { setRequestLocale } from "next-intl/server";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 import { routing } from "@/i18n/routing";
+import { env } from "@/lib/env";
 import "../globals.css";
 import { Providers } from "../providers";
 
@@ -38,6 +40,13 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        {env.umamiWebsiteId && env.umamiSrc && (
+          <Script
+            src={env.umamiSrc}
+            data-website-id={env.umamiWebsiteId}
+            strategy="afterInteractive"
+          />
+        )}
         <NextIntlClientProvider>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
