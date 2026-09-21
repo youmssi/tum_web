@@ -86,11 +86,13 @@ export function useMoveTask(projectId: string) {
       id,
       status,
       afterTaskId,
+      statusConfigId,
     }: {
       id: string;
       status: TaskStatus;
       afterTaskId?: string;
-    }) => taskApi.move(id, { status, afterTaskId }),
+      statusConfigId?: string | null;
+    }) => taskApi.move(id, { status, afterTaskId, statusConfigId }),
     onSuccess: (updated) => {
       qc.setQueryData(TASK_KEYS.detail(updated.id), updated);
       qc.invalidateQueries({ queryKey: TASK_KEYS.byProject(projectId) });

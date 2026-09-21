@@ -46,8 +46,10 @@ function buildColumns(
   colIdToCategory: Map<string, string>,
 ): ColumnMap {
   const cols: ColumnMap = Object.fromEntries(columnIds.map((id) => [id, []] as const));
-  // Build a mapping category -> first colId with that category (in sort order)
-  // so tasks whose status matches a category go into its first configured column.
+  const validColIds = new Set(columnIds);
+  // Build a mapping category -> first colId with that category (in sort order), used as the
+  // fallback for tasks with no explicit statusConfigId (never moved, imported, or predating
+  // that column — see the task-service comment on task.status_config_id).
   const categoryToFirstColId = new Map<string, string>();
   for (const colId of columnIds) {
     const cat = colIdToCategory.get(colId)!;
@@ -56,7 +58,13 @@ function buildColumns(
   [...tasks]
     .sort((a, b) => a.orderIndex - b.orderIndex)
     .forEach((t) => {
-      const colId = categoryToFirstColId.get(t.status);
+      // A project can have several columns sharing one category (e.g. "In Progress" and
+      // "Blocked"). Prefer the task's own statusConfigId — the specific column it was last
+      // dropped into — over the category fallback, otherwise it would always render back in
+      // whichever same-category column happens to sort first.
+      const explicitColId =
+        t.statusConfigId && validColIds.has(t.statusConfigId) ? t.statusConfigId : null;
+      const colId = explicitColId ?? categoryToFirstColId.get(t.status);
       if (colId) cols[colId].push(t.id);
     });
   return cols;
@@ -183,14 +191,19 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     const idx = colItems.indexOf(activeId);
     const afterTaskId = idx > 0 ? colItems[idx - 1] : undefined;
 
-    // The backend move API still takes the category (TaskStatus enum), not the config id.
-    // Resolve the category from the column the task ended up in.
-    const targetCategory = colIdToCategory.get(toCol ?? fromCol) as TaskStatus;
+    // The backend still needs the coarse category (TaskStatus enum) for the invariants that key
+    // off it (completion, dashboards). statusConfigId pins the task to the exact column when
+    // one's loaded (colIdToConfig is empty in the pre-configs-loaded fallback state, where the
+    // synthetic column ids are bare category strings, not real config ids).
+    const targetColId = toCol ?? fromCol;
+    const targetCategory = colIdToCategory.get(targetColId) as TaskStatus;
+    const targetStatusConfigId = colIdToConfig.has(targetColId) ? targetColId : null;
 
     try {
       await moveTask.mutateAsync({
         id: activeId,
         status: targetCategory,
+        statusConfigId: targetStatusConfigId,
         afterTaskId,
       });
       setDragCols(null);
@@ -228,6 +241,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           {columnIds.map((colId) => (
             <BoardColumn
               key={colId}
+              id={colId}
               status={colIdToCategory.get(colId) as TaskStatus}
               config={colIdToConfig.get(colId) ?? null}
               tasks={(cols[colId] ?? []).map((id) => taskMap[id]).filter(Boolean) as Task[]}

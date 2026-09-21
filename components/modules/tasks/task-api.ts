@@ -10,6 +10,11 @@ export interface Task {
   title: string;
   description: string | null;
   status: TaskStatus;
+  /**
+   * Which of the project's (possibly several same-category) status columns this task is in.
+   * Null for tasks never explicitly moved — the board falls back to bucketing by category.
+   */
+  statusConfigId: string | null;
   priority: TaskPriority;
   assigneeId: string | null;
   dueDate: string | null;
@@ -126,8 +131,10 @@ export const taskApi = {
   update: (id: string, data: UpdateTaskPayload) =>
     api.patch(`api/tasks/${id}`, { json: data }).json<Task>(),
 
-  move: (id: string, data: { status: TaskStatus; afterTaskId?: string }) =>
-    api.patch(`api/tasks/${id}/move`, { json: data }).json<Task>(),
+  move: (
+    id: string,
+    data: { status: TaskStatus; afterTaskId?: string; statusConfigId?: string | null },
+  ) => api.patch(`api/tasks/${id}/move`, { json: data }).json<Task>(),
 
   reschedule: (id: string, data: { startDate?: string | null; endDate?: string | null }) =>
     api.patch(`api/tasks/${id}/schedule`, { json: data }).json<Task>(),
