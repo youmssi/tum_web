@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminPlaceholder } from "@/components/modules/administration";
+import { AdminUsers } from "@/components/modules/administration";
 
 export const metadata: Metadata = {
   title: "Admin · Users",
@@ -8,9 +8,12 @@ export const metadata: Metadata = {
 
 export default function AdminUsersPage() {
   return (
-    <AdminPlaceholder
-      title="Users"
-      description="Search and manage every user across the platform."
-    />
+    <div className="space-y-6 p-6">
+      <div>
+        <h1 className="text-xl font-semibold">Users</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Every user across the platform.</p>
+      </div>
+      <AdminUsers />
+    </div>
   );
 }

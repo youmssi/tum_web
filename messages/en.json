@@ -353,10 +353,10 @@
       "today": "Today",
       "todayTooltip": "Scroll the chart to today's date",
       "linkTasks": "Link tasks",
-      "linkTasksTooltip": "Link tasks — click two bars to create a dependency",
+      "linkTasksTooltip": "Link tasks: click two bars to create a dependency",
       "cancelLinking": "Cancel linking",
       "cancelLinkingTooltip": "Exit link mode (Esc)",
-      "focusEnter": "Focus mode — full view",
+      "focusEnter": "Focus mode: full view",
       "focusExit": "Exit focus mode (Esc)",
       "exportXlsx": "Export XLSX",
       "exportXlsxTooltip": "Download all tasks as an Excel file (re-importable)"
@@ -402,7 +402,7 @@
     "header": "Comments",
     "empty": "No comments yet.",
     "placeholder": "Add a comment… (type @ to mention)",
-    "mentionTip": "Type @ to tag teammates — they'll be notified.",
+    "mentionTip": "Type @ to tag teammates. They'll be notified.",
     "submit": "Comment",
     "submitting": "Posting…",
     "edited": "(edited)",
@@ -591,7 +591,7 @@
     "builtFor": {
       "sectionLabel": "Who it's for",
       "heading": "Built for any team, any workflow",
-      "subhead": "From engineering sprints to marketing campaigns — Tûm adapts to how your team works.",
+      "subhead": "From engineering sprints to marketing campaigns, Tûm adapts to how your team works.",
       "footer": "+ every department in between. No rigid process imposed.",
       "teams": {
         "engineering": { "label": "Engineering" },
@@ -606,7 +606,7 @@
     "comparison": {
       "sectionLabel": "Compare",
       "heading": "Full-featured. Without the lock-in.",
-      "subhead": "Tûm gives you the capabilities of premium tools — with the freedom of open source.",
+      "subhead": "Tûm gives you the capabilities of premium tools, with the freedom of open source.",
       "headerFeature": "Feature",
       "footer": "Data gathered from public feature listings as of June 2026. Check each product's website for the latest details.",
       "rows": {
@@ -634,7 +634,7 @@
       "sectionLabel": "Interactive Demo",
       "heading": "See the Gantt chart",
       "headingAccent": "in action.",
-      "subhead": "Drag bars, explore dependencies, and see how smart scheduling works — right in your browser, no sign-up required."
+      "subhead": "Drag bars, explore dependencies, and see how smart scheduling works, right in your browser, no sign-up required."
     },
     "hero": {
       "tagline": "Project execution & workflow visibility",
@@ -648,7 +648,7 @@
         "track": "track",
         "succeed": "succeed"
       },
-      "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools — just clear execution. For any team, any department, any project.",
+      "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. No more scattered tools, just clear execution. For any team, any department, any project.",
       "ctaStartFree": "Start free",
       "ctaSignIn": "Sign in",
       "microFooter": "Free to use · No credit card required · Community & cloud plans",
@@ -661,7 +661,7 @@
           "dependencies": "Task Dependencies",
           "scheduling": "Smart Scheduling"
         },
-        "footer": "Drag-and-drop scheduling, dependency arrows, milestone markers, and real-time progress tracking — all in one workspace."
+        "footer": "Drag-and-drop scheduling, dependency arrows, milestone markers, and real-time progress tracking, all in one workspace."
       }
     },
     "features": {
@@ -671,15 +671,15 @@
       "items": {
         "timeline": {
           "title": "Visual Timeline",
-          "description": "Drag-and-drop scheduling with dependency arrows, milestone markers, and per-task progress bars. See your whole project at a glance — no spreadsheet required."
+          "description": "Drag-and-drop scheduling with dependency arrows, milestone markers, and per-task progress bars. See your whole project at a glance. No spreadsheet required."
         },
         "scheduling": {
           "title": "Smart Scheduling",
-          "description": "Dependency-aware auto-scheduling with critical path highlighting, SS/FF/SF semantics, and lag/lead offsets. Move one task and dependents shift automatically — no manual rework."
+          "description": "Dependency-aware auto-scheduling with critical path highlighting, SS/FF/SF semantics, and lag/lead offsets. Move one task and dependents shift automatically. No manual rework."
         },
         "visibility": {
           "title": "Dashboards & Analytics",
-          "description": "Real-time dashboards with completion trends, status breakdowns, overdue counters, and burndown. Know what's on track and what needs attention — without a status meeting."
+          "description": "Real-time dashboards with completion trends, status breakdowns, overdue counters, and burndown. Know what's on track and what needs attention, without a status meeting."
         },
         "workload": {
           "title": "Workload View",
@@ -687,7 +687,7 @@
         },
         "dependencies": {
           "title": "Task Dependencies",
-          "description": "Link tasks so nothing starts before it should. Model sequential steps, parallel tracks, and milestones — Tûm keeps your plan coherent as things shift."
+          "description": "Link tasks so nothing starts before it should. Model sequential steps, parallel tracks, and milestones. Tûm keeps your plan coherent as things shift."
         },
         "checklists": {
           "title": "Checklists & Subtasks",
@@ -695,15 +695,15 @@
         },
         "mentions": {
           "title": "@Mention & Watchers",
-          "description": "@mention teammates or use group mentions like @team and @assignees. Watch tasks to get notified on every change — nothing falls through the cracks."
+          "description": "@mention teammates or use group mentions like @team and @assignees. Watch tasks to get notified on every change. Nothing falls through the cracks."
         },
         "team": {
           "title": "Built for Every Team",
-          "description": "Operations, marketing, events, personal projects, community initiatives — if you have a project and a team, Tûm fits. No technical background required."
+          "description": "Operations, marketing, events, personal projects, community initiatives: if you have a project and a team, Tûm fits. No technical background required."
         },
         "selfHost": {
           "title": "Self-host or Cloud",
-          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Fair-code license — free for internal use, no vendor lock-in."
+          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Fair-code license: free for internal use, no vendor lock-in."
         }
       }
     },
@@ -714,11 +714,11 @@
       "steps": {
         "signup": {
           "title": "Sign up and create a workspace",
-          "description": "Get started in two minutes on Tûm Cloud — no setup required. Or self-host on your own server if you prefer to own your infrastructure."
+          "description": "Get started in two minutes on Tûm Cloud, no setup required. Or self-host on your own server if you prefer to own your infrastructure."
         },
         "organise": {
           "title": "Organise your work",
-          "description": "Create projects and tasks. Assign owners, set priorities, add due dates and labels. Tûm adapts to how your team already works — no rigid process imposed."
+          "description": "Create projects and tasks. Assign owners, set priorities, add due dates and labels. Tûm adapts to how your team already works, no rigid process imposed."
         },
         "timeline": {
           "title": "See everything on the timeline",
@@ -726,7 +726,7 @@
         },
         "track": {
           "title": "Track progress and adapt",
-          "description": "Live dashboards show completion trends, overdue alerts, and status breakdowns as they happen. Adjust the plan as reality evolves — in seconds, not meetings."
+          "description": "Live dashboards show completion trends, overdue alerts, and status breakdowns as they happen. Adjust the plan as reality evolves, in seconds, not meetings."
         }
       }
     },
@@ -741,7 +741,7 @@
       "perWorkspace": "/mo per workspace",
       "custom": "Custom",
       "footer": "All plans include unlimited users.",
-      "fairCodeNote": "Fair-code license — free for internal use, cannot be resold as a competing service.",
+      "fairCodeNote": "Fair-code license: free for internal use, cannot be resold as a competing service.",
       "plans": {
         "community": {
           "name": "Community",
@@ -835,7 +835,7 @@
         {
           "name": "Tom Andersson",
           "role": "Startup Founder at NordicLabs",
-          "quote": "Open-source with a fair license — that's rare for something this polished. We contribute back fixes and the community has been incredibly responsive."
+          "quote": "Open-source with a fair license: that's rare for something this polished. We contribute back fixes and the community has been incredibly responsive."
         },
         {
           "name": "Priya Sharma",
@@ -847,13 +847,14 @@
     "cta": {
       "heading": "Your projects.",
       "headingAccent": "Finally under control.",
-      "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. Pick it up today — personally, with your team, or across your whole community.",
+      "subhead": "Tûm brings tasks, timelines, and team visibility into one coherent workspace. Pick it up today: personally, with your team, or across your whole community.",
       "ctaPrimary": "Get started free",
       "ctaSecondary": "Sign in"
     },
     "footer": {
       "tagline": "Project execution & workflow visibility. Built for teams that care about shipping.",
       "rights": "Open-source project management.",
+      "discord": "Join our Discord community",
       "sections": {
         "product": "Product",
         "platform": "Platform",

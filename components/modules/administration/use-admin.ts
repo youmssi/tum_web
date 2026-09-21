@@ -7,6 +7,10 @@ import { adminApi } from "./admin-api";
 export const ADMIN_KEYS = {
   overview: ["admin", "overview"] as const,
   me: ["admin", "me"] as const,
+  users: ["admin", "users"] as const,
+  organisations: ["admin", "organisations"] as const,
+  subscriptions: ["admin", "subscriptions"] as const,
+  audit: ["admin", "audit"] as const,
 };
 
 /**
@@ -32,5 +36,41 @@ export function useIsAdmin() {
     queryFn: () => adminApi.me(),
     staleTime: 5 * 60_000,
     retry: 0,
+  });
+}
+
+export function useAdminUsers() {
+  return useQuery({
+    queryKey: ADMIN_KEYS.users,
+    queryFn: () => adminApi.users(),
+    staleTime: 30_000,
+    retry: 1,
+  });
+}
+
+export function useAdminOrganisations() {
+  return useQuery({
+    queryKey: ADMIN_KEYS.organisations,
+    queryFn: () => adminApi.organisations(),
+    staleTime: 30_000,
+    retry: 1,
+  });
+}
+
+export function useAdminSubscriptions() {
+  return useQuery({
+    queryKey: ADMIN_KEYS.subscriptions,
+    queryFn: () => adminApi.subscriptions(),
+    staleTime: 30_000,
+    retry: 1,
+  });
+}
+
+export function useAdminAudit() {
+  return useQuery({
+    queryKey: ADMIN_KEYS.audit,
+    queryFn: () => adminApi.audit(),
+    staleTime: 15_000,
+    retry: 1,
   });
 }
