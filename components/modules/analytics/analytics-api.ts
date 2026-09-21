@@ -1,36 +1,30 @@
-import { api } from "@/lib/api-client";
-
-export interface TrendPoint {
+export interface BurndownPoint {
   date: string;
+  remaining: number;
+  ideal: number;
+}
+
+export interface BurnupPoint {
+  date: string;
+  scope: number;
   completed: number;
 }
 
-export interface ProjectMetrics {
-  totalTasks: number;
-  completedTasks: number;
-  overdueTasks: number;
-  completionTrend: TrendPoint[];
+export interface CycleTimePoint {
+  weekStart: string;
+  p50: number;
+  p75: number;
+  p95: number;
 }
 
-interface ProjectDashboardResponse {
-  totalTasks: number;
-  byStatus: Record<string, number>;
-  byPriority: Record<string, number>;
-  overdueCount: number;
-  completionPct: number;
-  completionTrend?: TrendPoint[];
+export interface ThroughputPoint {
+  weekStart: string;
+  completed: number;
 }
 
-export const analyticsApi = {
-  project: async (projectId: string): Promise<ProjectMetrics> => {
-    const data = await api
-      .get(`api/projects/${projectId}/dashboard`)
-      .json<ProjectDashboardResponse>();
-    return {
-      totalTasks: data.totalTasks,
-      completedTasks: data.byStatus?.DONE ?? 0,
-      overdueTasks: data.overdueCount,
-      completionTrend: data.completionTrend ?? [],
-    };
-  },
-};
+export interface AnalyticsResponse {
+  burndown: BurndownPoint[];
+  burnup: BurnupPoint[];
+  cycleTime: CycleTimePoint[];
+  throughput: ThroughputPoint[];
+}

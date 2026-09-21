@@ -8,5 +8,6 @@ export { PricingSection } from "./pricing-section";
 export { CtaSection } from "./cta-section";
 export { GanttDemoSection } from "./gantt-demo-section";
 export { InteractiveGanttDemo } from "./interactive-gantt-demo";
+export { TestimonialsSection } from "./testimonials-section";
 export { FooterSection } from "./footer-section";
 export { TumLogo } from "./tum-logo";

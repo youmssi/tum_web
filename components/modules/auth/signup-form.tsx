@@ -23,6 +23,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
+import { trackEvent } from "@/lib/analytics";
 
 type SignupFormValues = {
   name: string;
@@ -60,6 +61,7 @@ export function SignupForm() {
       toast.error(error.message ?? t("failed"));
       return;
     }
+    trackEvent("sign_up");
     setEmailSent(true);
   }
 
@@ -191,9 +193,7 @@ export function SignupForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              {t("continueWith")}
-            </span>
+            <span className="bg-card px-2 text-muted-foreground">{t("continueWith")}</span>
           </div>
         </div>
       </CardContent>

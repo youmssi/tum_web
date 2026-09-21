@@ -353,10 +353,10 @@
       "today": "Aujourd’hui",
       "todayTooltip": "Faire défiler le graphique jusqu’à aujourd’hui",
       "linkTasks": "Lier les tâches",
-      "linkTasksTooltip": "Lier des tâches — cliquez sur deux barres pour créer une dépendance",
+      "linkTasksTooltip": "Lier des tâches : cliquez sur deux barres pour créer une dépendance",
       "cancelLinking": "Annuler la liaison",
       "cancelLinkingTooltip": "Quitter le mode liaison (Échap)",
-      "focusEnter": "Mode focus — pleine vue",
+      "focusEnter": "Mode focus : pleine vue",
       "focusExit": "Quitter le mode focus (Échap)",
       "exportXlsx": "Exporter XLSX",
       "exportXlsxTooltip": "Télécharger toutes les tâches dans un fichier Excel (réimportable)"
@@ -402,7 +402,7 @@
     "header": "Commentaires",
     "empty": "Aucun commentaire pour l’instant.",
     "placeholder": "Ajoutez un commentaire… (tapez @ pour mentionner)",
-    "mentionTip": "Tapez @ pour identifier des coéquipiers — ils seront notifiés.",
+    "mentionTip": "Tapez @ pour identifier des coéquipiers. Ils seront notifiés.",
     "submit": "Commenter",
     "submitting": "Publication…",
     "edited": "(modifié)",
@@ -591,7 +591,7 @@
     "builtFor": {
       "sectionLabel": "Pour qui",
       "heading": "Conçu pour toute équipe, tout flux de travail",
-      "subhead": "Des sprints d'ingénierie aux campagnes marketing — Tûm s'adapte à votre façon de travailler.",
+      "subhead": "Des sprints d'ingénierie aux campagnes marketing, Tûm s'adapte à votre façon de travailler.",
       "footer": "+ tous les services entre les deux. Aucun process rigide imposé.",
       "teams": {
         "engineering": { "label": "Ingénierie" },
@@ -606,7 +606,7 @@
     "comparison": {
       "sectionLabel": "Comparer",
       "heading": "Riche en fonctionnalités. Sans verrouillage.",
-      "subhead": "Tûm offre les capacités des outils premium — avec la liberté de l'open source.",
+      "subhead": "Tûm offre les capacités des outils premium, avec la liberté de l'open source.",
       "headerFeature": "Fonctionnalité",
       "footer": "Données issues des listes de fonctionnalités publiques en juin 2026. Consultez le site de chaque produit pour les détails les plus récents.",
       "rows": {
@@ -634,7 +634,7 @@
       "sectionLabel": "Démo interactive",
       "heading": "Voyez le diagramme de Gantt",
       "headingAccent": "en action.",
-      "subhead": "Glissez les barres, explorez les dépendances et voyez comment la planification intelligente fonctionne — directement dans votre navigateur, sans inscription."
+      "subhead": "Glissez les barres, explorez les dépendances et voyez comment la planification intelligente fonctionne, directement dans votre navigateur, sans inscription."
     },
     "hero": {
       "tagline": "Exécution de projets & visibilité des équipes",
@@ -648,7 +648,7 @@
         "track": "suivent",
         "succeed": "réussissent"
       },
-      "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Plus d’outils éparpillés — juste une exécution claire. Pour toute équipe, tout département, tout projet.",
+      "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Plus d’outils éparpillés, juste une exécution claire. Pour toute équipe, tout département, tout projet.",
       "ctaStartFree": "Démarrer gratuitement",
       "ctaSignIn": "Se connecter",
       "microFooter": "Gratuit · Sans carte bancaire · Formules communauté et cloud",
@@ -661,7 +661,7 @@
           "dependencies": "Dépendances de tâches",
           "scheduling": "Planification intelligente"
         },
-        "footer": "Planification glisser-déposer, flèches de dépendances, jalons et suivi en temps réel — tout dans un seul espace de travail."
+        "footer": "Planification glisser-déposer, flèches de dépendances, jalons et suivi en temps réel, tout dans un seul espace de travail."
       }
     },
     "features": {
@@ -671,7 +671,7 @@
       "items": {
         "timeline": {
           "title": "Chronologie visuelle",
-          "description": "Planification glisser-déposer avec flèches de dépendances, jalons et barres d’avancement par tâche. Voyez tout votre projet d’un coup d’œil — sans tableur."
+          "description": "Planification glisser-déposer avec flèches de dépendances, jalons et barres d’avancement par tâche. Voyez tout votre projet d’un coup d’œil. Sans tableur."
         },
         "scheduling": {
           "title": "Planification intelligente",
@@ -679,7 +679,7 @@
         },
         "visibility": {
           "title": "Tableaux de bord et analyses",
-          "description": "Tableaux de bord en temps réel avec tendances d’achèvement, répartition par statut, compteurs de retards et burndown. Sachez ce qui avance — sans réunion de point."
+          "description": "Tableaux de bord en temps réel avec tendances d’achèvement, répartition par statut, compteurs de retards et burndown. Sachez ce qui avance, sans réunion de point."
         },
         "workload": {
           "title": "Vue charge de travail",
@@ -687,7 +687,7 @@
         },
         "dependencies": {
           "title": "Dépendances entre tâches",
-          "description": "Liez les tâches pour que rien ne commence avant son heure. Modélisez étapes séquentielles, parcours parallèles et jalons — Tûm garde votre plan cohérent à mesure que tout évolue."
+          "description": "Liez les tâches pour que rien ne commence avant son heure. Modélisez étapes séquentielles, parcours parallèles et jalons. Tûm garde votre plan cohérent à mesure que tout évolue."
         },
         "checklists": {
           "title": "Checklists et sous-tâches",
@@ -699,11 +699,11 @@
         },
         "team": {
           "title": "Conçu pour toutes les équipes",
-          "description": "Opérations, marketing, événements, projets personnels, initiatives communautaires — si vous avez un projet et une équipe, Tûm s’adapte. Aucun bagage technique requis."
+          "description": "Opérations, marketing, événements, projets personnels, initiatives communautaires : si vous avez un projet et une équipe, Tûm s’adapte. Aucun bagage technique requis."
         },
         "selfHost": {
           "title": "Auto-hébergé ou Cloud",
-          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Licence fair-code — gratuit en interne, sans verrouillage fournisseur."
+          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Licence fair-code : gratuit en interne, sans verrouillage fournisseur."
         }
       }
     },
@@ -714,11 +714,11 @@
       "steps": {
         "signup": {
           "title": "Inscrivez-vous et créez un espace de travail",
-          "description": "Démarrez en deux minutes sur Tûm Cloud — aucune configuration requise. Ou auto-hébergez sur votre serveur si vous préférez maîtriser votre infrastructure."
+          "description": "Démarrez en deux minutes sur Tûm Cloud, aucune configuration requise. Ou auto-hébergez sur votre serveur si vous préférez maîtriser votre infrastructure."
         },
         "organise": {
           "title": "Organisez votre travail",
-          "description": "Créez projets et tâches. Attribuez les responsables, définissez les priorités, ajoutez échéances et étiquettes. Tûm s’adapte à votre façon de travailler — sans process rigide imposé."
+          "description": "Créez projets et tâches. Attribuez les responsables, définissez les priorités, ajoutez échéances et étiquettes. Tûm s’adapte à votre façon de travailler, sans process rigide imposé."
         },
         "timeline": {
           "title": "Visualisez tout sur la chronologie",
@@ -726,7 +726,7 @@
         },
         "track": {
           "title": "Suivez l’avancement et adaptez-vous",
-          "description": "Les tableaux de bord en direct affichent tendances, alertes de retard et répartitions par statut au fil de l’eau. Ajustez le plan à mesure que la réalité évolue — en secondes, pas en réunions."
+          "description": "Les tableaux de bord en direct affichent tendances, alertes de retard et répartitions par statut au fil de l’eau. Ajustez le plan à mesure que la réalité évolue, en secondes, pas en réunions."
         }
       }
     },
@@ -741,7 +741,7 @@
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
       "footer": "Toutes les formules incluent des utilisateurs illimités.",
-      "fairCodeNote": "Licence fair-code — gratuite en interne, ne peut pas être revendue en tant que service concurrent.",
+      "fairCodeNote": "Licence fair-code : gratuite en interne, ne peut pas être revendue en tant que service concurrent.",
       "plans": {
         "community": {
           "name": "Communauté",
@@ -791,16 +791,70 @@
         }
       }
     },
+    "testimonials": {
+      "sectionLabel": "Témoignages",
+      "heading": "Adoré par les équipes qui livrent",
+      "headingAccent": "des projets concrets",
+      "subhead": "Des startups aux grandes entreprises, découvrez pourquoi les équipes choisissent Tûm pour l'exécution et la visibilité de leurs projets.",
+      "items": [
+        {
+          "name": "Sarah Chen",
+          "role": "Engineering Manager chez NovaPay",
+          "quote": "Nous avons remplacé trois outils distincts par Tûm. Le diagramme de Gantt avec analyse du chemin critique nous fait gagner des heures à chaque sprint planning."
+        },
+        {
+          "name": "Marcus Rivera",
+          "role": "Product Lead chez Flowstate",
+          "quote": "La collaboration en temps réel est fluide. Notre équipe répartie sur 4 fuseaux horaires a enfin une source unique de vérité pour l'avancement des projets."
+        },
+        {
+          "name": "Aisha Patel",
+          "role": "Head of Operations chez Bloom Health",
+          "quote": "L'auto-hébergement a changé la donne. Nous avions besoin d'une gestion de projet conforme HIPAA et Tûm nous a donné le contrôle total sans le prix des solutions enterprise."
+        },
+        {
+          "name": "James Okonkwo",
+          "role": "CTO chez AgriTech Africa",
+          "quote": "Le suivi des dépendances et la vue charge de travail nous ont permis d'identifier des goulots d'étranglement que nous n'avions jamais vus. Les délais de livraison se sont améliorés de 30 % dès le premier trimestre."
+        },
+        {
+          "name": "Elena Kowalski",
+          "role": "Directrice Créative chez PixelForge",
+          "quote": "Enfin un outil de projet qui ne donne pas l'impression d'avoir été conçu par des comptables. Le tableau Kanban est magnifique et la vue chronologie est vraiment utile."
+        },
+        {
+          "name": "David Kim",
+          "role": "Staff Engineer chez CloudBase",
+          "quote": "L'architecture API-first m'a convaincu. Nous avons intégré Tûm à notre pipeline CI/CD pour que les statuts des tâches se mettent à jour automatiquement lors des déploiements."
+        },
+        {
+          "name": "Fatima Al-Rashid",
+          "role": "Directrice PMO chez Gulf Ventures",
+          "quote": "Gérer un portefeuille de 12 projets était un chaos. Le tableau de bord portfolio me donne une visibilité instantanée sur toutes les initiatives en cours."
+        },
+        {
+          "name": "Tom Andersson",
+          "role": "Fondateur de Startup chez NordicLabs",
+          "quote": "L'open source avec une licence fair-code : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
+        },
+        {
+          "name": "Priya Sharma",
+          "role": "Scrum Master chez FinEdge",
+          "quote": "Les graphiques burndown et throughput sont exactement ce dont j'avais besoin pour les rapports aux parties prenantes. Fini les tableurs manuels tous les vendredis."
+        }
+      ]
+    },
     "cta": {
       "heading": "Vos projets.",
       "headingAccent": "Enfin maîtrisés.",
-      "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Lancez-vous dès aujourd’hui — en solo, en équipe, ou pour toute votre communauté.",
+      "subhead": "Tûm réunit les tâches, les chronologies et la visibilité de l’équipe dans un espace de travail cohérent. Lancez-vous dès aujourd’hui : en solo, en équipe, ou pour toute votre communauté.",
       "ctaPrimary": "Démarrer gratuitement",
       "ctaSecondary": "Se connecter"
     },
     "footer": {
       "tagline": "Exécution de projets & visibilité des équipes. Conçu pour les équipes qui tiennent à livrer.",
       "rights": "Gestion de projet open source.",
+      "discord": "Rejoindre notre communauté Discord",
       "sections": {
         "product": "Produit",
         "platform": "Plateforme",

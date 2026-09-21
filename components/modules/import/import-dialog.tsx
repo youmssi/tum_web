@@ -25,7 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -401,7 +401,12 @@ export function ImportProjectDialog() {
                 <span>3. Import</span>
               </div>
 
-              <ScrollArea className="h-72 rounded-md border">
+              {/* Radix ScrollArea's Viewport wraps children in a `display: table` node so a
+                  vertical-only area still shrinks to content width — with a table this wide
+                  that lets it expand past the dialog instead of scrolling. Force block layout
+                  and add the horizontal scrollbar so overflow is contained on every screen
+                  size instead of spilling past the dialog edge. */}
+              <ScrollArea className="h-72 max-w-full rounded-md border [&>div]:!block">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -459,6 +464,7 @@ export function ImportProjectDialog() {
                     ))}
                   </TableBody>
                 </Table>
+                <ScrollBar orientation="horizontal" />
               </ScrollArea>
 
               <p className="text-xs text-muted-foreground">

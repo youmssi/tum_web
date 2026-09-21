@@ -1,4 +1,5 @@
+export { CalendarView } from "./calendar-view";
 export { WorkingCalendarCard } from "./working-calendar-card";
-export { calendarApi } from "./calendar-api";
+export { useCalendarConfig, useUpdateCalendar, CALENDAR_KEYS } from "./use-calendar";
 export type { CalendarConfig, HolidayEntry, UpdateCalendarPayload } from "./calendar-api";
-export { CALENDAR_KEYS, useCalendarConfig, useUpdateCalendar } from "./use-calendar";
+export { calendarApi } from "./calendar-api";

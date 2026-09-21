@@ -18,7 +18,16 @@ const CATEGORY_BG: Record<TaskStatus, string> = {
 };
 
 interface BoardColumnProps {
-  /** Drag-and-drop container id — always the {@code TaskStatus} enum, even after rename. */
+  /**
+   * Drag-and-drop container id. Must match the column id space used by the parent's
+   * {@code columnIds} (the status config's uuid once configs are loaded, the category string as
+   * a fallback) — see the comment in kanban-board.tsx about V24 dropping the
+   * unique(project_id, category) constraint. Using {@code status} here would collide across
+   * columns that share a category and would never match {@code columnIds}, breaking drops onto
+   * an empty column or the column background.
+   */
+  id: string;
+  /** Status category — drives styling/labels only, not drag-and-drop identity. */
   status: TaskStatus;
   /**
    * Configured status row for this column. Null while the project's statuses haven't loaded yet
@@ -30,8 +39,8 @@ interface BoardColumnProps {
   onTaskClick?: (task: Task) => void;
 }
 
-export function BoardColumn({ status, config, tasks, onTaskClick }: BoardColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({ id: status });
+export function BoardColumn({ id, status, config, tasks, onTaskClick }: BoardColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id });
 
   const title = config?.name ?? STATUS_LABELS[status];
   const accent = config?.color;

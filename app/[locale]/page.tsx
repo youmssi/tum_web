@@ -8,6 +8,7 @@ import {
   BuiltForSection,
   HowItWorksSection,
   PricingSection,
+  TestimonialsSection,
   CtaSection,
   FooterSection,
 } from "@/components/modules/landing-page";
@@ -69,6 +70,7 @@ export default function Home() {
         <ComparisonSection />
         <HowItWorksSection />
         <PricingSection />
+        <TestimonialsSection />
         <CtaSection />
         <FooterSection />
       </main>

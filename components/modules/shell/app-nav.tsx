@@ -6,8 +6,10 @@ import { useTranslations } from "next-intl";
 import {
   CreditCardIcon,
   FolderKanbanIcon,
+  HistoryIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  PieChartIcon,
   ShieldIcon,
   SettingsIcon,
   UserIcon,
@@ -44,6 +46,7 @@ export function AppSidebar() {
 
   const navItems = [
     { href: ROUTES.DASHBOARD, label: t("dashboard"), icon: LayoutDashboardIcon },
+    { href: ROUTES.PORTFOLIO, label: "Portfolio", icon: PieChartIcon },
     { href: ROUTES.PROJECTS, label: t("projects"), icon: FolderKanbanIcon },
     { href: ROUTES.ORGANIZATION_MEMBERS, label: t("members"), icon: UsersIcon },
   ];
@@ -100,7 +103,7 @@ export function AppSidebar() {
                 tooltip={t("audit")}
               >
                 <Link href={ROUTES.ORGANIZATION_AUDIT}>
-                  <ShieldIcon />
+                  <HistoryIcon />
                   <span>{t("audit")}</span>
                 </Link>
               </SidebarMenuButton>

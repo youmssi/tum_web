@@ -1,74 +1,95 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 
 import { GanttChart, type GanttTask } from "@/components/modules/timeline";
 
+/** Shift a Date by `days` (positive = future, negative = past). */
+function addDays(d: Date, days: number): Date {
+  const r = new Date(d);
+  r.setDate(r.getDate() + days);
+  return r;
+}
+
 /**
- * Sample project tasks with sequential dependencies so visitors see real
- * dependency arrows between bars — demonstrating the core scheduling feature.
+ * Build demo tasks whose bars are always centred around today so the chart
+ * looks correct no matter when a visitor loads the page.
+ *
+ * Layout (relative to today):
+ *  1. Market research  — completed  −28 → −15 days ago
+ *  2. Campaign brief   — completed  −21 → −8  days ago
+ *  3. Asset creation   — active       −7 → +9 days  (spans TODAY)
+ *  4. Internal review  — active       +3 → +17 days
+ *  5. Launch prep      — upcoming    +10 → +22 days
+ *  6. Go / no-go       — milestone   +22 → +22 days
  */
-const DEMO_TASKS: GanttTask[] = [
-  {
-    id: "demo-1",
-    name: "Market research",
-    start: "2026-05-01",
-    end: "2026-05-14",
-    progress: 100,
-    dependencies: "",
-    custom_class: "tum-demo-done",
-  },
-  {
-    id: "demo-2",
-    name: "Campaign brief",
-    start: "2026-05-05",
-    end: "2026-05-18",
-    progress: 80,
-    dependencies: "demo-1",
-    custom_class: "tum-demo-done",
-  },
-  {
-    id: "demo-3",
-    name: "Asset creation",
-    start: "2026-05-12",
-    end: "2026-05-28",
-    progress: 55,
-    dependencies: "demo-2",
-    custom_class: "tum-demo-active",
-  },
-  {
-    id: "demo-4",
-    name: "Internal review",
-    start: "2026-05-22",
-    end: "2026-06-03",
-    progress: 25,
-    dependencies: "demo-3",
-    custom_class: "tum-demo-active",
-  },
-  {
-    id: "demo-5",
-    name: "Launch prep",
-    start: "2026-05-29",
-    end: "2026-06-10",
-    progress: 10,
-    dependencies: "demo-4",
-    custom_class: "tum-demo-critical",
-  },
-  {
-    id: "demo-6",
-    name: "Go / no-go",
-    start: "2026-06-10",
-    end: "2026-06-10",
-    progress: 0,
-    dependencies: "demo-5",
-    custom_class: "tum-demo-critical",
-  },
-];
+function buildDemoTasks(): GanttTask[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return [
+    {
+      id: "demo-1",
+      name: "Market research",
+      start: addDays(today, -28),
+      end: addDays(today, -15),
+      progress: 100,
+      dependencies: "",
+      custom_class: "tum-demo-done",
+    },
+    {
+      id: "demo-2",
+      name: "Campaign brief",
+      start: addDays(today, -21),
+      end: addDays(today, -8),
+      progress: 80,
+      dependencies: "demo-1",
+      custom_class: "tum-demo-done",
+    },
+    {
+      id: "demo-3",
+      name: "Asset creation",
+      start: addDays(today, -7),
+      end: addDays(today, 9),
+      progress: 55,
+      dependencies: "demo-2",
+      custom_class: "tum-demo-active",
+    },
+    {
+      id: "demo-4",
+      name: "Internal review",
+      start: addDays(today, 3),
+      end: addDays(today, 17),
+      progress: 25,
+      dependencies: "demo-3",
+      custom_class: "tum-demo-active",
+    },
+    {
+      id: "demo-5",
+      name: "Launch prep",
+      start: addDays(today, 10),
+      end: addDays(today, 22),
+      progress: 10,
+      dependencies: "demo-4",
+      custom_class: "tum-demo-critical",
+    },
+    {
+      id: "demo-6",
+      name: "Go / no-go",
+      start: addDays(today, 22),
+      end: addDays(today, 22),
+      progress: 0,
+      dependencies: "demo-5",
+      custom_class: "tum-demo-critical",
+    },
+  ];
+}
 
 export function InteractiveGanttDemo() {
   const throttleRef = useRef(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const demoTasks = useMemo(() => buildDemoTasks(), []);
 
   // Clean up the throttle timer on unmount
   useEffect(() => {
@@ -111,7 +132,7 @@ export function InteractiveGanttDemo() {
       {/* Interactive Gantt chart — fixed height so Frappe Gantt's SVG has room to render */}
       <div className="demo-gantt-wrapper h-[260px] lg:h-[340px]">
         <GanttChart
-          tasks={DEMO_TASKS}
+          tasks={demoTasks}
           viewMode="Week"
           onDateChange={handleDemoInteraction}
           onProgressChange={handleDemoInteraction}

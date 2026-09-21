@@ -68,27 +68,25 @@ export function BuiltForSection() {
           <p className="text-muted-foreground mt-2 max-w-lg mx-auto">{t("subhead")}</p>
         </div>
 
-        {/* Horizontal scrolling trust bar */}
-        <div className="relative">
-          <div className="flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory scrollbar-hide [-webkit-overflow-scrolling:touch] justify-center">
-            {TEAMS.map((team, i) => {
-              const Icon = team.icon;
-              return (
-                <div
-                  key={team.key}
-                  className={`flex shrink-0 snap-start items-center gap-3 rounded-full border border-foreground/10 px-5 py-3 bg-card/50 hover:bg-card hover:border-foreground/20 transition-all duration-500 ${
-                    visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                  }`}
-                  style={{ transitionDelay: `${i * 80}ms` }}
-                >
-                  <Icon className={`size-5 ${team.color}`} />
-                  <span className="text-sm font-medium whitespace-nowrap">
-                    {teams(`${team.key}.label`)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+        {/* Wrapped trust bar — flex-wrap avoids horizontal scrollbar on small screens */}
+        <div className="flex flex-wrap justify-center items-center gap-3">
+          {TEAMS.map((team, i) => {
+            const Icon = team.icon;
+            return (
+              <div
+                key={team.key}
+                className={`flex items-center gap-3 rounded-full border border-foreground/10 px-5 py-3 bg-card/50 hover:bg-card hover:border-foreground/20 transition-all duration-500 ${
+                  visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
+                <Icon className={`size-5 ${team.color}`} />
+                <span className="text-sm font-medium whitespace-nowrap">
+                  {teams(`${team.key}.label`)}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         <p
