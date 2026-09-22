@@ -588,6 +588,12 @@
     "tooLarge": "Le fichier est trop volumineux."
   },
   "landing": {
+    "seo": {
+      "title": "Tûm : plateforme open source d'exécution de projets et de visibilité des flux de travail",
+      "description": "Tûm réunit tâches, chronologies, diagrammes de Gantt et visibilité d'équipe dans un espace de travail cohérent. Planification intelligente, analyse du chemin critique, vues de charge de travail, tableau Kanban et collaboration en temps réel. Auto-hébergé ou cloud, sans dépendance à un fournisseur.",
+      "ogTitle": "Tûm : plateforme open source d'exécution de projets",
+      "ogDescription": "Planification intelligente, diagrammes de Gantt, tableaux Kanban, vues de charge de travail et collaboration en temps réel dans un espace de travail open source."
+    },
     "builtFor": {
       "sectionLabel": "Pour qui",
       "heading": "Conçu pour toute équipe, tout flux de travail",

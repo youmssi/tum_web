@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { env } from "@/lib/env";
+import { routing, localizedUrl } from "@/i18n/routing";
 
 /**
  * Minimal root layout — the real {@code <html>} / {@code <body>} structure lives in
@@ -39,6 +40,15 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Tûm" }],
   creator: "Tûm",
+  // Site-wide hreflang default — any future page that doesn't set its own alternates (see the
+  // homepage for the pattern) still declares every language version instead of none.
+  alternates: {
+    canonical: env.siteUrl,
+    languages: {
+      ...Object.fromEntries(routing.locales.map((l) => [l, localizedUrl(l)])),
+      "x-default": env.siteUrl,
+    },
+  },
   openGraph: {
     type: "website",
     url: env.siteUrl,
