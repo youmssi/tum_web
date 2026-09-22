@@ -588,6 +588,12 @@
     "tooLarge": "File is too large."
   },
   "landing": {
+    "seo": {
+      "title": "Tûm: Open-Source Project Execution & Workflow Visibility Platform",
+      "description": "Tûm brings tasks, timelines, Gantt charts, and team visibility into one coherent workspace. Smart scheduling, critical path analysis, workload views, Kanban board, and real-time collaboration. Self-host or cloud, no vendor lock-in.",
+      "ogTitle": "Tûm: Open-Source Project Execution Platform",
+      "ogDescription": "Smart scheduling, Gantt charts, Kanban boards, workload views, and real-time collaboration in one open-source workspace."
+    },
     "builtFor": {
       "sectionLabel": "Who it's for",
       "heading": "Built for any team, any workflow",
