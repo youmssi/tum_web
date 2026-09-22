@@ -203,7 +203,10 @@ export function SignupForm() {
           variant="outline"
           className="w-full"
           onClick={async () => {
-            const { error } = await authClient.signIn.social({ provider: "google" });
+            const { error } = await authClient.signIn.social({
+              provider: "google",
+              callbackURL: ROUTES.DASHBOARD,
+            });
             if (error) toast.error(error.message ?? t("failed"));
           }}
         >
@@ -231,7 +234,10 @@ export function SignupForm() {
           variant="outline"
           className="w-full"
           onClick={async () => {
-            const { error } = await authClient.signIn.social({ provider: "github" });
+            const { error } = await authClient.signIn.social({
+              provider: "github",
+              callbackURL: ROUTES.DASHBOARD,
+            });
             if (error) toast.error(error.message ?? t("failed"));
           }}
         >
