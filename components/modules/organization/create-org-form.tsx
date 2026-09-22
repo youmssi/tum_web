@@ -52,13 +52,29 @@ export function CreateOrgForm() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit({ name, slug }: CreateOrgValues) {
-    const { error } = await authClient.organization.create({
+    const { data, error } = await authClient.organization.create({
       name,
       slug: slug || toSlug(name),
     });
     if (error) {
       toast.error(error.message ?? "Failed to create organisation.");
       return;
+    }
+    // create() doesn't activate the new org on the caller's session — without this, the
+    // dashboard redirect below lands on AppLayout's server-side session check with
+    // activeOrganizationId still unset, which bounces straight back to /workspaces.
+    if (data?.id) {
+      const { error: activateError } = await authClient.organization.setActive({
+        organizationId: data.id,
+      });
+      if (activateError) {
+        toast.error(
+          activateError.message ??
+            "Created, but couldn't switch to it. Pick it from the workspace list.",
+        );
+        router.push(ROUTES.WORKSPACES);
+        return;
+      }
     }
     clearOrgCache();
     router.push(ROUTES.DASHBOARD);
