@@ -1,4 +1,5 @@
 import { defineRouting } from "next-intl/routing";
+import { env } from "@/lib/env";
 
 /**
  * Canonical i18n routing config consumed by the middleware, the navigation helpers, and the
@@ -24,6 +25,17 @@ export const routing = defineRouting({
 });
 
 export type Locale = (typeof routing.locales)[number];
+
+/**
+ * Absolute URL for a locale under the "as-needed" prefix strategy above: the default locale is
+ * unprefixed, every other locale gets a leading segment. The single source of truth for this —
+ * sitemap.ts, the homepage's canonical/hreflang metadata, and anywhere else that needs a
+ * locale's public URL all import from here rather than re-deriving it, so they can't drift out
+ * of sync with each other or with a future change to localePrefix.
+ */
+export function localizedUrl(locale: Locale): string {
+  return locale === routing.defaultLocale ? env.siteUrl : `${env.siteUrl}/${locale}`;
+}
 
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",

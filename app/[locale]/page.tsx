@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import {
   LandingNav,
   HeroSection,
@@ -13,53 +14,82 @@ import {
   FooterSection,
 } from "@/components/modules/landing-page";
 import { env } from "@/lib/env";
+import { routing, localizedUrl, type Locale } from "@/i18n/routing";
 
-export const metadata: Metadata = {
-  title: {
-    absolute: "Tûm — Open-source project execution & workflow visibility platform",
-  },
-  description:
-    "Tûm brings tasks, timelines, Gantt charts, and team visibility into one coherent workspace. Smart scheduling, critical path analysis, workload views, Kanban board, and real-time collaboration. Self-host or cloud — no vendor lock-in.",
-  alternates: {
-    canonical: env.siteUrl,
-  },
-  openGraph: {
-    title: "Tûm — Open-source project execution platform",
-    description:
-      "Smart scheduling, Gantt charts, Kanban boards, workload views, and real-time collaboration in one open-source workspace.",
-    url: env.siteUrl,
-    siteName: "Tûm",
-  },
-  twitter: {
-    title: "Tûm — Open-source project execution platform",
-    description:
-      "Smart scheduling, Gantt charts, Kanban boards, workload views, and real-time collaboration in one open-source workspace.",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing.seo" });
+  const canonical = localizedUrl(locale as Locale);
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Tûm",
-  applicationCategory: "Project Management",
-  operatingSystem: "Web, Self-hosted (Docker)",
-  url: env.siteUrl,
-  description:
-    "Tûm brings tasks, timelines, Gantt charts, and team visibility into one coherent workspace. Smart scheduling, critical path analysis, workload views, Kanban board, and real-time collaboration. Open-source with fair-code license.",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-    description: "Free self-hosted version. Cloud plans from $17/mo.",
-  },
-};
+  return {
+    title: { absolute: t("title") },
+    description: t("description"),
+    alternates: {
+      canonical,
+      languages: {
+        ...Object.fromEntries(routing.locales.map((l) => [l, localizedUrl(l)])),
+        "x-default": env.siteUrl,
+      },
+    },
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      url: canonical,
+      siteName: "Tûm",
+      locale,
+    },
+    twitter: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+    },
+  };
+}
 
-export default function Home() {
+async function structuredData(locale: string) {
+  const t = await getTranslations({ locale, namespace: "landing.seo" });
+  const url = localizedUrl(locale as Locale);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${env.siteUrl}/#organization`,
+        name: "Tûm",
+        url: env.siteUrl,
+        logo: `${env.siteUrl}/icon.png`,
+        sameAs: ["https://discord.gg/JeJV9M6n"],
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${url}/#software`,
+        name: "Tûm",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web, Self-hosted (Docker)",
+        url,
+        description: t("description"),
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          description: "Free self-hosted version. Cloud plans from $17/mo.",
+        },
+      },
+    ],
+  };
+}
+
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const jsonLd = await structuredData(locale);
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className="relative min-h-screen overflow-x-hidden">
         <LandingNav />
