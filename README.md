@@ -22,24 +22,27 @@
 
 ## Tech stack
 
-| Layer             | Technology                     | Version    |
-| ----------------- | ------------------------------ | ---------- |
-| Framework         | Next.js (App Router)           | 16.2.6     |
-| UI runtime        | React                          | 19.2.4     |
-| Language          | TypeScript                     | 5.x        |
-| Styling           | Tailwind CSS                   | 4.x        |
-| Component library | shadcn/ui (Radix primitives)   | latest     |
-| Server state      | TanStack Query                 | 5.x        |
-| HTTP client       | KY                             | 2.0.2      |
-| Client state      | Zustand                        | 5.x        |
-| Forms             | React Hook Form + Zod          | 7.x / 4.x  |
-| Auth              | Better Auth                    | 1.6.11     |
-| Real-time         | @stomp/stompjs                 | 7.3.0      |
-| Drag & drop       | dnd-kit                        | 6.x / 10.x |
-| Timeline / Gantt  | Frappe Gantt                   | 1.2.2      |
-| Charts            | Recharts                       | 3.x        |
-| Database (auth)   | PostgreSQL via `pg`            | 8.x        |
-| Testing           | Vitest + React Testing Library | 4.x / 16.x |
+| Layer             | Technology                            | Version        |
+| ----------------- | ------------------------------------- | -------------- |
+| Framework         | Next.js (App Router)                  | 16.2.6         |
+| UI runtime        | React                                 | 19.2.4         |
+| Language          | TypeScript                            | 5.x            |
+| Styling           | Tailwind CSS                          | 4.x            |
+| Component library | shadcn/ui (Radix primitives)          | latest         |
+| Server state      | TanStack Query                        | 5.x            |
+| HTTP client       | KY                                    | 2.0.2          |
+| Client state      | Zustand                               | 5.x            |
+| Forms             | React Hook Form + Zod                 | 7.x / 4.x      |
+| Auth              | Better Auth                           | 1.6.11         |
+| Real-time         | @stomp/stompjs                        | 7.3.0          |
+| Drag & drop       | dnd-kit                               | 6.x / 10.x     |
+| Timeline / Gantt  | Frappe Gantt                          | 1.2.2          |
+| Charts            | Recharts                              | 3.x            |
+| Data tables       | TanStack Table                        | 8.21.3         |
+| Billing           | Polar (`@polar-sh/better-auth` + SDK) | 1.8.4 / 0.47.1 |
+| Analytics         | Umami (optional, env-gated)           | —              |
+| Database (auth)   | PostgreSQL via `pg`                   | 8.x            |
+| Testing           | Vitest + React Testing Library        | 4.x / 16.x     |
 
 ---
 
@@ -139,23 +142,31 @@ sequenceDiagram
 
 **Locale-prefixed routing** — every UI route lives under `app/[locale]/`. Supported locales are `en` and `fr`; the prefix is omitted for the default locale (English) and rendered for everything else (e.g. `/fr/dashboard`). Routing is driven by `next-intl` (`i18n/routing.ts`, `i18n/navigation.ts`) and locale resolution happens in `proxy.ts`: cookie → `Accept-Language` → default. The list below shows the canonical paths; the same paths exist under each locale prefix.
 
-| Route                        | Component                 | Notes                                                                           |
-| ---------------------------- | ------------------------- | ------------------------------------------------------------------------------- |
-| `/`                          | `app/[locale]/page.tsx`   | Landing page (`HeroSection`, `FeaturesSection`, `HowItWorks`, `Pricing`, `CTA`) |
-| `/login`                     | `LoginForm`               | Email + Google + GitHub sign-in                                                 |
-| `/signup`                    | `SignupForm`              | Email registration with verification email                                      |
-| `/onboarding`                | `CreateOrgForm`           | Org creation after first sign-in                                                |
-| `/workspaces`                | `WorkspacePicker`         | Pick an org or create a new one (also reachable from the sidebar switcher)      |
-| `/invitations/accept`        | `AcceptInvitationView`    | Accept org invite via token                                                     |
-| `/dashboard`                 | `MyWorkDashboard`         | Personal task overview + completion-trend chart                                 |
-| `/projects`                  | `ProjectList`             | All projects in the active org; archived toggle; import CSV button              |
-| `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, List, Board, Timeline, Activity                                 |
-| `/projects/[id]/settings`    | `ProjectSettingsForm`     | Project name, description, member-restriction, delete                           |
-| `/profile`                   | `ProfileForm`             | Name, avatar, sign-out                                                          |
-| `/organization/members`      | `MemberList`              | Invite, role change, remove                                                     |
-| `/organization/settings`     | `OrgSettingsForm`         | Org name + preferences                                                          |
-| `/organization/audit`        | `AuditLog`                | Filterable audit trail (admin/owner only) + CSV export                          |
-| `/notifications/preferences` | `NotificationPreferences` | Email + in-app toggles per event type                                           |
+| Route                        | Component                 | Notes                                                                                                                        |
+| ---------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `/`                          | `app/[locale]/page.tsx`   | Landing page (`HeroSection`, `FeaturesSection`, `HowItWorks`, `Pricing`, `CTA`)                                              |
+| `/login`                     | `LoginForm`               | Email + Google + GitHub sign-in                                                                                              |
+| `/signup`                    | `SignupForm`              | Email registration with verification email                                                                                   |
+| `/onboarding`                | `CreateOrgForm`           | Org creation after first sign-in                                                                                             |
+| `/workspaces`                | `WorkspacePicker`         | Pick an org or create a new one (also reachable from the sidebar switcher)                                                   |
+| `/invitations/accept`        | `AcceptInvitationView`    | Accept org invite via token                                                                                                  |
+| `/dashboard`                 | `MyWorkDashboard`         | Personal task overview + completion-trend chart                                                                              |
+| `/portfolio`                 | `PortfolioPage`           | Cross-project rollup — aggregate stats across every accessible project (distinct from `/dashboard`, which is per-user)       |
+| `/projects`                  | `ProjectList`             | All projects in the active org; archived toggle; import CSV button                                                           |
+| `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, List, Board, Timeline, Activity                                                                              |
+| `/projects/[id]/settings`    | `ProjectSettingsForm`     | Project name, description, member-restriction, working calendar, delete                                                      |
+| `/billing`                   | `BillingPage`             | Subscription status + Polar customer portal (no-op UI when Polar isn't configured)                                           |
+| `/upgrade/success`           | —                         | Polar checkout return URL; confirms the subscription and links to `/billing`                                                 |
+| `/profile`                   | `ProfileForm`             | Name, avatar, sign-out                                                                                                       |
+| `/organization/members`      | `MemberList`              | Invite, role change, remove                                                                                                  |
+| `/organization/settings`     | `OrgSettingsForm`         | Org name + preferences, delete organisation                                                                                  |
+| `/organization/audit`        | `AuditLog`                | Filterable audit trail for the active org (org admin/owner only) + CSV export                                                |
+| `/notifications/preferences` | `NotificationPreferences` | Email + in-app toggles per event type                                                                                        |
+| `/admin`                     | `AdminOverview`           | App-wide admin landing — aggregate counts across every org. Gated on `ROLE_APP_ADMIN` (app-wide, distinct from any org role) |
+| `/admin/users`               | `AdminUsers`              | Every Better Auth user across every org (sortable/filterable table)                                                          |
+| `/admin/organisations`       | `AdminOrganisations`      | Every organisation with member counts                                                                                        |
+| `/admin/subscriptions`       | `AdminSubscriptions`      | Every subscription across every org                                                                                          |
+| `/admin/audit`               | `AdminAudit`              | Most recent actions across every org (distinct from the org-scoped audit log above)                                          |
 
 ---
 
@@ -163,21 +174,30 @@ sequenceDiagram
 
 Copy `.env.example` to `.env.local` for local development. Never commit `.env.local`.
 
-| Variable                      | Example                                   | Description                                                           |
-| ----------------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
-| `NEXT_PUBLIC_API_BASE_URL`    | `http://localhost:8080`                   | Spring Boot base URL — used by the KY HTTP client in the browser      |
-| `NEXT_PUBLIC_BETTER_AUTH_URL` | `http://localhost:3000`                   | Better Auth base URL (must equal the app's own origin)                |
-| `BETTER_AUTH_URL`             | `http://localhost:3000`                   | Same as above, server-side                                            |
-| `BETTER_AUTH_SECRET`          | _(strong random string)_                  | Signs Better Auth sessions — keep secret, rotate on breach            |
-| `DATABASE_URL`                | `postgresql://tum:tum@localhost:5432/tum` | PostgreSQL URL for Better Auth session storage                        |
-| `INTERNAL_SERVICE_TOKEN`      | `dev-internal-token`                      | Shared secret for service-to-service calls (must match backend)       |
-| `INTERNAL_API_URL`            | `http://localhost:8080`                   | Backend URL for server-side calls (route handlers, Server Components) |
-| `GOOGLE_CLIENT_ID`            | _(optional)_                              | Google OAuth app client ID                                            |
-| `GOOGLE_CLIENT_SECRET`        | _(optional)_                              | Google OAuth app client secret                                        |
-| `GITHUB_CLIENT_ID`            | _(optional)_                              | GitHub OAuth app client ID                                            |
-| `GITHUB_CLIENT_SECRET`        | _(optional)_                              | GitHub OAuth app client secret                                        |
+| Variable                                                 | Example                                   | Description                                                                                                                                                                                                                 |
+| -------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL`                               | `http://localhost:8080`                   | Spring Boot base URL — used by the KY HTTP client in the browser                                                                                                                                                            |
+| `NEXT_PUBLIC_BETTER_AUTH_URL`                            | `http://localhost:3000`                   | Better Auth base URL (must equal the app's own origin)                                                                                                                                                                      |
+| `BETTER_AUTH_URL`                                        | `http://localhost:3000`                   | Same as above, server-side                                                                                                                                                                                                  |
+| `BETTER_AUTH_SECRET`                                     | _(strong random string)_                  | Signs Better Auth sessions — keep secret, rotate on breach                                                                                                                                                                  |
+| `DATABASE_URL`                                           | `postgresql://tum:tum@localhost:5432/tum` | PostgreSQL URL for Better Auth session storage                                                                                                                                                                              |
+| `INTERNAL_SERVICE_TOKEN`                                 | `dev-internal-token`                      | Shared secret for service-to-service calls (must match backend)                                                                                                                                                             |
+| `INTERNAL_API_URL`                                       | `http://localhost:8080`                   | Backend URL for server-side calls (route handlers, Server Components)                                                                                                                                                       |
+| `GOOGLE_CLIENT_ID`                                       | _(optional)_                              | Google OAuth app client ID                                                                                                                                                                                                  |
+| `GOOGLE_CLIENT_SECRET`                                   | _(optional)_                              | Google OAuth app client secret                                                                                                                                                                                              |
+| `GITHUB_CLIENT_ID`                                       | _(optional)_                              | GitHub OAuth app client ID — **both** id and secret must be set or Better Auth disables the provider                                                                                                                        |
+| `GITHUB_CLIENT_SECRET`                                   | _(optional)_                              | GitHub OAuth app client secret                                                                                                                                                                                              |
+| `NEXT_PUBLIC_SITE_URL`                                   | `https://tum-app.vercel.app` (fallback)   | Canonical public URL — drives OpenGraph tags, `sitemap.xml`, `robots.txt`, and per-locale hreflang. **Must match your real domain and the domain verified in Google Search Console exactly** (protocol + no trailing slash) |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`                   | _(optional)_                              | Google Search Console per-property verification token. Omitted entirely (not just blank) when unset                                                                                                                         |
+| `POLAR_ACCESS_TOKEN`                                     | _(optional)_                              | Polar organization access token — the billing plugin only registers when this is set; leaving it blank is safe (Pro/Enterprise CTAs fall back to `/signup`)                                                                 |
+| `POLAR_PRO_PRODUCT_ID` / `POLAR_ENTERPRISE_PRODUCT_ID`   | _(optional)_                              | Polar product IDs for the two paid plans                                                                                                                                                                                    |
+| `POLAR_WEBHOOK_SECRET`                                   | _(optional)_                              | Verifies inbound Polar webhook signatures                                                                                                                                                                                   |
+| `POLAR_SERVER`                                           | `sandbox`                                 | `sandbox` for testing, `production` for real billing — use a _different_ Polar org/token for each, never share sandbox and production credentials                                                                           |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` / `NEXT_PUBLIC_UMAMI_SRC` | _(optional)_                              | Umami analytics — both must be set or no tracking script is injected at all                                                                                                                                                 |
 
 > `NEXT_PUBLIC_*` variables are embedded in the client bundle at build time. Never put secrets in them.
+>
+> **`BETTER_AUTH_SECRET` changing after deploy will break every session.** Better Auth's JWT plugin encrypts its signing keypair with this secret and stores it in the `jwks` table; if the secret changes, every request that needs a session/JWT starts failing with `BetterAuthError: Failed to decrypt private key`. If you ever rotate this secret in production, also run `DELETE FROM jwks;` against the database so a fresh keypair gets generated with the new secret.
 
 ---
 

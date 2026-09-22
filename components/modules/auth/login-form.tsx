@@ -23,6 +23,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
+import { GithubIcon, GoogleIcon } from "./social-icons";
 
 type LoginFormValues = { email: string; password: string };
 
@@ -120,6 +121,7 @@ export function LoginForm() {
             className="w-full"
             onClick={() => handleSocialSignIn("google")}
           >
+            <GoogleIcon className="mr-2 size-4" />
             {t("google")}
           </Button>
           <Button
@@ -128,6 +130,7 @@ export function LoginForm() {
             className="w-full"
             onClick={() => handleSocialSignIn("github")}
           >
+            <GithubIcon className="mr-2 size-4" />
             {t("github")}
           </Button>
         </FieldGroup>
