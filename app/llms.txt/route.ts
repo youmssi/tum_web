@@ -1,5 +1,5 @@
 import { routing, localizedUrl } from "@/i18n/routing";
-import { COMPANY, CONTACT } from "@/lib/constants";
+import { COMPANY, CONTACT, ROUTES } from "@/lib/constants";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-static";
@@ -10,11 +10,14 @@ export function GET() {
 
 > Tûm is a project execution and workflow visibility platform: tasks, Kanban boards, Gantt timelines with dependencies and critical path, workload views, baselines, portfolio dashboards and analytics in one workspace. Available in English and French.
 
-Tûm is built and operated by ${COMPANY.NAME} (${COMPANY.URL}).
+Tûm is built and operated by ${COMPANY.NAME} (${COMPANY.URL}). The source code is licensed under the GNU AGPLv3.
 
 ## Product
 
-- [Home](${env.siteUrl}): overview, features, pricing
+- [Home](${env.siteUrl}): overview and interactive Gantt demo
+- [Features](${env.siteUrl}${ROUTES.FEATURES}): timeline, scheduling, workload, dependencies, comparison
+- [Pricing](${env.siteUrl}${ROUTES.PRICING}): Community (self-hosted, free), Pro and Enterprise cloud plans, in USD
+- [Legal notice](${env.siteUrl}${ROUTES.LEGAL}): publisher and registration details
 - [Sign up](${env.siteUrl}/signup): create a workspace
 - [Sign in](${env.siteUrl}/login)
 

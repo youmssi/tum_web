@@ -623,7 +623,7 @@
         "customStatuses": "Custom statuses + WIP limits",
         "workloadView": "Workload / capacity view",
         "selfHost": "Self-host option",
-        "fairCode": "Fair-code / no vendor lock-in",
+        "fairCode": "AGPLv3 / no vendor lock-in",
         "unlimitedUsers": "Unlimited users on all plans",
         "realTime": "Real-time collaboration",
         "openSource": "Open-source codebase"
@@ -709,7 +709,7 @@
         },
         "selfHost": {
           "title": "Self-host or Cloud",
-          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Fair-code license: free for internal use, no vendor lock-in."
+          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Open source under the AGPLv3, no vendor lock-in."
         }
       }
     },
@@ -740,14 +740,14 @@
       "sectionLabel": "Pricing",
       "heading": "Free to run yourself.",
       "headingAccent": "Pay only for cloud.",
-      "intro": "Tûm is open-source under a fair-code license. Self-host for free forever. Choose cloud hosting only when you want zero-ops convenience.",
+      "intro": "Tûm is open source under the GNU AGPLv3. Self-host for free forever. Choose cloud hosting only when you want zero-ops convenience.",
       "monthly": "Monthly",
       "annual": "Annual",
       "annualSavings": "Save 15%",
       "perWorkspace": "/mo per workspace",
       "custom": "Custom",
       "footer": "All plans include unlimited users.",
-      "fairCodeNote": "Fair-code license: free for internal use, cannot be resold as a competing service.",
+      "fairCodeNote": "Licensed under the GNU AGPLv3: use, modify and self-host freely; changes to a hosted version must be shared under the same licence.",
       "plans": {
         "community": {
           "name": "Community",
@@ -883,7 +883,41 @@
         "contact": "Contact sales",
         "support": "Support",
         "privacy": "Privacy policy",
-        "terms": "Terms"
+        "terms": "Terms",
+        "legal": "Legal notice"
+      }
+    },
+    "pages": {
+      "features": {
+        "title": "Features: Gantt timeline, scheduling, workload and Kanban | Tûm",
+        "description": "Explore Tûm's features: Gantt timeline with dependencies and critical path, smart scheduling, workload view, Kanban board, dashboards and real-time collaboration.",
+        "heading": "Tûm features",
+        "intro": "Everything a team needs to plan, schedule and deliver projects: from the Gantt timeline to workload and analytics."
+      },
+      "pricing": {
+        "title": "Pricing: free self-hosting, Pro and Enterprise cloud plans | Tûm",
+        "description": "Tûm pricing in USD: self-host for free under the AGPLv3, or choose Tûm Cloud Pro or Enterprise with unlimited users per workspace and a 14-day trial.",
+        "heading": "Tûm pricing",
+        "intro": "Free to self-host. Cloud plans are billed per workspace, in US dollars, with unlimited users."
+      },
+      "legal": {
+        "title": "Legal notice | Tûm",
+        "description": "Publisher and company registration details for Tûm, a product of MRVIN100 SARLU.",
+        "heading": "Legal notice",
+        "intro": "Tûm is published and operated by the company below.",
+        "labels": {
+          "company": "Company name",
+          "tradeName": "Trade name",
+          "address": "Registered office",
+          "rccm": "Trade register (RCCM)",
+          "taxId": "Tax ID",
+          "contact": "Contact",
+          "support": "Support",
+          "website": "Website",
+          "license": "Software licence"
+        },
+        "country": "Republic of Guinea",
+        "licenseValue": "GNU Affero General Public License v3.0"
       }
     }
   },

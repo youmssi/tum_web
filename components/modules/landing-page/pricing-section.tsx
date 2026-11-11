@@ -7,7 +7,7 @@ import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { CONTACT, ROUTES } from "@/lib/constants";
+import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
 import { productMailto } from "@/lib/contact";
 import { useBillingState, useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
@@ -26,8 +26,7 @@ const PLAN_CONFIG: {
 }[] = [
   {
     key: "community",
-    monthly: 0,
-    annual: 0,
+    ...PLAN_PRICES.community,
     // Community is invitation-only: visitors book a 15-min call where we collect their email and
     // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
     // MVP and lets us match contributors / reviewers / early adopters to the right room.
@@ -38,8 +37,7 @@ const PLAN_CONFIG: {
   },
   {
     key: "pro",
-    monthly: 20,
-    annual: 17,
+    ...PLAN_PRICES.pro,
     href: ROUTES.SIGNUP,
     external: false,
     popular: true,
@@ -47,8 +45,7 @@ const PLAN_CONFIG: {
   },
   {
     key: "enterprise",
-    monthly: 99,
-    annual: 84,
+    ...PLAN_PRICES.enterprise,
     href: productMailto(CONTACT.EMAIL, "Enterprise plan"),
     external: true,
     popular: false,

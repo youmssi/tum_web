@@ -35,9 +35,9 @@ export async function FooterSection() {
     {
       section: "product",
       items: [
-        { key: "features", href: "#features" },
-        { key: "howItWorks", href: "#how-it-works" },
-        { key: "pricing", href: "#pricing" },
+        { key: "features", href: ROUTES.FEATURES },
+        { key: "howItWorks", href: ROUTES.HOW_IT_WORKS },
+        { key: "pricing", href: ROUTES.PRICING },
       ],
     },
     {
@@ -93,6 +93,14 @@ export async function FooterSection() {
           <div>
             <h4 className="text-sm font-semibold mb-4">{t("sections.company")}</h4>
             <ul className="space-y-3">
+              <li>
+                <Link
+                  href={ROUTES.LEGAL}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {t("links.legal")}
+                </Link>
+              </li>
               {companyLinks.map((item) => (
                 <li key={item.key}>
                   <a
