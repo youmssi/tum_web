@@ -1,8 +1,8 @@
 import { Link } from "@/i18n/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 import { COMPANY, CONTACT, ROUTES } from "@/lib/constants";
-import { companyLegalUrl, productMailto } from "@/lib/contact";
+import { productMailto } from "@/lib/contact";
 import { TumLogo } from "./tum-logo";
 
 type LinkKey =
@@ -16,17 +16,20 @@ type LinkKey =
   | "signUp"
   | "acceptInvitation";
 
-type CompanyLinkKey = "about" | "contact" | "support" | "privacy" | "terms";
+type CompanyLinkKey = "about" | "contact" | "support";
+type LegalLinkKey = "legal" | "privacy" | "terms";
 
 export async function FooterSection() {
   const t = await getTranslations("landing.footer");
-  const locale = await getLocale();
   const companyLinks: { key: CompanyLinkKey; href: string }[] = [
     { key: "about", href: COMPANY.URL },
     { key: "contact", href: productMailto(CONTACT.EMAIL, "Enquiry") },
     { key: "support", href: productMailto(CONTACT.SUPPORT_EMAIL, "Support request") },
-    { key: "privacy", href: companyLegalUrl("privacy", locale) },
-    { key: "terms", href: companyLegalUrl("terms", locale) },
+  ];
+  const legalLinks: { key: LegalLinkKey; href: string }[] = [
+    { key: "legal", href: ROUTES.LEGAL },
+    { key: "terms", href: ROUTES.TERMS },
+    { key: "privacy", href: ROUTES.PRIVACY },
   ];
   const sections: {
     section: "product" | "platform" | "account";
@@ -93,14 +96,16 @@ export async function FooterSection() {
           <div>
             <h4 className="text-sm font-semibold mb-4">{t("sections.company")}</h4>
             <ul className="space-y-3">
-              <li>
-                <Link
-                  href={ROUTES.LEGAL}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {t("links.legal")}
-                </Link>
-              </li>
+              {legalLinks.map((item) => (
+                <li key={item.key}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {t(`links.${item.key}`)}
+                  </Link>
+                </li>
+              ))}
               {companyLinks.map((item) => (
                 <li key={item.key}>
                   <a

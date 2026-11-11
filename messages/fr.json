@@ -98,7 +98,11 @@
       "backToSignIn": "Retour à la connexion",
       "continueWith": "ou continuer avec",
       "google": "Continuer avec Google",
-      "github": "Continuer avec GitHub"
+      "github": "Continuer avec GitHub",
+      "agreePrefix": "En créant un compte, vous acceptez nos",
+      "agreeTerms": "Conditions générales d’utilisation",
+      "agreeAnd": "et notre",
+      "agreePrivacy": "Politique de confidentialité"
     },
     "profile": {
       "nameLabel": "Nom affiché",
@@ -843,7 +847,7 @@
         {
           "name": "Tom Andersson",
           "role": "Fondateur de Startup chez NordicLabs",
-          "quote": "L'open source avec une licence fair-code : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
+          "quote": "L'open source avec une licence équitable : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
         },
         {
           "name": "Priya Sharma",
