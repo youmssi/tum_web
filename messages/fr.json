@@ -795,7 +795,9 @@
             "SAML / résidence des données sur demande"
           ]
         }
-      }
+      },
+      "customPlan": "Besoin d’une offre sur mesure ?",
+      "talkToSales": "Contacter l’équipe commerciale"
     },
     "testimonials": {
       "sectionLabel": "Témoignages",
@@ -859,12 +861,13 @@
     },
     "footer": {
       "tagline": "Exécution de projets & visibilité des équipes. Conçu pour les équipes qui tiennent à livrer.",
-      "rights": "Gestion de projet open source.",
+      "rights": "Un produit MRVIN100.",
       "discord": "Rejoindre notre communauté Discord",
       "sections": {
         "product": "Produit",
         "platform": "Plateforme",
-        "account": "Compte"
+        "account": "Compte",
+        "company": "Entreprise"
       },
       "links": {
         "features": "Fonctionnalités",
@@ -875,7 +878,12 @@
         "board": "Tableau de tâches",
         "signIn": "Se connecter",
         "signUp": "Créer un compte",
-        "acceptInvitation": "Accepter l’invitation"
+        "acceptInvitation": "Accepter l’invitation",
+        "about": "À propos de MRVIN100",
+        "contact": "Contacter les ventes",
+        "support": "Support",
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions générales"
       }
     }
   },

@@ -795,7 +795,9 @@
             "SAML / data residency on request"
           ]
         }
-      }
+      },
+      "customPlan": "Need a custom plan?",
+      "talkToSales": "Talk to sales"
     },
     "testimonials": {
       "sectionLabel": "Testimonials",
@@ -859,12 +861,13 @@
     },
     "footer": {
       "tagline": "Project execution & workflow visibility. Built for teams that care about shipping.",
-      "rights": "Open-source project management.",
+      "rights": "A product of MRVIN100.",
       "discord": "Join our Discord community",
       "sections": {
         "product": "Product",
         "platform": "Platform",
-        "account": "Account"
+        "account": "Account",
+        "company": "Company"
       },
       "links": {
         "features": "Features",
@@ -875,7 +878,12 @@
         "board": "Task board",
         "signIn": "Sign in",
         "signUp": "Sign up",
-        "acceptInvitation": "Accept invitation"
+        "acceptInvitation": "Accept invitation",
+        "about": "About MRVIN100",
+        "contact": "Contact sales",
+        "support": "Support",
+        "privacy": "Privacy policy",
+        "terms": "Terms"
       }
     }
   },

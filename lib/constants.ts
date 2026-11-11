@@ -25,3 +25,16 @@ export const AUTH_COOKIES = {
   SESSION: "better-auth.session_token",
   SESSION_SECURE: "__Secure-better-auth.session_token",
 } as const;
+
+export const COMPANY = {
+  NAME: "MRVIN100 SARLU",
+  URL: "https://mrvin100.de",
+} as const;
+
+export const CONTACT = {
+  EMAIL: "contact@mrvin100.de",
+  SUPPORT_EMAIL: "support@mrvin100.de",
+  PRODUCT_REFERENCE: "Tûm",
+} as const;
+
+export const SITE_URL_DEFAULT = "https://tum.mrvin100.de";

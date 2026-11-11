@@ -7,7 +7,8 @@ import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/lib/constants";
+import { CONTACT, ROUTES } from "@/lib/constants";
+import { productMailto } from "@/lib/contact";
 import { useBillingState, useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { trackEvent } from "@/lib/analytics";
@@ -48,7 +49,7 @@ const PLAN_CONFIG: {
     key: "enterprise",
     monthly: 99,
     annual: 84,
-    href: "mailto:mrvin100mail@gmail.com",
+    href: productMailto(CONTACT.EMAIL, "Enterprise plan"),
     external: true,
     popular: false,
     hasBadge: false,
@@ -252,9 +253,9 @@ export function PricingSection() {
                     )}
                     {plan.key === "enterprise" && (
                       <p className="text-center text-xs text-muted-foreground">
-                        Need a custom plan?{" "}
+                        {t("customPlan")}{" "}
                         <a className="underline hover:text-foreground" href={plan.href}>
-                          Talk to sales
+                          {t("talkToSales")}
                         </a>
                       </p>
                     )}

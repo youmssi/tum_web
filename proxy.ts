@@ -62,6 +62,6 @@ export const config = {
     // Run on everything except Next internals, static files, and API routes. Without the
     // icon.svg / icon.png / apple-icon.png entries, next-intl's locale detection treats those
     // static asset URLs as page routes and rewrites them to /{locale}/icon.svg which 404s.
-    "/((?!api|_next/static|_next/image|favicon\\.ico|icon\\.svg|icon\\.png|apple-icon\\.png|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|opengraph-image).*)",
+    "/((?!api|_next/static|_next/image|favicon\\.ico|icon\\.svg|icon\\.png|apple-icon\\.png|robots\\.txt|llms\\.txt|sitemap\\.xml|manifest\\.webmanifest|opengraph-image).*)",
   ],
 };
