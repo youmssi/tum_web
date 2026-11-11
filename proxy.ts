@@ -4,6 +4,7 @@ import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
 import { AUTH_COOKIES, PUBLIC_MARKETING_PATHS, ROUTES } from "@/lib/constants";
+import { legacyHostRedirect } from "@/lib/legacy-host";
 
 /**
  * Composes locale resolution (from {@code next-intl}) with our session check. Order matters: the
@@ -36,6 +37,14 @@ export function proxy(request: NextRequest) {
 
   // API routes never need locale rewriting or auth at this layer.
   if (pathname.startsWith("/api/")) return NextResponse.next();
+
+  // API routes are deliberately left reachable on a retired host (see the early return above):
+  // OAuth callbacks, webhooks and the backend's JWKS lookup may still be configured with it.
+  const legacyTarget = legacyHostRedirect(
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host"),
+    `${pathname}${request.nextUrl.search}`,
+  );
+  if (legacyTarget) return NextResponse.redirect(legacyTarget, 308);
 
   // Let next-intl decide the locale (it may issue a redirect — return that immediately).
   const intlResponse = intlMiddleware(request);

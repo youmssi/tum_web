@@ -3,6 +3,8 @@ export const ROUTES = {
   FEATURES: "/features",
   PRICING: "/pricing",
   LEGAL: "/legal",
+  TERMS: "/terms",
+  PRIVACY: "/privacy",
   HOW_IT_WORKS: "/#how-it-works",
   LOGIN: "/login",
   SIGNUP: "/signup",
@@ -55,4 +57,13 @@ export const PLAN_PRICES = {
   enterprise: { monthly: 99, annual: 84 },
 } as const;
 
-export const PUBLIC_MARKETING_PATHS = [ROUTES.FEATURES, ROUTES.PRICING, ROUTES.LEGAL] as const;
+export const PUBLIC_MARKETING_PATHS = [
+  ROUTES.FEATURES,
+  ROUTES.PRICING,
+  ROUTES.LEGAL,
+  ROUTES.TERMS,
+  ROUTES.PRIVACY,
+] as const;
+
+/** Hostnames that used to serve the site and now only redirect to the production domain. */
+export const LEGACY_HOSTS: readonly string[] = ["tum-app.vercel.app"];
