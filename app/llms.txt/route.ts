@@ -28,8 +28,8 @@ ${locales}
 ## Company
 
 - [${COMPANY.NAME}](${COMPANY.URL})
-- [Privacy policy](${COMPANY.URL}/en/privacy)
-- [Terms](${COMPANY.URL}/en/terms)
+- [Terms of Service](${env.siteUrl}${ROUTES.TERMS})
+- [Privacy Policy](${env.siteUrl}${ROUTES.PRIVACY})
 
 ## Contact
 

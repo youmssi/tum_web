@@ -98,7 +98,11 @@
       "backToSignIn": "Back to sign in",
       "continueWith": "or continue with",
       "google": "Continue with Google",
-      "github": "Continue with GitHub"
+      "github": "Continue with GitHub",
+      "agreePrefix": "By creating an account, you agree to our",
+      "agreeTerms": "Terms of Service",
+      "agreeAnd": "and",
+      "agreePrivacy": "Privacy Policy"
     },
     "profile": {
       "nameLabel": "Display name",
