@@ -11,3 +11,5 @@ export { InteractiveGanttDemo } from "./interactive-gantt-demo";
 export { TestimonialsSection } from "./testimonials-section";
 export { FooterSection } from "./footer-section";
 export { TumLogo } from "./tum-logo";
+export { MarketingPageHeader } from "./marketing-page-header";
+export { LegalNotice } from "./legal-notice";

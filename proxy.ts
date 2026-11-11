@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
-import { AUTH_COOKIES, ROUTES } from "@/lib/constants";
+import { AUTH_COOKIES, PUBLIC_MARKETING_PATHS, ROUTES } from "@/lib/constants";
 
 /**
  * Composes locale resolution (from {@code next-intl}) with our session check. Order matters: the
@@ -15,7 +15,12 @@ import { AUTH_COOKIES, ROUTES } from "@/lib/constants";
  */
 const intlMiddleware = createIntlMiddleware(routing);
 
-const PUBLIC_PATHS = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.INVITATIONS_ACCEPT];
+const PUBLIC_PATHS = [
+  ROUTES.LOGIN,
+  ROUTES.SIGNUP,
+  ROUTES.INVITATIONS_ACCEPT,
+  ...PUBLIC_MARKETING_PATHS,
+];
 
 /** Strip the optional locale prefix so we can match on the canonical app route. */
 function stripLocale(pathname: string): string {

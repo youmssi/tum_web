@@ -59,8 +59,15 @@ async function structuredData(locale: string) {
       {
         "@type": "Organization",
         "@id": `${env.siteUrl}/#organization`,
-        name: COMPANY.NAME,
+        name: COMPANY.TRADE_NAME,
         url: COMPANY.URL,
+        legalName: COMPANY.NAME,
+        taxID: COMPANY.TAX_ID,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: COMPANY.ADDRESS,
+          addressCountry: COMPANY.COUNTRY_CODE,
+        },
         contactPoint: [
           { "@type": "ContactPoint", contactType: "sales", email: CONTACT.EMAIL },
           {

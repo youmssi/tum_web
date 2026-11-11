@@ -1,5 +1,9 @@
 export const ROUTES = {
   HOME: "/",
+  FEATURES: "/features",
+  PRICING: "/pricing",
+  LEGAL: "/legal",
+  HOW_IT_WORKS: "/#how-it-works",
   LOGIN: "/login",
   SIGNUP: "/signup",
   DASHBOARD: "/dashboard",
@@ -28,7 +32,12 @@ export const AUTH_COOKIES = {
 
 export const COMPANY = {
   NAME: "MRVIN100 SARLU",
+  TRADE_NAME: "MRVIN100",
   URL: "https://mrvin100.de",
+  ADDRESS: "Kaporo-Rails, C/Ratoma, Conakry",
+  COUNTRY_CODE: "GN",
+  RCCM: "GN.TCC.2026.B.14483",
+  TAX_ID: "814824199",
 } as const;
 
 export const CONTACT = {
@@ -38,3 +47,12 @@ export const CONTACT = {
 } as const;
 
 export const SITE_URL_DEFAULT = "https://tum.mrvin100.de";
+
+/** Monthly USD price per workspace; `annual` is the monthly equivalent when billed yearly. */
+export const PLAN_PRICES = {
+  community: { monthly: 0, annual: 0 },
+  pro: { monthly: 20, annual: 17 },
+  enterprise: { monthly: 99, annual: 84 },
+} as const;
+
+export const PUBLIC_MARKETING_PATHS = [ROUTES.FEATURES, ROUTES.PRICING, ROUTES.LEGAL] as const;
