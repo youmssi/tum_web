@@ -657,7 +657,7 @@
         "workloadView": "Vue charge de travail / capacité",
         "selfHost": "Option auto-hébergement",
         "fairCode": "AGPLv3 / pas de verrouillage fournisseur",
-        "unlimitedUsers": "Utilisateurs illimités sur tous les plans",
+        "unlimitedUsers": "Utilisateurs illimités sur les offres payantes",
         "realTime": "Collaboration en temps réel",
         "openSource": "Code source ouvert"
       }
@@ -771,30 +771,30 @@
     },
     "pricing": {
       "sectionLabel": "Tarifs",
-      "heading": "Gratuit à auto-héberger.",
-      "headingAccent": "Ne payez que pour le cloud.",
-      "intro": "Tûm est open source sous licence GNU AGPLv3. Auto-hébergez gratuitement à vie. Choisissez l’hébergement cloud uniquement si vous voulez le zéro-gestion.",
+      "heading": "Commencez gratuitement.",
+      "headingAccent": "Évoluez quand vous grandissez.",
+      "intro": "Commencez gratuitement sur Tûm Cloud et changez d’offre pour la planification avancée et les rapports. Tûm est aussi open source sous licence GNU AGPLv3 : vous pouvez l’auto-héberger sans frais.",
       "monthly": "Mensuel",
       "annual": "Annuel",
       "annualSavings": "Économisez 15 %",
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
-      "footer": "Toutes les formules incluent des utilisateurs illimités.",
+      "footer": "Les offres payantes incluent des utilisateurs illimités.",
       "fairCodeNote": "Sous licence GNU AGPLv3 : utilisez, modifiez et auto-hébergez librement ; les modifications d’une version hébergée doivent être partagées sous la même licence.",
       "plans": {
-        "community": {
-          "name": "Communauté",
-          "description": "Auto-hébergé, gratuit à vie",
-          "cta": "Auto-héberger gratuitement",
+        "free": {
+          "name": "Gratuit",
+          "description": "Tûm Cloud, pour les petites équipes",
+          "cta": "Commencer gratuitement",
           "features": [
-            "Projets et tâches illimités",
-            "Membres d’équipe illimités",
-            "Vues Kanban, liste et Gantt",
+            "Hébergement Tûm Cloud (zéro ops)",
+            "1 espace de travail, jusqu’à 5 membres",
+            "Jusqu’à 3 projets actifs",
+            "Vues Kanban, liste, calendrier et Gantt",
             "Dépendances et sous-tâches",
-            "Statuts personnalisés avec limites WIP",
             "Commentaires, @mentions et notifications",
             "Import CSV et export Excel d’archive",
-            "Auto-hébergement via Docker Compose"
+            "Changement d’offre à tout moment"
           ]
         },
         "pro": {
@@ -803,13 +803,13 @@
           "badge": "Le plus populaire",
           "cta": "Essai gratuit de 14 jours",
           "features": [
-            "Tout ce qui est inclus dans Communauté",
-            "Hébergement Tûm Cloud (zéro ops)",
-            "Tableaux de bord et tendances par projet",
-            "Mises à jour temps réel pour toute l’équipe",
-            "Sélecteur multi-organisations",
+            "Tout ce qui est inclus dans Gratuit",
+            "Projets et membres illimités",
+            "Analyse du chemin critique",
+            "Références de planning et écarts",
+            "Vue de charge et de capacité",
+            "Analyses et tableau de bord portefeuille",
             "Support par e-mail",
-            "Mises à jour et sauvegardes automatiques",
             "Essai gratuit 14 jours · annulable à tout moment"
           ]
         },
@@ -826,6 +826,21 @@
             "Support prioritaire par e-mail",
             "Contrats et facturation personnalisés",
             "SAML / résidence des données sur demande"
+          ]
+        },
+        "community": {
+          "name": "Communauté",
+          "description": "Auto-hébergé, gratuit à vie",
+          "cta": "Auto-héberger gratuitement",
+          "features": [
+            "Projets et tâches illimités",
+            "Membres d’équipe illimités",
+            "Vues Kanban, liste et Gantt",
+            "Dépendances et sous-tâches",
+            "Statuts personnalisés avec limites WIP",
+            "Commentaires, @mentions et notifications",
+            "Import CSV et export Excel d’archive",
+            "Auto-hébergement via Docker Compose"
           ]
         }
       },
@@ -928,10 +943,10 @@
         "intro": "Tout ce dont une équipe a besoin pour planifier, ordonnancer et livrer ses projets : du diagramme de Gantt à la charge de travail et aux analyses."
       },
       "pricing": {
-        "title": "Tarifs : auto-hébergement gratuit, offres cloud Pro et Enterprise | Tûm",
-        "description": "Tarifs de Tûm en USD : auto-hébergement gratuit sous AGPLv3, ou Tûm Cloud Pro ou Enterprise avec utilisateurs illimités par espace de travail et 14 jours d’essai.",
+        "title": "Tarifs : offre gratuite, Pro et Enterprise, auto-hébergement gratuit | Tûm",
+        "description": "Tarifs de Tûm en USD : une offre cloud gratuite pour les petites équipes, Pro et Enterprise avec utilisateurs illimités par espace de travail et 14 jours d’essai, ou l’auto-hébergement gratuit sous AGPLv3.",
         "heading": "Tarifs de Tûm",
-        "intro": "Gratuit en auto-hébergement. Les offres cloud sont facturées par espace de travail, en dollars américains, avec utilisateurs illimités."
+        "intro": "Gratuit pour les petites équipes. Les offres payantes sont facturées par espace de travail, en dollars américains, avec utilisateurs illimités. L’auto-hébergement est gratuit."
       },
       "legal": {
         "title": "Mentions légales | Tûm",

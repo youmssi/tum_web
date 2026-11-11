@@ -52,9 +52,10 @@ export const SITE_URL_DEFAULT = "https://tum.mrvin100.de";
 
 /** Monthly USD price per workspace; `annual` is the monthly equivalent when billed yearly. */
 export const PLAN_PRICES = {
-  community: { monthly: 0, annual: 0 },
+  free: { monthly: 0, annual: 0 },
   pro: { monthly: 20, annual: 17 },
   enterprise: { monthly: 99, annual: 84 },
+  community: { monthly: 0, annual: 0 },
 } as const;
 
 export const PUBLIC_MARKETING_PATHS = [

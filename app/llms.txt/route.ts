@@ -16,7 +16,7 @@ Tûm is built and operated by ${COMPANY.NAME} (${COMPANY.URL}). The source code 
 
 - [Home](${env.siteUrl}): overview and interactive Gantt demo
 - [Features](${env.siteUrl}${ROUTES.FEATURES}): timeline, scheduling, workload, dependencies, comparison
-- [Pricing](${env.siteUrl}${ROUTES.PRICING}): Community (self-hosted, free), Pro and Enterprise cloud plans, in USD
+- [Pricing](${env.siteUrl}${ROUTES.PRICING}): Free, Pro and Enterprise cloud plans in USD, plus the free self-hosted Community edition
 - [Legal notice](${env.siteUrl}${ROUTES.LEGAL}): publisher and registration details
 - [Sign up](${env.siteUrl}/signup): create a workspace
 - [Sign in](${env.siteUrl}/login)

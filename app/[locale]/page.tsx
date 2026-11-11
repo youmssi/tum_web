@@ -91,7 +91,7 @@ async function structuredData(locale: string) {
           "@type": "Offer",
           price: "0",
           priceCurrency: "USD",
-          description: "Free self-hosted version. Cloud plans from $17/mo.",
+          description: "Free cloud plan and free self-hosted edition. Paid plans from $17/mo.",
         },
       },
     ],
