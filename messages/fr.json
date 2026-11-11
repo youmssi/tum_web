@@ -179,7 +179,9 @@
         "ANALYTICS": "Suivez le burndown, le burnup, le temps de cycle et le débit de ce projet.",
         "PORTFOLIO": "Suivez l’avancement et les risques de tous vos projets en une seule vue.",
         "AUDIT_LOG": "Consultez et exportez chaque modification effectuée dans l’espace de travail."
-      }
+      },
+      "memberLimit": "L’offre gratuite est limitée à 5 membres. Changez l’offre de cet espace de travail pour inviter d’autres personnes.",
+      "workspaceLimit": "Vous possédez déjà un espace de travail sur l’offre gratuite. Changez son offre pour en créer un autre."
     }
   },
   "dashboard": {
