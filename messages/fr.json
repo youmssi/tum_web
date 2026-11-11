@@ -98,7 +98,11 @@
       "backToSignIn": "Retour à la connexion",
       "continueWith": "ou continuer avec",
       "google": "Continuer avec Google",
-      "github": "Continuer avec GitHub"
+      "github": "Continuer avec GitHub",
+      "agreePrefix": "En créant un compte, vous acceptez nos",
+      "agreeTerms": "Conditions générales d’utilisation",
+      "agreeAnd": "et notre",
+      "agreePrivacy": "Politique de confidentialité"
     },
     "profile": {
       "nameLabel": "Nom affiché",
@@ -149,6 +153,35 @@
     "unconfigured": {
       "title": "La facturation est temporairement indisponible",
       "description": "Nous ne pouvons pas joindre le fournisseur de paiement avec les identifiants actuels. Un administrateur doit régénérer le jeton Polar avec tous les scopes (customers, subscriptions, customer_sessions, checkouts). Votre compte et vos données restent intacts."
+    },
+    "upgrade": {
+      "title": "{feature} fait partie de l’offre {plan}",
+      "cta": "Voir l’offre {plan}",
+      "seePlans": "Voir les offres",
+      "projectLimit": "L’offre gratuite est limitée à 3 projets actifs. Archivez un projet ou changez d’offre pour en créer d’autres.",
+      "timelineLocked": "Le chemin critique et les références de planning font partie de l’offre Pro.",
+      "plans": {
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      },
+      "features": {
+        "CRITICAL_PATH": "Le chemin critique",
+        "BASELINES": "Les références de planning",
+        "WORKLOAD": "La charge de travail",
+        "ANALYTICS": "Les analyses",
+        "PORTFOLIO": "Le portefeuille",
+        "AUDIT_LOG": "Le journal d’audit"
+      },
+      "descriptions": {
+        "CRITICAL_PATH": "Repérez les tâches qui déterminent directement la date de fin du projet.",
+        "BASELINES": "Enregistrez le planning et comparez-le à ce qui s’est réellement passé.",
+        "WORKLOAD": "Voyez qui est en surcharge ou en sous-charge sur les semaines à venir.",
+        "ANALYTICS": "Suivez le burndown, le burnup, le temps de cycle et le débit de ce projet.",
+        "PORTFOLIO": "Suivez l’avancement et les risques de tous vos projets en une seule vue.",
+        "AUDIT_LOG": "Consultez et exportez chaque modification effectuée dans l’espace de travail."
+      },
+      "memberLimit": "L’offre gratuite est limitée à 5 membres. Changez l’offre de cet espace de travail pour inviter d’autres personnes.",
+      "workspaceLimit": "Vous possédez déjà un espace de travail sur l’offre gratuite. Changez son offre pour en créer un autre."
     }
   },
   "dashboard": {
@@ -623,8 +656,8 @@
         "customStatuses": "Statuts personnalisés + limites WIP",
         "workloadView": "Vue charge de travail / capacité",
         "selfHost": "Option auto-hébergement",
-        "fairCode": "Fair-code / pas de verrouillage fournisseur",
-        "unlimitedUsers": "Utilisateurs illimités sur tous les plans",
+        "fairCode": "AGPLv3 / pas de verrouillage fournisseur",
+        "unlimitedUsers": "Utilisateurs illimités sur les offres payantes",
         "realTime": "Collaboration en temps réel",
         "openSource": "Code source ouvert"
       }
@@ -709,7 +742,7 @@
         },
         "selfHost": {
           "title": "Auto-hébergé ou Cloud",
-          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Licence fair-code : gratuit en interne, sans verrouillage fournisseur."
+          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Open source sous AGPLv3, sans verrouillage fournisseur."
         }
       }
     },
@@ -738,30 +771,30 @@
     },
     "pricing": {
       "sectionLabel": "Tarifs",
-      "heading": "Gratuit à auto-héberger.",
-      "headingAccent": "Ne payez que pour le cloud.",
-      "intro": "Tûm est open source sous une licence fair-code. Auto-hébergez gratuitement à vie. Choisissez l’hébergement cloud uniquement si vous voulez le zéro-gestion.",
+      "heading": "Commencez gratuitement.",
+      "headingAccent": "Évoluez quand vous grandissez.",
+      "intro": "Commencez gratuitement sur Tûm Cloud et changez d’offre pour la planification avancée et les rapports. Tûm est aussi open source sous licence GNU AGPLv3 : vous pouvez l’auto-héberger sans frais.",
       "monthly": "Mensuel",
       "annual": "Annuel",
       "annualSavings": "Économisez 15 %",
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
-      "footer": "Toutes les formules incluent des utilisateurs illimités.",
-      "fairCodeNote": "Licence fair-code : gratuite en interne, ne peut pas être revendue en tant que service concurrent.",
+      "footer": "Les offres payantes incluent des utilisateurs illimités.",
+      "fairCodeNote": "Sous licence GNU AGPLv3 : utilisez, modifiez et auto-hébergez librement ; les modifications d’une version hébergée doivent être partagées sous la même licence.",
       "plans": {
-        "community": {
-          "name": "Communauté",
-          "description": "Auto-hébergé, gratuit à vie",
-          "cta": "Auto-héberger gratuitement",
+        "free": {
+          "name": "Gratuit",
+          "description": "Tûm Cloud, pour les petites équipes",
+          "cta": "Commencer gratuitement",
           "features": [
-            "Projets et tâches illimités",
-            "Membres d’équipe illimités",
-            "Vues Kanban, liste et Gantt",
+            "Hébergement Tûm Cloud (zéro ops)",
+            "1 espace de travail, jusqu’à 5 membres",
+            "Jusqu’à 3 projets actifs",
+            "Vues Kanban, liste, calendrier et Gantt",
             "Dépendances et sous-tâches",
-            "Statuts personnalisés avec limites WIP",
             "Commentaires, @mentions et notifications",
             "Import CSV et export Excel d’archive",
-            "Auto-hébergement via Docker Compose"
+            "Changement d’offre à tout moment"
           ]
         },
         "pro": {
@@ -770,13 +803,13 @@
           "badge": "Le plus populaire",
           "cta": "Essai gratuit de 14 jours",
           "features": [
-            "Tout ce qui est inclus dans Communauté",
-            "Hébergement Tûm Cloud (zéro ops)",
-            "Tableaux de bord et tendances par projet",
-            "Mises à jour temps réel pour toute l’équipe",
-            "Sélecteur multi-organisations",
+            "Tout ce qui est inclus dans Gratuit",
+            "Projets et membres illimités",
+            "Analyse du chemin critique",
+            "Références de planning et écarts",
+            "Vue de charge et de capacité",
+            "Analyses et tableau de bord portefeuille",
             "Support par e-mail",
-            "Mises à jour et sauvegardes automatiques",
             "Essai gratuit 14 jours · annulable à tout moment"
           ]
         },
@@ -794,8 +827,25 @@
             "Contrats et facturation personnalisés",
             "SAML / résidence des données sur demande"
           ]
+        },
+        "community": {
+          "name": "Communauté",
+          "description": "Auto-hébergé, gratuit à vie",
+          "cta": "Auto-héberger gratuitement",
+          "features": [
+            "Projets et tâches illimités",
+            "Membres d’équipe illimités",
+            "Vues Kanban, liste et Gantt",
+            "Dépendances et sous-tâches",
+            "Statuts personnalisés avec limites WIP",
+            "Commentaires, @mentions et notifications",
+            "Import CSV et export Excel d’archive",
+            "Auto-hébergement via Docker Compose"
+          ]
         }
-      }
+      },
+      "customPlan": "Besoin d’une offre sur mesure ?",
+      "talkToSales": "Contacter l’équipe commerciale"
     },
     "testimonials": {
       "sectionLabel": "Témoignages",
@@ -841,7 +891,7 @@
         {
           "name": "Tom Andersson",
           "role": "Fondateur de Startup chez NordicLabs",
-          "quote": "L'open source avec une licence fair-code : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
+          "quote": "L'open source avec une licence équitable : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
         },
         {
           "name": "Priya Sharma",
@@ -859,12 +909,13 @@
     },
     "footer": {
       "tagline": "Exécution de projets & visibilité des équipes. Conçu pour les équipes qui tiennent à livrer.",
-      "rights": "Gestion de projet open source.",
+      "rights": "Un produit MRVIN100.",
       "discord": "Rejoindre notre communauté Discord",
       "sections": {
         "product": "Produit",
         "platform": "Plateforme",
-        "account": "Compte"
+        "account": "Compte",
+        "company": "Entreprise"
       },
       "links": {
         "features": "Fonctionnalités",
@@ -875,7 +926,46 @@
         "board": "Tableau de tâches",
         "signIn": "Se connecter",
         "signUp": "Créer un compte",
-        "acceptInvitation": "Accepter l’invitation"
+        "acceptInvitation": "Accepter l’invitation",
+        "about": "À propos de MRVIN100",
+        "contact": "Contacter les ventes",
+        "support": "Support",
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions générales",
+        "legal": "Mentions légales"
+      }
+    },
+    "pages": {
+      "features": {
+        "title": "Fonctionnalités : Gantt, planification, charge de travail et Kanban | Tûm",
+        "description": "Découvrez les fonctionnalités de Tûm : diagramme de Gantt avec dépendances et chemin critique, planification intelligente, vue de charge, tableau Kanban, tableaux de bord et collaboration en temps réel.",
+        "heading": "Fonctionnalités de Tûm",
+        "intro": "Tout ce dont une équipe a besoin pour planifier, ordonnancer et livrer ses projets : du diagramme de Gantt à la charge de travail et aux analyses."
+      },
+      "pricing": {
+        "title": "Tarifs : offre gratuite, Pro et Enterprise, auto-hébergement gratuit | Tûm",
+        "description": "Tarifs de Tûm en USD : une offre cloud gratuite pour les petites équipes, Pro et Enterprise avec utilisateurs illimités par espace de travail et 14 jours d’essai, ou l’auto-hébergement gratuit sous AGPLv3.",
+        "heading": "Tarifs de Tûm",
+        "intro": "Gratuit pour les petites équipes. Les offres payantes sont facturées par espace de travail, en dollars américains, avec utilisateurs illimités. L’auto-hébergement est gratuit."
+      },
+      "legal": {
+        "title": "Mentions légales | Tûm",
+        "description": "Éditeur et informations d’immatriculation de Tûm, un produit de MRVIN100 SARLU.",
+        "heading": "Mentions légales",
+        "intro": "Tûm est édité et exploité par la société ci-dessous.",
+        "labels": {
+          "company": "Dénomination",
+          "tradeName": "Nom commercial",
+          "address": "Siège social",
+          "rccm": "RCCM",
+          "taxId": "Numéro d’identification fiscale",
+          "contact": "Contact",
+          "support": "Support",
+          "website": "Site web",
+          "license": "Licence du logiciel"
+        },
+        "country": "République de Guinée",
+        "licenseValue": "GNU Affero General Public License v3.0"
       }
     }
   },

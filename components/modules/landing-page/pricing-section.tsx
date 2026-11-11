@@ -7,12 +7,13 @@ import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/lib/constants";
+import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
+import { productMailto } from "@/lib/contact";
 import { useBillingState, useStartCheckout } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { trackEvent } from "@/lib/analytics";
 
-type PlanKey = "community" | "pro" | "enterprise";
+type PlanKey = "free" | "pro" | "enterprise" | "community";
 
 const PLAN_CONFIG: {
   key: PlanKey;
@@ -24,21 +25,16 @@ const PLAN_CONFIG: {
   hasBadge: boolean;
 }[] = [
   {
-    key: "community",
-    monthly: 0,
-    annual: 0,
-    // Community is invitation-only: visitors book a 15-min call where we collect their email and
-    // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
-    // MVP and lets us match contributors / reviewers / early adopters to the right room.
-    href: "https://cal.com/mrvin100/collective",
-    external: true,
+    key: "free",
+    ...PLAN_PRICES.free,
+    href: ROUTES.SIGNUP,
+    external: false,
     popular: false,
     hasBadge: false,
   },
   {
     key: "pro",
-    monthly: 20,
-    annual: 17,
+    ...PLAN_PRICES.pro,
     href: ROUTES.SIGNUP,
     external: false,
     popular: true,
@@ -46,9 +42,19 @@ const PLAN_CONFIG: {
   },
   {
     key: "enterprise",
-    monthly: 99,
-    annual: 84,
-    href: "mailto:mrvin100mail@gmail.com",
+    ...PLAN_PRICES.enterprise,
+    href: productMailto(CONTACT.EMAIL, "Enterprise plan"),
+    external: true,
+    popular: false,
+    hasBadge: false,
+  },
+  {
+    key: "community",
+    ...PLAN_PRICES.community,
+    // Community is invitation-only: visitors book a 15-min call where we collect their email and
+    // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
+    // MVP and lets us match contributors / reviewers / early adopters to the right room.
+    href: "https://cal.com/mrvin100/collective",
     external: true,
     popular: false,
     hasBadge: false,
@@ -163,14 +169,14 @@ export function PricingSection() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
           {PLAN_CONFIG.map((plan, idx) => {
             const isPaid = plan.key === "pro" || plan.key === "enterprise";
             const pending = pendingPlan === plan.key;
             return (
               <div
                 key={plan.key}
-                className={`relative p-8 rounded-2xl border transition-all ${
+                className={`relative p-6 rounded-2xl border transition-all ${
                   plan.popular
                     ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
                     : "border-foreground/10 bg-card"
@@ -195,7 +201,7 @@ export function PricingSection() {
                 <div className="mb-6 pb-6 border-b border-foreground/10">
                   {plan.monthly !== null ? (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold">
+                      <span className="text-4xl font-bold">
                         ${annual ? plan.annual : plan.monthly}
                       </span>
                       <span className="text-muted-foreground text-sm">{t("perWorkspace")}</span>
@@ -252,9 +258,9 @@ export function PricingSection() {
                     )}
                     {plan.key === "enterprise" && (
                       <p className="text-center text-xs text-muted-foreground">
-                        Need a custom plan?{" "}
+                        {t("customPlan")}{" "}
                         <a className="underline hover:text-foreground" href={plan.href}>
-                          Talk to sales
+                          {t("talkToSales")}
                         </a>
                       </p>
                     )}

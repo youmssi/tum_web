@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -39,6 +40,7 @@ export function InviteMemberDialog({ onInvited }: { onInvited?: () => void }) {
   const [open, setOpen] = useState(false);
   const { data: activeOrg } = authClient.useActiveOrganization();
 
+  const upgradeT = useTranslations("billing.upgrade");
   const form = useForm<InviteValues>({
     resolver: zodResolver(inviteSchema),
     defaultValues: { email: "", role: "member" },
@@ -54,7 +56,11 @@ export function InviteMemberDialog({ onInvited }: { onInvited?: () => void }) {
       organizationId: activeOrg.id,
     });
     if (error) {
-      toast.error(error.message ?? "Failed to send invitation.");
+      toast.error(
+        error.code === "ORGANIZATION_MEMBERSHIP_LIMIT_REACHED"
+          ? upgradeT("memberLimit")
+          : (error.message ?? "Failed to send invitation."),
+      );
       return;
     }
     toast.success(`Invitation sent to ${email}.`);
