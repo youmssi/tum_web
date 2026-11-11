@@ -153,6 +153,33 @@
     "unconfigured": {
       "title": "La facturation est temporairement indisponible",
       "description": "Nous ne pouvons pas joindre le fournisseur de paiement avec les identifiants actuels. Un administrateur doit régénérer le jeton Polar avec tous les scopes (customers, subscriptions, customer_sessions, checkouts). Votre compte et vos données restent intacts."
+    },
+    "upgrade": {
+      "title": "{feature} fait partie de l’offre {plan}",
+      "cta": "Voir l’offre {plan}",
+      "seePlans": "Voir les offres",
+      "projectLimit": "L’offre gratuite est limitée à 3 projets actifs. Archivez un projet ou changez d’offre pour en créer d’autres.",
+      "timelineLocked": "Le chemin critique et les références de planning font partie de l’offre Pro.",
+      "plans": {
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      },
+      "features": {
+        "CRITICAL_PATH": "Le chemin critique",
+        "BASELINES": "Les références de planning",
+        "WORKLOAD": "La charge de travail",
+        "ANALYTICS": "Les analyses",
+        "PORTFOLIO": "Le portefeuille",
+        "AUDIT_LOG": "Le journal d’audit"
+      },
+      "descriptions": {
+        "CRITICAL_PATH": "Repérez les tâches qui déterminent directement la date de fin du projet.",
+        "BASELINES": "Enregistrez le planning et comparez-le à ce qui s’est réellement passé.",
+        "WORKLOAD": "Voyez qui est en surcharge ou en sous-charge sur les semaines à venir.",
+        "ANALYTICS": "Suivez le burndown, le burnup, le temps de cycle et le débit de ce projet.",
+        "PORTFOLIO": "Suivez l’avancement et les risques de tous vos projets en une seule vue.",
+        "AUDIT_LOG": "Consultez et exportez chaque modification effectuée dans l’espace de travail."
+      }
     }
   },
   "dashboard": {
