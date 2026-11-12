@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { FeatureGate } from "@/components/modules/billing";
 import { AuditLog } from "@/components/modules/audit";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,7 +17,9 @@ export default async function AuditPage() {
         <h1 className="text-xl font-semibold">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
-      <AuditLog />
+      <FeatureGate feature="AUDIT_LOG">
+        <AuditLog />
+      </FeatureGate>
     </div>
   );
 }

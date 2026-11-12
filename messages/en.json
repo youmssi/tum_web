@@ -98,7 +98,11 @@
       "backToSignIn": "Back to sign in",
       "continueWith": "or continue with",
       "google": "Continue with Google",
-      "github": "Continue with GitHub"
+      "github": "Continue with GitHub",
+      "agreePrefix": "By creating an account, you agree to our",
+      "agreeTerms": "Terms of Service",
+      "agreeAnd": "and",
+      "agreePrivacy": "Privacy Policy"
     },
     "profile": {
       "nameLabel": "Display name",
@@ -143,12 +147,62 @@
     "portalFailed": "Could not open the billing portal.",
     "noPlan": {
       "title": "You're on the free plan",
-      "description": "Upgrade to Pro to unlock workspace-wide automations, custom statuses with WIP limits, and the full project archive export.",
+      "description": "Upgrade to Pro for unlimited projects and members, critical path, baselines, workload, analytics and the portfolio dashboard.",
       "viewPlans": "View plans"
     },
     "unconfigured": {
       "title": "Billing is temporarily unavailable",
       "description": "We can't reach the billing provider with the current credentials. An admin needs to regenerate the Polar access token with the full scope set (customers, subscriptions, customer_sessions, checkouts). Your account and workspace data are unaffected."
+    },
+    "upgrade": {
+      "title": "{feature} is part of the {plan} plan",
+      "cta": "See the {plan} plan",
+      "seePlans": "See plans",
+      "projectLimit": "The Free plan is limited to 3 active projects. Archive a project or upgrade to create more.",
+      "timelineLocked": "Critical path and baselines are part of the Pro plan.",
+      "plans": {
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      },
+      "features": {
+        "CRITICAL_PATH": "Critical path",
+        "BASELINES": "Baselines",
+        "WORKLOAD": "Workload",
+        "ANALYTICS": "Analytics",
+        "PORTFOLIO": "Portfolio",
+        "AUDIT_LOG": "The audit log"
+      },
+      "descriptions": {
+        "CRITICAL_PATH": "See which tasks directly determine the project end date.",
+        "BASELINES": "Capture the schedule and compare it with what actually happened.",
+        "WORKLOAD": "See who is over or under capacity across the coming weeks.",
+        "ANALYTICS": "Follow burndown, burnup, cycle time and throughput for this project.",
+        "PORTFOLIO": "Follow progress and risk across all your projects in one view.",
+        "AUDIT_LOG": "Review and export every change made in the workspace."
+      },
+      "memberLimit": "The Free plan is limited to 5 members. Upgrade this workspace to invite more people.",
+      "workspaceLimit": "You already own a workspace on the Free plan. Upgrade it to create another one."
+    },
+    "dexpay": {
+      "title": "Pay with mobile money or card",
+      "summaryMonthly": "{price} per month for this workspace. You will finish the payment on the secure Dexpay page.",
+      "summaryYearly": "{price} per year for this workspace. You will finish the payment on the secure Dexpay page.",
+      "nameLabel": "Full name",
+      "nameRequired": "Enter your name.",
+      "emailLabel": "Email",
+      "emailInvalid": "Enter a valid email address.",
+      "emailHint": "Receipts and renewal reminders are sent here.",
+      "phoneLabel": "Phone number",
+      "phoneInvalid": "Use the international format, for example +237650000000.",
+      "phoneHint": "International format. Mobile money payments are approved on this phone.",
+      "cancel": "Cancel",
+      "submit": "Continue to payment",
+      "ownerOnly": "Only a workspace owner or admin can subscribe.",
+      "failed": "The payment page could not be opened. Please try again."
+    },
+    "otherProvider": {
+      "title": "Your workspace is on the {plan} plan",
+      "description": "This subscription is paid through Dexpay. Before each renewal you receive an email with a payment link; the plan stays active for 7 days after the due date."
     }
   },
   "dashboard": {
@@ -623,8 +677,8 @@
         "customStatuses": "Custom statuses + WIP limits",
         "workloadView": "Workload / capacity view",
         "selfHost": "Self-host option",
-        "fairCode": "Fair-code / no vendor lock-in",
-        "unlimitedUsers": "Unlimited users on all plans",
+        "fairCode": "AGPLv3 / no vendor lock-in",
+        "unlimitedUsers": "Unlimited users on paid plans",
         "realTime": "Real-time collaboration",
         "openSource": "Open-source codebase"
       }
@@ -709,7 +763,7 @@
         },
         "selfHost": {
           "title": "Self-host or Cloud",
-          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Fair-code license: free for internal use, no vendor lock-in."
+          "description": "Run Tûm on your own server for free, or use Tûm Cloud for zero-ops convenience. Open source under the AGPLv3, no vendor lock-in."
         }
       }
     },
@@ -738,30 +792,30 @@
     },
     "pricing": {
       "sectionLabel": "Pricing",
-      "heading": "Free to run yourself.",
-      "headingAccent": "Pay only for cloud.",
-      "intro": "Tûm is open-source under a fair-code license. Self-host for free forever. Choose cloud hosting only when you want zero-ops convenience.",
+      "heading": "Start free.",
+      "headingAccent": "Upgrade when you grow.",
+      "intro": "Start on Tûm Cloud for free and upgrade for advanced scheduling and reporting. Tûm is also open source under the GNU AGPLv3, so you can self-host it at no cost.",
       "monthly": "Monthly",
       "annual": "Annual",
       "annualSavings": "Save 15%",
       "perWorkspace": "/mo per workspace",
       "custom": "Custom",
-      "footer": "All plans include unlimited users.",
-      "fairCodeNote": "Fair-code license: free for internal use, cannot be resold as a competing service.",
+      "footer": "Paid plans include unlimited users.",
+      "fairCodeNote": "Licensed under the GNU AGPLv3: use, modify and self-host freely; changes to a hosted version must be shared under the same licence.",
       "plans": {
-        "community": {
-          "name": "Community",
-          "description": "Self-hosted, forever free",
-          "cta": "Self-host for free",
+        "free": {
+          "name": "Free",
+          "description": "Tûm Cloud, for small teams",
+          "cta": "Start for free",
           "features": [
-            "Unlimited projects & tasks",
-            "Unlimited team members",
-            "Kanban, list & Gantt views",
+            "Tûm Cloud hosting (zero ops)",
+            "1 workspace, up to 5 members",
+            "Up to 3 active projects",
+            "Kanban, list, calendar & Gantt views",
             "Task dependencies & subtasks",
-            "Custom statuses with WIP limits",
             "Comments, @mentions & notifications",
             "CSV import & Excel archive export",
-            "Docker Compose self-host"
+            "Upgrade at any time"
           ]
         },
         "pro": {
@@ -770,13 +824,13 @@
           "badge": "Most popular",
           "cta": "Start 14-day trial",
           "features": [
-            "Everything in Community",
-            "Tûm Cloud hosting (zero ops)",
-            "Per-project dashboards & trends",
-            "Real-time updates across the team",
-            "Multi-workspace switcher",
+            "Everything in Free",
+            "Unlimited projects & members",
+            "Critical path analysis",
+            "Schedule baselines & variance",
+            "Workload & capacity view",
+            "Analytics & portfolio dashboards",
             "Email support",
-            "Automatic updates & backups",
             "14-day free trial · cancel anytime"
           ]
         },
@@ -794,8 +848,26 @@
             "Custom contracts & invoicing",
             "SAML / data residency on request"
           ]
+        },
+        "community": {
+          "name": "Community",
+          "description": "Self-hosted, forever free",
+          "cta": "Self-host for free",
+          "features": [
+            "Unlimited projects & tasks",
+            "Unlimited team members",
+            "Kanban, list & Gantt views",
+            "Task dependencies & subtasks",
+            "Custom statuses with WIP limits",
+            "Comments, @mentions & notifications",
+            "CSV import & Excel archive export",
+            "Docker Compose self-host"
+          ]
         }
-      }
+      },
+      "customPlan": "Need a custom plan?",
+      "talkToSales": "Talk to sales",
+      "perWorkspaceYear": "/yr per workspace"
     },
     "testimonials": {
       "sectionLabel": "Testimonials",
@@ -859,12 +931,13 @@
     },
     "footer": {
       "tagline": "Project execution & workflow visibility. Built for teams that care about shipping.",
-      "rights": "Open-source project management.",
+      "rights": "A product of MRVIN100.",
       "discord": "Join our Discord community",
       "sections": {
         "product": "Product",
         "platform": "Platform",
-        "account": "Account"
+        "account": "Account",
+        "company": "Company"
       },
       "links": {
         "features": "Features",
@@ -875,7 +948,46 @@
         "board": "Task board",
         "signIn": "Sign in",
         "signUp": "Sign up",
-        "acceptInvitation": "Accept invitation"
+        "acceptInvitation": "Accept invitation",
+        "about": "About MRVIN100",
+        "contact": "Contact sales",
+        "support": "Support",
+        "privacy": "Privacy policy",
+        "terms": "Terms",
+        "legal": "Legal notice"
+      }
+    },
+    "pages": {
+      "features": {
+        "title": "Features: Gantt timeline, scheduling, workload and Kanban | Tûm",
+        "description": "Explore Tûm's features: Gantt timeline with dependencies and critical path, smart scheduling, workload view, Kanban board, dashboards and real-time collaboration.",
+        "heading": "Tûm features",
+        "intro": "Everything a team needs to plan, schedule and deliver projects: from the Gantt timeline to workload and analytics."
+      },
+      "pricing": {
+        "title": "Pricing: free plan, Pro and Enterprise, free self-hosting | Tûm",
+        "description": "Tûm pricing in USD: a free cloud plan for small teams, Pro and Enterprise with unlimited users per workspace and a 14-day trial, or free self-hosting under the AGPLv3.",
+        "heading": "Tûm pricing",
+        "intro": "Free for small teams. Paid plans are billed per workspace, in US dollars, with unlimited users. Self-hosting is free."
+      },
+      "legal": {
+        "title": "Legal notice | Tûm",
+        "description": "Publisher and company registration details for Tûm, a product of MRVIN100 SARLU.",
+        "heading": "Legal notice",
+        "intro": "Tûm is published and operated by the company below.",
+        "labels": {
+          "company": "Company name",
+          "tradeName": "Trade name",
+          "address": "Registered office",
+          "rccm": "Trade register (RCCM)",
+          "taxId": "Tax ID",
+          "contact": "Contact",
+          "support": "Support",
+          "website": "Website",
+          "license": "Software licence"
+        },
+        "country": "Republic of Guinea",
+        "licenseValue": "GNU Affero General Public License v3.0"
       }
     }
   },

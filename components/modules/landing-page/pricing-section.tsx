@@ -2,17 +2,27 @@
 
 import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/lib/constants";
-import { useBillingState, useStartCheckout } from "@/components/modules/billing";
+import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
+import { productMailto } from "@/lib/contact";
+import {
+  DexpayCheckoutDialog,
+  type DexpayPlanPrice,
+  findDexpayPlan,
+  formatDexpayPrice,
+  useBillingState,
+  useDexpayPlans,
+  useEntitlements,
+  useStartCheckout,
+} from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { trackEvent } from "@/lib/analytics";
 
-type PlanKey = "community" | "pro" | "enterprise";
+type PlanKey = "free" | "pro" | "enterprise" | "community";
 
 const PLAN_CONFIG: {
   key: PlanKey;
@@ -24,21 +34,16 @@ const PLAN_CONFIG: {
   hasBadge: boolean;
 }[] = [
   {
-    key: "community",
-    monthly: 0,
-    annual: 0,
-    // Community is invitation-only: visitors book a 15-min call where we collect their email and
-    // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
-    // MVP and lets us match contributors / reviewers / early adopters to the right room.
-    href: "https://cal.com/mrvin100/collective",
-    external: true,
+    key: "free",
+    ...PLAN_PRICES.free,
+    href: ROUTES.SIGNUP,
+    external: false,
     popular: false,
     hasBadge: false,
   },
   {
     key: "pro",
-    monthly: 20,
-    annual: 17,
+    ...PLAN_PRICES.pro,
     href: ROUTES.SIGNUP,
     external: false,
     popular: true,
@@ -46,9 +51,19 @@ const PLAN_CONFIG: {
   },
   {
     key: "enterprise",
-    monthly: 99,
-    annual: 84,
-    href: "mailto:mrvin100mail@gmail.com",
+    ...PLAN_PRICES.enterprise,
+    href: productMailto(CONTACT.EMAIL, "Enterprise plan"),
+    external: true,
+    popular: false,
+    hasBadge: false,
+  },
+  {
+    key: "community",
+    ...PLAN_PRICES.community,
+    // Community is invitation-only: visitors book a 15-min call where we collect their email and
+    // hand them the #tum-server Discord invite + the self-host docs. Keeps the funnel curated for
+    // MVP and lets us match contributors / reviewers / early adopters to the right room.
+    href: "https://cal.com/mrvin100/collective",
     external: true,
     popular: false,
     hasBadge: false,
@@ -65,13 +80,31 @@ export function PricingSection() {
   const billing = useBillingState({ enabled: !!session });
   const [annual, setAnnual] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
+  const locale = useLocale();
+  const dexpayPlans = useDexpayPlans();
+  const entitlements = useEntitlements();
+  const [dexpayCheckout, setDexpayCheckout] = useState<DexpayPlanPrice | null>(null);
+
+  // Where Dexpay sells a plan it is the default: its price, in local currency, is what the
+  // card shows and its checkout is the one that opens.
+  const dexpayPriceFor = (key: PlanKey) =>
+    key === "pro" || key === "enterprise"
+      ? findDexpayPlan(
+          dexpayPlans.data,
+          key === "pro" ? "PRO" : "ENTERPRISE",
+          annual ? "YEARLY" : "MONTHLY",
+        )
+      : undefined;
 
   // Role check: only the org owner can take on a subscription. Members + admins clicking the CTA
   // would tie billing to a workspace they can't manage. The button stays visible but is disabled
   // with an explainer for non-owners; only fully-anonymous visitors see no role gate.
   const currentRole = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? null;
   const isOwner = currentRole === "owner";
-  const hasActiveSubscription = billing.data?.kind === "subscription";
+  // The Polar state only knows Polar subscriptions; the entitlements cover every provider.
+  const hasActiveSubscription =
+    billing.data?.kind === "subscription" ||
+    (entitlements.data !== undefined && entitlements.data.plan !== "FREE");
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>
@@ -102,6 +135,11 @@ export function PricingSection() {
     // creating a parallel Polar subscription.
     if (hasActiveSubscription) {
       router.push(ROUTES.BILLING);
+      return;
+    }
+    const localPrice = dexpayPriceFor(plan);
+    if (localPrice) {
+      setDexpayCheckout(localPrice);
       return;
     }
     setPendingPlan(plan);
@@ -163,14 +201,15 @@ export function PricingSection() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
           {PLAN_CONFIG.map((plan, idx) => {
             const isPaid = plan.key === "pro" || plan.key === "enterprise";
             const pending = pendingPlan === plan.key;
+            const localPrice = dexpayPriceFor(plan.key);
             return (
               <div
                 key={plan.key}
-                className={`relative p-8 rounded-2xl border transition-all ${
+                className={`relative p-6 rounded-2xl border transition-all ${
                   plan.popular
                     ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
                     : "border-foreground/10 bg-card"
@@ -193,9 +232,18 @@ export function PricingSection() {
                 </div>
 
                 <div className="mb-6 pb-6 border-b border-foreground/10">
-                  {plan.monthly !== null ? (
+                  {localPrice ? (
+                    <div className="flex flex-wrap items-baseline gap-x-1">
+                      <span className="text-3xl font-bold">
+                        {formatDexpayPrice(localPrice, locale)}
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        {t(annual ? "perWorkspaceYear" : "perWorkspace")}
+                      </span>
+                    </div>
+                  ) : plan.monthly !== null ? (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold">
+                      <span className="text-4xl font-bold">
                         ${annual ? plan.annual : plan.monthly}
                       </span>
                       <span className="text-muted-foreground text-sm">{t("perWorkspace")}</span>
@@ -252,9 +300,9 @@ export function PricingSection() {
                     )}
                     {plan.key === "enterprise" && (
                       <p className="text-center text-xs text-muted-foreground">
-                        Need a custom plan?{" "}
+                        {t("customPlan")}{" "}
                         <a className="underline hover:text-foreground" href={plan.href}>
-                          Talk to sales
+                          {t("talkToSales")}
                         </a>
                       </p>
                     )}
@@ -285,6 +333,12 @@ export function PricingSection() {
           {t("footer")} <span className="font-mono text-xs">{t("fairCodeNote")}</span>
         </p>
       </div>
+      <DexpayCheckoutDialog
+        price={dexpayCheckout}
+        defaultName={session?.user?.name ?? undefined}
+        defaultEmail={session?.user?.email ?? undefined}
+        onClose={() => setDexpayCheckout(null)}
+      />
     </section>
   );
 }
