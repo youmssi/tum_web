@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { ROUTES } from "@/lib/constants";
 import { useBillingState, useOpenCustomerPortal } from "./use-billing";
+import { useEntitlements } from "./use-entitlements";
 
 /**
  * Customer billing page. Three terminal states (besides loading): {@code no-subscription},
@@ -27,6 +28,10 @@ import { useBillingState, useOpenCustomerPortal } from "./use-billing";
 export function BillingPage() {
   const t = useTranslations("billing");
   const billing = useBillingState();
+  // A plan that Polar does not know about was bought through another provider (Dexpay).
+  const entitlements = useEntitlements();
+  const paidPlan =
+    entitlements.data && entitlements.data.plan !== "FREE" ? entitlements.data.plan : null;
   const openPortal = useOpenCustomerPortal();
 
   function handleOpenPortal() {
@@ -122,7 +127,18 @@ export function BillingPage() {
         </Card>
       )}
 
-      {billing.data?.kind === "no-subscription" && (
+      {billing.data?.kind === "no-subscription" && paidPlan && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {t("otherProvider.title", { plan: t(`upgrade.plans.${paidPlan}`) })}
+            </CardTitle>
+            <CardDescription>{t("otherProvider.description")}</CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      {billing.data?.kind === "no-subscription" && !paidPlan && (
         <Card>
           <CardHeader>
             <CardTitle>{t("noPlan.title")}</CardTitle>
@@ -130,7 +146,7 @@ export function BillingPage() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
             <Button asChild>
-              <Link href={`${ROUTES.HOME}#pricing`}>
+              <Link href={ROUTES.PRICING}>
                 {t("noPlan.viewPlans")}
                 <ArrowUpRightIcon className="ml-2 size-4" />
               </Link>

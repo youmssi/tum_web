@@ -147,7 +147,7 @@
     "portalFailed": "Could not open the billing portal.",
     "noPlan": {
       "title": "You're on the free plan",
-      "description": "Upgrade to Pro to unlock workspace-wide automations, custom statuses with WIP limits, and the full project archive export.",
+      "description": "Upgrade to Pro for unlimited projects and members, critical path, baselines, workload, analytics and the portfolio dashboard.",
       "viewPlans": "View plans"
     },
     "unconfigured": {
@@ -182,6 +182,27 @@
       },
       "memberLimit": "The Free plan is limited to 5 members. Upgrade this workspace to invite more people.",
       "workspaceLimit": "You already own a workspace on the Free plan. Upgrade it to create another one."
+    },
+    "dexpay": {
+      "title": "Pay with mobile money or card",
+      "summaryMonthly": "{price} per month for this workspace. You will finish the payment on the secure Dexpay page.",
+      "summaryYearly": "{price} per year for this workspace. You will finish the payment on the secure Dexpay page.",
+      "nameLabel": "Full name",
+      "nameRequired": "Enter your name.",
+      "emailLabel": "Email",
+      "emailInvalid": "Enter a valid email address.",
+      "emailHint": "Receipts and renewal reminders are sent here.",
+      "phoneLabel": "Phone number",
+      "phoneInvalid": "Use the international format, for example +237650000000.",
+      "phoneHint": "International format. Mobile money payments are approved on this phone.",
+      "cancel": "Cancel",
+      "submit": "Continue to payment",
+      "ownerOnly": "Only a workspace owner or admin can subscribe.",
+      "failed": "The payment page could not be opened. Please try again."
+    },
+    "otherProvider": {
+      "title": "Your workspace is on the {plan} plan",
+      "description": "This subscription is paid through Dexpay. Before each renewal you receive an email with a payment link; the plan stays active for 7 days after the due date."
     }
   },
   "dashboard": {
@@ -845,7 +866,8 @@
         }
       },
       "customPlan": "Need a custom plan?",
-      "talkToSales": "Talk to sales"
+      "talkToSales": "Talk to sales",
+      "perWorkspaceYear": "/yr per workspace"
     },
     "testimonials": {
       "sectionLabel": "Testimonials",

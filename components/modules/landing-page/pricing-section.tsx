@@ -2,14 +2,23 @@
 
 import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
 import { productMailto } from "@/lib/contact";
-import { useBillingState, useStartCheckout } from "@/components/modules/billing";
+import {
+  DexpayCheckoutDialog,
+  type DexpayPlanPrice,
+  findDexpayPlan,
+  formatDexpayPrice,
+  useBillingState,
+  useDexpayPlans,
+  useEntitlements,
+  useStartCheckout,
+} from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { trackEvent } from "@/lib/analytics";
 
@@ -71,13 +80,31 @@ export function PricingSection() {
   const billing = useBillingState({ enabled: !!session });
   const [annual, setAnnual] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
+  const locale = useLocale();
+  const dexpayPlans = useDexpayPlans();
+  const entitlements = useEntitlements();
+  const [dexpayCheckout, setDexpayCheckout] = useState<DexpayPlanPrice | null>(null);
+
+  // Where Dexpay sells a plan it is the default: its price, in local currency, is what the
+  // card shows and its checkout is the one that opens.
+  const dexpayPriceFor = (key: PlanKey) =>
+    key === "pro" || key === "enterprise"
+      ? findDexpayPlan(
+          dexpayPlans.data,
+          key === "pro" ? "PRO" : "ENTERPRISE",
+          annual ? "YEARLY" : "MONTHLY",
+        )
+      : undefined;
 
   // Role check: only the org owner can take on a subscription. Members + admins clicking the CTA
   // would tie billing to a workspace they can't manage. The button stays visible but is disabled
   // with an explainer for non-owners; only fully-anonymous visitors see no role gate.
   const currentRole = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? null;
   const isOwner = currentRole === "owner";
-  const hasActiveSubscription = billing.data?.kind === "subscription";
+  // The Polar state only knows Polar subscriptions; the entitlements cover every provider.
+  const hasActiveSubscription =
+    billing.data?.kind === "subscription" ||
+    (entitlements.data !== undefined && entitlements.data.plan !== "FREE");
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>
@@ -108,6 +135,11 @@ export function PricingSection() {
     // creating a parallel Polar subscription.
     if (hasActiveSubscription) {
       router.push(ROUTES.BILLING);
+      return;
+    }
+    const localPrice = dexpayPriceFor(plan);
+    if (localPrice) {
+      setDexpayCheckout(localPrice);
       return;
     }
     setPendingPlan(plan);
@@ -173,6 +205,7 @@ export function PricingSection() {
           {PLAN_CONFIG.map((plan, idx) => {
             const isPaid = plan.key === "pro" || plan.key === "enterprise";
             const pending = pendingPlan === plan.key;
+            const localPrice = dexpayPriceFor(plan.key);
             return (
               <div
                 key={plan.key}
@@ -199,7 +232,16 @@ export function PricingSection() {
                 </div>
 
                 <div className="mb-6 pb-6 border-b border-foreground/10">
-                  {plan.monthly !== null ? (
+                  {localPrice ? (
+                    <div className="flex flex-wrap items-baseline gap-x-1">
+                      <span className="text-3xl font-bold">
+                        {formatDexpayPrice(localPrice, locale)}
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        {t(annual ? "perWorkspaceYear" : "perWorkspace")}
+                      </span>
+                    </div>
+                  ) : plan.monthly !== null ? (
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold">
                         ${annual ? plan.annual : plan.monthly}
@@ -291,6 +333,12 @@ export function PricingSection() {
           {t("footer")} <span className="font-mono text-xs">{t("fairCodeNote")}</span>
         </p>
       </div>
+      <DexpayCheckoutDialog
+        price={dexpayCheckout}
+        defaultName={session?.user?.name ?? undefined}
+        defaultEmail={session?.user?.email ?? undefined}
+        onClose={() => setDexpayCheckout(null)}
+      />
     </section>
   );
 }

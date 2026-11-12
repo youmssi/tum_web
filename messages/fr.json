@@ -147,7 +147,7 @@
     "portalFailed": "Impossible d’ouvrir le portail de facturation.",
     "noPlan": {
       "title": "Vous êtes sur le plan gratuit",
-      "description": "Passez à Pro pour débloquer les automatisations, les statuts personnalisés avec limites WIP et l’export complet des archives de projet.",
+      "description": "Passez à Pro pour des projets et membres illimités, le chemin critique, les références de planning, la charge de travail, les analyses et le tableau de bord portefeuille.",
       "viewPlans": "Voir les plans"
     },
     "unconfigured": {
@@ -182,6 +182,27 @@
       },
       "memberLimit": "L’offre gratuite est limitée à 5 membres. Changez l’offre de cet espace de travail pour inviter d’autres personnes.",
       "workspaceLimit": "Vous possédez déjà un espace de travail sur l’offre gratuite. Changez son offre pour en créer un autre."
+    },
+    "dexpay": {
+      "title": "Payer par mobile money ou carte",
+      "summaryMonthly": "{price} par mois pour cet espace de travail. Vous terminerez le paiement sur la page sécurisée de Dexpay.",
+      "summaryYearly": "{price} par an pour cet espace de travail. Vous terminerez le paiement sur la page sécurisée de Dexpay.",
+      "nameLabel": "Nom complet",
+      "nameRequired": "Saisissez votre nom.",
+      "emailLabel": "E-mail",
+      "emailInvalid": "Saisissez une adresse e-mail valide.",
+      "emailHint": "Les reçus et les rappels de renouvellement sont envoyés à cette adresse.",
+      "phoneLabel": "Numéro de téléphone",
+      "phoneInvalid": "Utilisez le format international, par exemple +237650000000.",
+      "phoneHint": "Format international. Les paiements mobile money sont validés sur ce téléphone.",
+      "cancel": "Annuler",
+      "submit": "Continuer vers le paiement",
+      "ownerOnly": "Seul un propriétaire ou un administrateur de l’espace de travail peut souscrire.",
+      "failed": "La page de paiement n’a pas pu être ouverte. Veuillez réessayer."
+    },
+    "otherProvider": {
+      "title": "Votre espace de travail est sur l’offre {plan}",
+      "description": "Cet abonnement est payé via Dexpay. Avant chaque renouvellement, vous recevez un e-mail avec un lien de paiement ; l’offre reste active 7 jours après l’échéance."
     }
   },
   "dashboard": {
@@ -845,7 +866,8 @@
         }
       },
       "customPlan": "Besoin d’une offre sur mesure ?",
-      "talkToSales": "Contacter l’équipe commerciale"
+      "talkToSales": "Contacter l’équipe commerciale",
+      "perWorkspaceYear": "/an par espace de travail"
     },
     "testimonials": {
       "sectionLabel": "Témoignages",
