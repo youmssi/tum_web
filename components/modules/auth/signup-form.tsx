@@ -230,14 +230,30 @@ export function SignupForm() {
         </Button>
       </CardContent>
 
-      <CardFooter className="justify-center text-sm text-muted-foreground">
-        {t("haveAccount")}&nbsp;
-        <Link
-          href={ROUTES.LOGIN}
-          className="text-foreground underline underline-offset-4 hover:text-primary"
-        >
-          {t("loginLink")}
-        </Link>
+      <CardFooter className="flex-col gap-3 text-sm text-muted-foreground">
+        <p>
+          {t("haveAccount")}&nbsp;
+          <Link
+            href={ROUTES.LOGIN}
+            className="text-foreground underline underline-offset-4 hover:text-primary"
+          >
+            {t("loginLink")}
+          </Link>
+        </p>
+        <p className="text-center text-xs">
+          {t("agreePrefix")}{" "}
+          <Link href={ROUTES.TERMS} className="underline underline-offset-4 hover:text-foreground">
+            {t("agreeTerms")}
+          </Link>{" "}
+          {t("agreeAnd")}{" "}
+          <Link
+            href={ROUTES.PRIVACY}
+            className="underline underline-offset-4 hover:text-foreground"
+          >
+            {t("agreePrivacy")}
+          </Link>
+          .
+        </p>
       </CardFooter>
     </Card>
   );

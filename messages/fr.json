@@ -98,7 +98,11 @@
       "backToSignIn": "Retour à la connexion",
       "continueWith": "ou continuer avec",
       "google": "Continuer avec Google",
-      "github": "Continuer avec GitHub"
+      "github": "Continuer avec GitHub",
+      "agreePrefix": "En créant un compte, vous acceptez nos",
+      "agreeTerms": "Conditions générales d’utilisation",
+      "agreeAnd": "et notre",
+      "agreePrivacy": "Politique de confidentialité"
     },
     "profile": {
       "nameLabel": "Nom affiché",
@@ -623,7 +627,7 @@
         "customStatuses": "Statuts personnalisés + limites WIP",
         "workloadView": "Vue charge de travail / capacité",
         "selfHost": "Option auto-hébergement",
-        "fairCode": "Fair-code / pas de verrouillage fournisseur",
+        "fairCode": "AGPLv3 / pas de verrouillage fournisseur",
         "unlimitedUsers": "Utilisateurs illimités sur tous les plans",
         "realTime": "Collaboration en temps réel",
         "openSource": "Code source ouvert"
@@ -709,7 +713,7 @@
         },
         "selfHost": {
           "title": "Auto-hébergé ou Cloud",
-          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Licence fair-code : gratuit en interne, sans verrouillage fournisseur."
+          "description": "Faites tourner Tûm sur votre serveur gratuitement, ou utilisez Tûm Cloud pour zéro gestion. Open source sous AGPLv3, sans verrouillage fournisseur."
         }
       }
     },
@@ -740,14 +744,14 @@
       "sectionLabel": "Tarifs",
       "heading": "Gratuit à auto-héberger.",
       "headingAccent": "Ne payez que pour le cloud.",
-      "intro": "Tûm est open source sous une licence fair-code. Auto-hébergez gratuitement à vie. Choisissez l’hébergement cloud uniquement si vous voulez le zéro-gestion.",
+      "intro": "Tûm est open source sous licence GNU AGPLv3. Auto-hébergez gratuitement à vie. Choisissez l’hébergement cloud uniquement si vous voulez le zéro-gestion.",
       "monthly": "Mensuel",
       "annual": "Annuel",
       "annualSavings": "Économisez 15 %",
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
       "footer": "Toutes les formules incluent des utilisateurs illimités.",
-      "fairCodeNote": "Licence fair-code : gratuite en interne, ne peut pas être revendue en tant que service concurrent.",
+      "fairCodeNote": "Sous licence GNU AGPLv3 : utilisez, modifiez et auto-hébergez librement ; les modifications d’une version hébergée doivent être partagées sous la même licence.",
       "plans": {
         "community": {
           "name": "Communauté",
@@ -795,7 +799,9 @@
             "SAML / résidence des données sur demande"
           ]
         }
-      }
+      },
+      "customPlan": "Besoin d’une offre sur mesure ?",
+      "talkToSales": "Contacter l’équipe commerciale"
     },
     "testimonials": {
       "sectionLabel": "Témoignages",
@@ -841,7 +847,7 @@
         {
           "name": "Tom Andersson",
           "role": "Fondateur de Startup chez NordicLabs",
-          "quote": "L'open source avec une licence fair-code : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
+          "quote": "L'open source avec une licence équitable : c'est rare pour un produit aussi abouti. Nous contribuons en retour et la communauté a été incroyablement réactive."
         },
         {
           "name": "Priya Sharma",
@@ -859,12 +865,13 @@
     },
     "footer": {
       "tagline": "Exécution de projets & visibilité des équipes. Conçu pour les équipes qui tiennent à livrer.",
-      "rights": "Gestion de projet open source.",
+      "rights": "Un produit MRVIN100.",
       "discord": "Rejoindre notre communauté Discord",
       "sections": {
         "product": "Produit",
         "platform": "Plateforme",
-        "account": "Compte"
+        "account": "Compte",
+        "company": "Entreprise"
       },
       "links": {
         "features": "Fonctionnalités",
@@ -875,7 +882,46 @@
         "board": "Tableau de tâches",
         "signIn": "Se connecter",
         "signUp": "Créer un compte",
-        "acceptInvitation": "Accepter l’invitation"
+        "acceptInvitation": "Accepter l’invitation",
+        "about": "À propos de MRVIN100",
+        "contact": "Contacter les ventes",
+        "support": "Support",
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions générales",
+        "legal": "Mentions légales"
+      }
+    },
+    "pages": {
+      "features": {
+        "title": "Fonctionnalités : Gantt, planification, charge de travail et Kanban | Tûm",
+        "description": "Découvrez les fonctionnalités de Tûm : diagramme de Gantt avec dépendances et chemin critique, planification intelligente, vue de charge, tableau Kanban, tableaux de bord et collaboration en temps réel.",
+        "heading": "Fonctionnalités de Tûm",
+        "intro": "Tout ce dont une équipe a besoin pour planifier, ordonnancer et livrer ses projets : du diagramme de Gantt à la charge de travail et aux analyses."
+      },
+      "pricing": {
+        "title": "Tarifs : auto-hébergement gratuit, offres cloud Pro et Enterprise | Tûm",
+        "description": "Tarifs de Tûm en USD : auto-hébergement gratuit sous AGPLv3, ou Tûm Cloud Pro ou Enterprise avec utilisateurs illimités par espace de travail et 14 jours d’essai.",
+        "heading": "Tarifs de Tûm",
+        "intro": "Gratuit en auto-hébergement. Les offres cloud sont facturées par espace de travail, en dollars américains, avec utilisateurs illimités."
+      },
+      "legal": {
+        "title": "Mentions légales | Tûm",
+        "description": "Éditeur et informations d’immatriculation de Tûm, un produit de MRVIN100 SARLU.",
+        "heading": "Mentions légales",
+        "intro": "Tûm est édité et exploité par la société ci-dessous.",
+        "labels": {
+          "company": "Dénomination",
+          "tradeName": "Nom commercial",
+          "address": "Siège social",
+          "rccm": "RCCM",
+          "taxId": "Numéro d’identification fiscale",
+          "contact": "Contact",
+          "support": "Support",
+          "website": "Site web",
+          "license": "Licence du logiciel"
+        },
+        "country": "République de Guinée",
+        "licenseValue": "GNU Affero General Public License v3.0"
       }
     }
   },
