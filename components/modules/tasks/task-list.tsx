@@ -19,7 +19,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -66,6 +66,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 
 import { TaskDetailSheet } from "./task-detail-sheet";
+import { useTaskDeepLink } from "./use-task-deep-link";
 import { CreateTaskDialog } from "./create-task-dialog";
 import { useBulkUpdateTasks, useTasks } from "./use-tasks";
 
@@ -179,6 +180,11 @@ export function TaskList({ projectId }: { projectId: string }) {
   const { data: statusConfigs } = useStatuses(projectId);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const openTask = useCallback((task: Task) => {
+    setSelectedTask(task);
+    setSheetOpen(true);
+  }, []);
+  const clearDeepLink = useTaskDeepLink(tasks, openTask);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "ALL">("ALL");
@@ -615,10 +621,7 @@ export function TaskList({ projectId }: { projectId: string }) {
                   <TableRow
                     key={row.id}
                     className="cursor-pointer"
-                    onClick={() => {
-                      setSelectedTask(row.original);
-                      setSheetOpen(true);
-                    }}
+                    onClick={() => openTask(row.original)}
                     data-state={row.getIsSelected() ? "selected" : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -674,7 +677,10 @@ export function TaskList({ projectId }: { projectId: string }) {
       <TaskDetailSheet
         task={selectedTask}
         open={sheetOpen}
-        onOpenChange={setSheetOpen}
+        onOpenChange={(open) => {
+          setSheetOpen(open);
+          if (!open) clearDeepLink();
+        }}
         projectId={projectId}
       />
     </div>
