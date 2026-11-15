@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useDirectory, type DirectoryMember } from "@/components/modules/organization";
 import { type Task } from "@/components/modules/tasks";
 import { DEPENDENCY_TYPE_LABELS, type Dependency } from "./dependency-api";
+import { formatLag } from "./dependency-format";
 
 const MONTH_SHORT = [
   "Jan",
@@ -337,7 +338,7 @@ function TaskRow({
                         → {target?.title ?? dep.toTaskId.slice(0, 8)}
                         <span className="ml-1 text-[10px] opacity-70">
                           ({DEPENDENCY_TYPE_LABELS[dep.type]}
-                          {dep.lagDays > 0 ? ` +${dep.lagDays}d` : ""})
+                          {formatLag(dep.lagDays)})
                         </span>
                       </span>
                       <Button
