@@ -450,7 +450,19 @@
     "linkSourcePrompt": "Now click the target task to create a dependency.",
     "emptyAll": "No tasks yet. Create tasks and set dates to see them here.",
     "emptyFiltered": "No tasks fall within the selected date range.",
-    "emptyDates": "Add start & end dates to tasks to see bars here."
+    "emptyDates": "Add start & end dates to tasks to see bars here.",
+    "export": {
+      "button": "Export",
+      "png": "Image (PNG)",
+      "pdf": "PDF (print)",
+      "svg": "Vector (SVG)",
+      "stamp": "Exported on {date}",
+      "freeFooter": "Made with Tûm · tum.mrvin100.de",
+      "today": "Today",
+      "critical": "Critical path",
+      "done": "Done",
+      "failed": "The timeline could not be exported. Try another format or a coarser zoom."
+    }
   },
   "comments": {
     "header": "Comments",

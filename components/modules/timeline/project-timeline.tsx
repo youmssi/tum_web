@@ -6,9 +6,10 @@ import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatLocalDate, parseLocalDate, todayLocalDate } from "@/lib/date";
 import { toast } from "sonner";
-import { useFeatureAccess } from "@/components/modules/billing";
+import { useEntitlements, useFeatureAccess } from "@/components/modules/billing";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ROUTES } from "@/lib/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -55,6 +56,14 @@ import {
 import { BaselineVarianceDialog } from "./baseline-variance-view";
 import { TimelineToolbar } from "./timeline-toolbar";
 import { TimelineLeftPanel, GANTT_ROW_HEIGHT } from "./timeline-left-panel";
+import { type ExportScale, buildGanttSvg, taskHealth } from "./gantt-export";
+import {
+  type GanttExportFormat,
+  downloadPng,
+  downloadSvg,
+  printPdf,
+  timelineFilename,
+} from "./gantt-export-download";
 
 const GANTT_OPTIONS = {
   bar_height: 28,
@@ -64,6 +73,9 @@ const GANTT_OPTIONS = {
   // line renders on the chart. The button element is hidden via CSS ('.gantt .side-header > *')
   // because we have our own in the toolbar — see the .project-timeline-chart styles below.
 } as const;
+
+// Completed work reads as finished in exports, where there is no status column to say so.
+const DONE_COLOR = "#16a34a";
 
 const LEFT_PANEL_MIN = 240;
 const LEFT_PANEL_MAX = 600;
@@ -86,9 +98,11 @@ const DEP_TYPE_OPTIONS: { value: DependencyType; label: string }[] = [
 
 export function ProjectTimeline({
   projectId,
+  projectName,
   dateRange,
 }: {
   projectId: string;
+  projectName: string;
   dateRange?: DateRange;
 }) {
   const { data: tasks, isLoading } = useTasks(projectId);
@@ -122,6 +136,12 @@ export function ProjectTimeline({
       action: { label: upgradeT("seePlans"), onClick: () => router.push(ROUTES.PRICING) },
     });
   const queryClient = useQueryClient();
+  const exportT = useTranslations("timeline.export");
+  const legendT = useTranslations("timeline.legend");
+  const panelT = useTranslations("timeline.panel");
+  const locale = useLocale();
+  const entitlements = useEntitlements();
+  const { data: activeOrg } = authClient.useActiveOrganization();
 
   const { data: criticalPathData } = useCriticalPath(criticalPathMode ? projectId : undefined);
   const criticalTaskIds = useMemo(
@@ -233,6 +253,61 @@ export function ProjectTimeline({
       };
     });
   }, [scheduledTasks, depMap, colors.nearDueDays, criticalPathMode, criticalTaskIds]);
+
+  async function handleExport(format: GanttExportFormat) {
+    const now = Date.now();
+    const gantt = buildGanttSvg({
+      title: projectName,
+      subtitle: activeOrg?.name,
+      stamp: exportT("stamp", {
+        date: new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(now),
+      }),
+      // The Free plan credits Tûm on exports; paid plans export without it.
+      footer: entitlements.data?.plan === "FREE" ? exportT("freeFooter") : undefined,
+      tasks: scheduledTasks.map((t) => ({
+        id: t.id,
+        name: t.title,
+        start: t.milestone ? (t.startDate ?? t.endDate)! : t.startDate!,
+        end: t.milestone ? (t.startDate ?? t.endDate)! : t.endDate!,
+        progress: t.progress,
+        milestone: t.milestone,
+        health: taskHealth(t, colors.nearDueDays, now),
+        critical: criticalPathMode && criticalTaskIds.has(t.id),
+      })),
+      dependencies: (allDeps ?? []).map((d) => ({ from: d.fromTaskId, to: d.toTaskId })),
+      colors: {
+        onTrack: colors.onTrackColor,
+        nearDue: colors.nearDueColor,
+        overdue: colors.overdueColor,
+        done: DONE_COLOR,
+      },
+      labels: {
+        task: panelT("headerTask"),
+        start: panelT("headerStart"),
+        end: panelT("headerEnd"),
+        progress: panelT("headerProgress"),
+        today: exportT("today"),
+        critical: exportT("critical"),
+        legend: {
+          onTrack: legendT("onTrack"),
+          nearDue: legendT("nearDue"),
+          overdue: legendT("overdue"),
+          done: exportT("done"),
+        },
+      },
+      scale: viewMode as ExportScale,
+      locale,
+      today: todayLocalDate(),
+    });
+    const filename = timelineFilename(projectName, format);
+    try {
+      if (format === "svg") downloadSvg(gantt, filename);
+      else if (format === "png") await downloadPng(gantt, filename);
+      else printPdf(gantt, projectName);
+    } catch {
+      toast.error(exportT("failed"));
+    }
+  }
 
   const handleDateChange = useCallback(
     async (ganttTask: GanttTask, start: Date, end: Date) => {
@@ -417,6 +492,8 @@ export function ProjectTimeline({
             criticalPathLocked ? promptUpgrade() : setCriticalPathMode((m) => !m)
           }
           criticalPathLocked={criticalPathLocked}
+          onExport={handleExport}
+          exportDisabled={scheduledTasks.length === 0}
           baselinesLocked={baselinesLocked}
           criticalPathCount={criticalTaskIds.size}
           onBaselinesOpen={() => (baselinesLocked ? promptUpgrade() : setBaselinesOpen(true))}

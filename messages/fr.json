@@ -450,7 +450,19 @@
     "linkSourcePrompt": "Cliquez maintenant sur la tâche cible pour créer une dépendance.",
     "emptyAll": "Aucune tâche pour l’instant. Créez des tâches avec des dates pour les voir ici.",
     "emptyFiltered": "Aucune tâche ne se trouve dans la plage de dates sélectionnée.",
-    "emptyDates": "Ajoutez des dates de début et de fin aux tâches pour voir les barres ici."
+    "emptyDates": "Ajoutez des dates de début et de fin aux tâches pour voir les barres ici.",
+    "export": {
+      "button": "Exporter",
+      "png": "Image (PNG)",
+      "pdf": "PDF (impression)",
+      "svg": "Vectoriel (SVG)",
+      "stamp": "Exporté le {date}",
+      "freeFooter": "Réalisé avec Tûm · tum.mrvin100.de",
+      "today": "Aujourd’hui",
+      "critical": "Chemin critique",
+      "done": "Terminé",
+      "failed": "La chronologie n’a pas pu être exportée. Essayez un autre format ou un zoom moins détaillé."
+    }
   },
   "comments": {
     "header": "Commentaires",
