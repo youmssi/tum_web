@@ -179,7 +179,9 @@
         "ANALYTICS": "Follow burndown, burnup, cycle time and throughput for this project.",
         "PORTFOLIO": "Follow progress and risk across all your projects in one view.",
         "AUDIT_LOG": "Review and export every change made in the workspace."
-      }
+      },
+      "memberLimit": "The Free plan is limited to 5 members. Upgrade this workspace to invite more people.",
+      "workspaceLimit": "You already own a workspace on the Free plan. Upgrade it to create another one."
     }
   },
   "dashboard": {

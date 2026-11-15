@@ -4,6 +4,8 @@ import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { Pool } from "pg";
 
+import { hasReachedWorkspaceLimit, membershipLimitFor } from "./lib/workspace-limits";
+
 // This file is the single source of truth for the Better Auth config.
 // It intentionally has no `server-only` import so the CLI can use it for migrations.
 // App code must import from `lib/auth.ts` (which re-exports with the server-only guard).
@@ -11,6 +13,11 @@ import { Pool } from "pg";
 // Shared pool so definePayload can query member roles without a second connection.
 // Also re-exported so server routes (e.g. the internal directory endpoint) reuse the same pool.
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+const internalApi = {
+  baseUrl: process.env.INTERNAL_API_URL ?? "http://localhost:8080",
+  serviceToken: process.env.INTERNAL_SERVICE_TOKEN ?? "dev-internal-token",
+};
 
 // ---- Polar plugin assembly --------------------------------------------------------------------
 // We only register the Polar plugin when an access token is present. Local dev installs (and the
@@ -159,6 +166,17 @@ export const auth = betterAuth({
   plugins: [
     organization({
       requireEmailVerificationOnInvitation: false,
+      membershipLimit: (_user, org) => membershipLimitFor(org.id, internalApi),
+      organizationLimit: async (user) => {
+        const { rows } = await pool.query<{ organizationId: string }>(
+          `SELECT "organizationId" FROM member WHERE "userId" = $1 AND role = 'owner'`,
+          [user.id],
+        );
+        return hasReachedWorkspaceLimit(
+          rows.map((row) => row.organizationId),
+          internalApi,
+        );
+      },
       sendInvitationEmail: async (data) => {
         const url = `${process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/invitations/accept?token=${data.invitation.id}`;
         await fetch(`${process.env.INTERNAL_API_URL ?? "http://localhost:8080"}/internal/email`, {
