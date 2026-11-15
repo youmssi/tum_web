@@ -121,10 +121,10 @@ export function TimelineToolbar({
               ) : (
                 <GanttChartIcon className="size-3.5" />
               )}
-              Baselines
+              {t("baselines")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Capture and compare schedule baselines</TooltipContent>
+          <TooltipContent side="bottom">{t("baselinesTooltip")}</TooltipContent>
         </Tooltip>
 
         {/* Critical path toggle */}
@@ -141,13 +141,11 @@ export function TimelineToolbar({
               ) : (
                 <RouteIcon className="size-3.5" />
               )}
-              {criticalPathMode ? `Critical (${criticalPathCount})` : "Critical"}
+              {criticalPathMode ? t("criticalCount", { count: criticalPathCount }) : t("critical")}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {criticalPathMode
-              ? "Hide critical path"
-              : "Show the critical path — tasks that directly determine the project duration"}
+            {criticalPathMode ? t("criticalHide") : t("criticalShow")}
           </TooltipContent>
         </Tooltip>
 

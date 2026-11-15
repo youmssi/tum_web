@@ -413,7 +413,13 @@
       "focusEnter": "Mode focus : pleine vue",
       "focusExit": "Quitter le mode focus (Échap)",
       "exportXlsx": "Exporter XLSX",
-      "exportXlsxTooltip": "Télécharger toutes les tâches dans un fichier Excel (réimportable)"
+      "exportXlsxTooltip": "Télécharger toutes les tâches dans un fichier Excel (réimportable)",
+      "baselines": "Références",
+      "baselinesTooltip": "Enregistrer et comparer des références de planning",
+      "critical": "Critique",
+      "criticalCount": "Critique ({count})",
+      "criticalHide": "Masquer le chemin critique",
+      "criticalShow": "Afficher le chemin critique : les tâches qui déterminent directement la durée du projet"
     },
     "panel": {
       "headerTask": "Tâche",
@@ -441,7 +447,10 @@
       "createFailed": "Échec de la création de la dépendance.",
       "removed": "Dépendance supprimée.",
       "removeFailed": "Échec de la suppression de la dépendance.",
-      "restoreFailed": "Échec de la restauration de la dépendance."
+      "restoreFailed": "Échec de la restauration de la dépendance.",
+      "undo": "Annuler",
+      "lagLabel": "Décalage ou chevauchement (jours)",
+      "lagHint": "Un nombre positif retarde la tâche suivante, un nombre négatif la fait chevaucher. Jours ouvrés uniquement."
     },
     "rescheduleFailed": "Échec de la replanification de la tâche.",
     "progressFailed": "Échec de la mise à jour de l’avancement.",
@@ -462,7 +471,9 @@
       "critical": "Chemin critique",
       "done": "Terminé",
       "failed": "La chronologie n’a pas pu être exportée. Essayez un autre format ou un zoom moins détaillé."
-    }
+    },
+    "emptyFilteredTitle": "Aucune tâche dans cette plage de dates",
+    "emptyDatesTitle": "Ajoutez des dates pour voir les barres"
   },
   "comments": {
     "header": "Commentaires",

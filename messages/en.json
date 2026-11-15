@@ -413,7 +413,13 @@
       "focusEnter": "Focus mode: full view",
       "focusExit": "Exit focus mode (Esc)",
       "exportXlsx": "Export XLSX",
-      "exportXlsxTooltip": "Download all tasks as an Excel file (re-importable)"
+      "exportXlsxTooltip": "Download all tasks as an Excel file (re-importable)",
+      "baselines": "Baselines",
+      "baselinesTooltip": "Capture and compare schedule baselines",
+      "critical": "Critical",
+      "criticalCount": "Critical ({count})",
+      "criticalHide": "Hide critical path",
+      "criticalShow": "Show the critical path: tasks that directly determine the project duration"
     },
     "panel": {
       "headerTask": "Task",
@@ -441,7 +447,10 @@
       "createFailed": "Failed to create dependency.",
       "removed": "Dependency removed.",
       "removeFailed": "Failed to remove dependency.",
-      "restoreFailed": "Failed to restore dependency."
+      "restoreFailed": "Failed to restore dependency.",
+      "undo": "Undo",
+      "lagLabel": "Lag or lead (days)",
+      "lagHint": "Positive delays the next task, negative lets it overlap (lead). Working days only."
     },
     "rescheduleFailed": "Failed to reschedule task.",
     "progressFailed": "Failed to update progress.",
@@ -462,7 +471,9 @@
       "critical": "Critical path",
       "done": "Done",
       "failed": "The timeline could not be exported. Try another format or a coarser zoom."
-    }
+    },
+    "emptyFilteredTitle": "No tasks in this date range",
+    "emptyDatesTitle": "Set dates to see bars"
   },
   "comments": {
     "header": "Comments",
