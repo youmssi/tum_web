@@ -4,18 +4,19 @@ Task CRUD, list view, detail sheet, and bulk operations.
 
 ## Exports
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `TaskList` | Component | Filterable/sortable data table with pagination |
-| `TaskDetailSheet` | Component | Slide-over panel for task details |
-| `CreateTaskDialog` | Component | Inline dialog to create a task |
-| `useTasks` | Hook | Fetches and caches tasks for a project |
-| `useMyTasks` | Hook | Fetches tasks assigned to the current user |
-| `useMoveTask` | Hook | Drag-and-drop board → status updates |
-| `useBulkUpdateTasks` | Hook | Batch status/assignee/delete |
-| `useRescheduleTask` | Hook | Date changes from the timeline |
-| `type Task`, `type TaskStatus`, `type TaskPriority` | Types | Core domain types |
-| `STATUS_LABELS`, `PRIORITY_LABELS` | Constants | Display labels |
+| Export                                              | Type      | Description                                        |
+| --------------------------------------------------- | --------- | -------------------------------------------------- |
+| `TaskList`                                          | Component | Filterable/sortable data table with pagination     |
+| `useTaskDeepLink`                                   | Hook      | Opens the task named in `?task=<id>` (email links) |
+| `TaskDetailSheet`                                   | Component | Slide-over panel for task details                  |
+| `CreateTaskDialog`                                  | Component | Inline dialog to create a task                     |
+| `useTasks`                                          | Hook      | Fetches and caches tasks for a project             |
+| `useMyTasks`                                        | Hook      | Fetches tasks assigned to the current user         |
+| `useMoveTask`                                       | Hook      | Drag-and-drop board → status updates               |
+| `useBulkUpdateTasks`                                | Hook      | Batch status/assignee/delete                       |
+| `useRescheduleTask`                                 | Hook      | Date changes from the timeline                     |
+| `type Task`, `type TaskStatus`, `type TaskPriority` | Types     | Core domain types                                  |
+| `STATUS_LABELS`, `PRIORITY_LABELS`                  | Constants | Display labels                                     |
 
 ## Key patterns
 

@@ -2,6 +2,7 @@ export { CreateTaskDialog } from "./create-task-dialog";
 export { useRealtimeTasks } from "./use-realtime-tasks";
 export { TaskDetailSheet } from "./task-detail-sheet";
 export { TaskList } from "./task-list";
+export { TASK_SEARCH_PARAM, useTaskDeepLink } from "./use-task-deep-link";
 export type {
   Task,
   TaskStatus,
