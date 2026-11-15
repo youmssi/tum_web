@@ -23,3 +23,13 @@ export {
 export { ENTITLEMENT_KEYS, useEntitlements, useFeatureAccess } from "./use-entitlements";
 export { FeatureGate } from "./feature-gate";
 export { UpgradePrompt } from "./upgrade-prompt";
+export {
+  dexpayApi,
+  type DexpayCheckoutInput,
+  type DexpayInterval,
+  type DexpayPlan,
+  type DexpayPlanPrice,
+} from "./dexpay-api";
+export { findDexpayPlan, formatDexpayPrice } from "./dexpay-price";
+export { DEXPAY_KEYS, useDexpayPlans, useStartDexpayCheckout } from "./use-dexpay";
+export { DexpayCheckoutDialog } from "./dexpay-checkout-dialog";
