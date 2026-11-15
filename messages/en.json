@@ -657,7 +657,7 @@
         "workloadView": "Workload / capacity view",
         "selfHost": "Self-host option",
         "fairCode": "AGPLv3 / no vendor lock-in",
-        "unlimitedUsers": "Unlimited users on all plans",
+        "unlimitedUsers": "Unlimited users on paid plans",
         "realTime": "Real-time collaboration",
         "openSource": "Open-source codebase"
       }
@@ -771,30 +771,30 @@
     },
     "pricing": {
       "sectionLabel": "Pricing",
-      "heading": "Free to run yourself.",
-      "headingAccent": "Pay only for cloud.",
-      "intro": "Tûm is open source under the GNU AGPLv3. Self-host for free forever. Choose cloud hosting only when you want zero-ops convenience.",
+      "heading": "Start free.",
+      "headingAccent": "Upgrade when you grow.",
+      "intro": "Start on Tûm Cloud for free and upgrade for advanced scheduling and reporting. Tûm is also open source under the GNU AGPLv3, so you can self-host it at no cost.",
       "monthly": "Monthly",
       "annual": "Annual",
       "annualSavings": "Save 15%",
       "perWorkspace": "/mo per workspace",
       "custom": "Custom",
-      "footer": "All plans include unlimited users.",
+      "footer": "Paid plans include unlimited users.",
       "fairCodeNote": "Licensed under the GNU AGPLv3: use, modify and self-host freely; changes to a hosted version must be shared under the same licence.",
       "plans": {
-        "community": {
-          "name": "Community",
-          "description": "Self-hosted, forever free",
-          "cta": "Self-host for free",
+        "free": {
+          "name": "Free",
+          "description": "Tûm Cloud, for small teams",
+          "cta": "Start for free",
           "features": [
-            "Unlimited projects & tasks",
-            "Unlimited team members",
-            "Kanban, list & Gantt views",
+            "Tûm Cloud hosting (zero ops)",
+            "1 workspace, up to 5 members",
+            "Up to 3 active projects",
+            "Kanban, list, calendar & Gantt views",
             "Task dependencies & subtasks",
-            "Custom statuses with WIP limits",
             "Comments, @mentions & notifications",
             "CSV import & Excel archive export",
-            "Docker Compose self-host"
+            "Upgrade at any time"
           ]
         },
         "pro": {
@@ -803,13 +803,13 @@
           "badge": "Most popular",
           "cta": "Start 14-day trial",
           "features": [
-            "Everything in Community",
-            "Tûm Cloud hosting (zero ops)",
-            "Per-project dashboards & trends",
-            "Real-time updates across the team",
-            "Multi-workspace switcher",
+            "Everything in Free",
+            "Unlimited projects & members",
+            "Critical path analysis",
+            "Schedule baselines & variance",
+            "Workload & capacity view",
+            "Analytics & portfolio dashboards",
             "Email support",
-            "Automatic updates & backups",
             "14-day free trial · cancel anytime"
           ]
         },
@@ -826,6 +826,21 @@
             "Priority email support",
             "Custom contracts & invoicing",
             "SAML / data residency on request"
+          ]
+        },
+        "community": {
+          "name": "Community",
+          "description": "Self-hosted, forever free",
+          "cta": "Self-host for free",
+          "features": [
+            "Unlimited projects & tasks",
+            "Unlimited team members",
+            "Kanban, list & Gantt views",
+            "Task dependencies & subtasks",
+            "Custom statuses with WIP limits",
+            "Comments, @mentions & notifications",
+            "CSV import & Excel archive export",
+            "Docker Compose self-host"
           ]
         }
       },
@@ -928,10 +943,10 @@
         "intro": "Everything a team needs to plan, schedule and deliver projects: from the Gantt timeline to workload and analytics."
       },
       "pricing": {
-        "title": "Pricing: free self-hosting, Pro and Enterprise cloud plans | Tûm",
-        "description": "Tûm pricing in USD: self-host for free under the AGPLv3, or choose Tûm Cloud Pro or Enterprise with unlimited users per workspace and a 14-day trial.",
+        "title": "Pricing: free plan, Pro and Enterprise, free self-hosting | Tûm",
+        "description": "Tûm pricing in USD: a free cloud plan for small teams, Pro and Enterprise with unlimited users per workspace and a 14-day trial, or free self-hosting under the AGPLv3.",
         "heading": "Tûm pricing",
-        "intro": "Free to self-host. Cloud plans are billed per workspace, in US dollars, with unlimited users."
+        "intro": "Free for small teams. Paid plans are billed per workspace, in US dollars, with unlimited users. Self-hosting is free."
       },
       "legal": {
         "title": "Legal notice | Tûm",
