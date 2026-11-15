@@ -2,6 +2,7 @@
 
 import {
   CalendarCheck2Icon,
+  DownloadIcon,
   GanttChartIcon,
   LinkIcon,
   LockIcon,
@@ -11,7 +12,14 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import type { GanttExportFormat } from "./gantt-export-download";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { type GanttViewMode } from "./gantt-chart";
 
@@ -30,6 +38,8 @@ interface TimelineToolbarProps {
   onBaselinesOpen: () => void;
   criticalPathLocked?: boolean;
   baselinesLocked?: boolean;
+  onExport?: (format: GanttExportFormat) => void;
+  exportDisabled?: boolean;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -49,7 +59,10 @@ export function TimelineToolbar({
   onBaselinesOpen,
   criticalPathLocked = false,
   baselinesLocked = false,
+  onExport,
+  exportDisabled = false,
 }: TimelineToolbarProps) {
+  const exportT = useTranslations("timeline.export");
   const t = useTranslations("timeline.toolbar");
   const viewModeT = useTranslations("timeline.viewMode");
   const legendT = useTranslations("timeline.legend");
@@ -149,6 +162,22 @@ export function TimelineToolbar({
           <LinkIcon className="size-3.5" />
           {linkMode ? t("cancelLinking") : t("linkTasks")}
         </Button>
+
+        {onExport && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 gap-1.5" disabled={exportDisabled}>
+                <DownloadIcon className="size-3.5" />
+                {exportT("button")}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => onExport("png")}>{exportT("png")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onExport("pdf")}>{exportT("pdf")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onExport("svg")}>{exportT("svg")}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         {/* Focus mode toggle — Export lives next to the Archive button in the project header so
             there is one canonical place to trigger it. */}

@@ -289,7 +289,11 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4 flex min-h-0 flex-1 flex-col">
-          <ProjectTimeline projectId={project.id} dateRange={dateRange} />
+          <ProjectTimeline
+            projectId={project.id}
+            projectName={project.name}
+            dateRange={dateRange}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-4">
