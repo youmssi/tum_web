@@ -44,6 +44,7 @@ import { ActivityFeed } from "@/components/modules/activity";
 import { AnalyticsPage, ProjectDashboard, WorkloadView } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
 import { CalendarView } from "@/components/modules/calendar";
+import { FeatureGate } from "@/components/modules/billing";
 import { ProjectTimeline } from "@/components/modules/timeline";
 import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
 import { authClient } from "@/lib/auth-client";
@@ -292,11 +293,15 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-4">
-          <AnalyticsPage projectId={project.id} />
+          <FeatureGate feature="ANALYTICS">
+            <AnalyticsPage projectId={project.id} />
+          </FeatureGate>
         </TabsContent>
 
         <TabsContent value="workload" className="mt-4">
-          <WorkloadView projectId={project.id} />
+          <FeatureGate feature="WORKLOAD">
+            <WorkloadView projectId={project.id} />
+          </FeatureGate>
         </TabsContent>
 
         <TabsContent value="activity" className="mt-4">

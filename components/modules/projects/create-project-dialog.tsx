@@ -5,6 +5,10 @@ import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+import { isPlanUpgradeError } from "@/lib/api-error";
+import { ROUTES } from "@/lib/constants";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -34,6 +38,8 @@ type CreateValues = z.infer<typeof createSchema>;
 export function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
   const createProject = useCreateProject();
+  const upgradeT = useTranslations("billing.upgrade");
+  const router = useRouter();
 
   const form = useForm<CreateValues>({
     resolver: zodResolver(createSchema),
@@ -52,7 +58,13 @@ export function CreateProjectDialog() {
       toast.success(`Project "${name}" created.`);
       form.reset();
       setOpen(false);
-    } catch {
+    } catch (error) {
+      if (isPlanUpgradeError(error)) {
+        toast.error(upgradeT("projectLimit"), {
+          action: { label: upgradeT("seePlans"), onClick: () => router.push(ROUTES.PRICING) },
+        });
+        return;
+      }
       toast.error("Failed to create project.");
     }
   }

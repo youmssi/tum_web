@@ -6,6 +6,10 @@ import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatLocalDate, parseLocalDate, todayLocalDate } from "@/lib/date";
 import { toast } from "sonner";
+import { useFeatureAccess } from "@/components/modules/billing";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { ROUTES } from "@/lib/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -109,6 +113,14 @@ export function ProjectTimeline({
   const [isFocused, setIsFocused] = useState(false);
   const [criticalPathMode, setCriticalPathMode] = useState(false);
   const [baselinesOpen, setBaselinesOpen] = useState(false);
+  const upgradeT = useTranslations("billing.upgrade");
+  const router = useRouter();
+  const criticalPathLocked = useFeatureAccess("CRITICAL_PATH") === "locked";
+  const baselinesLocked = useFeatureAccess("BASELINES") === "locked";
+  const promptUpgrade = () =>
+    toast.info(upgradeT("timelineLocked"), {
+      action: { label: upgradeT("seePlans"), onClick: () => router.push(ROUTES.PRICING) },
+    });
   const queryClient = useQueryClient();
 
   const { data: criticalPathData } = useCriticalPath(criticalPathMode ? projectId : undefined);
@@ -202,9 +214,12 @@ export function ProjectTimeline({
       const colorClass = taskColorClass(t, colors.nearDueDays);
       const isCritical = criticalTaskIds.has(t.id);
       const baseClass = t.milestone ? `${colorClass}-milestone` : colorClass;
-      const cpClass = criticalPathMode && isCritical
-        ? (t.milestone ? "tum-critical-milestone" : "tum-critical")
-        : "";
+      const cpClass =
+        criticalPathMode && isCritical
+          ? t.milestone
+            ? "tum-critical-milestone"
+            : "tum-critical"
+          : "";
       return {
         id: t.id,
         name: t.title,
@@ -398,9 +413,13 @@ export function ProjectTimeline({
           onFocusToggle={() => setIsFocused((f) => !f)}
           onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
           criticalPathMode={criticalPathMode}
-          onCriticalPathToggle={() => setCriticalPathMode((m) => !m)}
+          onCriticalPathToggle={() =>
+            criticalPathLocked ? promptUpgrade() : setCriticalPathMode((m) => !m)
+          }
+          criticalPathLocked={criticalPathLocked}
+          baselinesLocked={baselinesLocked}
           criticalPathCount={criticalTaskIds.size}
-          onBaselinesOpen={() => setBaselinesOpen(true)}
+          onBaselinesOpen={() => (baselinesLocked ? promptUpgrade() : setBaselinesOpen(true))}
         />
       </div>
 

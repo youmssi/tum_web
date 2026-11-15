@@ -4,6 +4,7 @@ import {
   CalendarCheck2Icon,
   GanttChartIcon,
   LinkIcon,
+  LockIcon,
   Maximize2Icon,
   Minimize2Icon,
   RouteIcon,
@@ -27,6 +28,8 @@ interface TimelineToolbarProps {
   onCriticalPathToggle: () => void;
   criticalPathCount: number;
   onBaselinesOpen: () => void;
+  criticalPathLocked?: boolean;
+  baselinesLocked?: boolean;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -44,6 +47,8 @@ export function TimelineToolbar({
   onCriticalPathToggle,
   criticalPathCount,
   onBaselinesOpen,
+  criticalPathLocked = false,
+  baselinesLocked = false,
 }: TimelineToolbarProps) {
   const t = useTranslations("timeline.toolbar");
   const viewModeT = useTranslations("timeline.viewMode");
@@ -98,7 +103,11 @@ export function TimelineToolbar({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onBaselinesOpen}>
-              <GanttChartIcon className="size-3.5" />
+              {baselinesLocked ? (
+                <LockIcon className="size-3.5" />
+              ) : (
+                <GanttChartIcon className="size-3.5" />
+              )}
               Baselines
             </Button>
           </TooltipTrigger>
@@ -114,7 +123,11 @@ export function TimelineToolbar({
               className="h-8 gap-1.5"
               onClick={onCriticalPathToggle}
             >
-              <RouteIcon className="size-3.5" />
+              {criticalPathLocked ? (
+                <LockIcon className="size-3.5" />
+              ) : (
+                <RouteIcon className="size-3.5" />
+              )}
               {criticalPathMode ? `Critical (${criticalPathCount})` : "Critical"}
             </Button>
           </TooltipTrigger>

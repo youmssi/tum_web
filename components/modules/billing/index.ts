@@ -13,3 +13,13 @@ export {
   useOpenCustomerPortal,
   useStartCheckout,
 } from "./use-billing";
+export {
+  entitlementsApi,
+  FEATURE_PLAN,
+  type Entitlements,
+  type Feature,
+  type Plan,
+} from "./entitlements-api";
+export { ENTITLEMENT_KEYS, useEntitlements, useFeatureAccess } from "./use-entitlements";
+export { FeatureGate } from "./feature-gate";
+export { UpgradePrompt } from "./upgrade-prompt";

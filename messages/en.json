@@ -153,6 +153,33 @@
     "unconfigured": {
       "title": "Billing is temporarily unavailable",
       "description": "We can't reach the billing provider with the current credentials. An admin needs to regenerate the Polar access token with the full scope set (customers, subscriptions, customer_sessions, checkouts). Your account and workspace data are unaffected."
+    },
+    "upgrade": {
+      "title": "{feature} is part of the {plan} plan",
+      "cta": "See the {plan} plan",
+      "seePlans": "See plans",
+      "projectLimit": "The Free plan is limited to 3 active projects. Archive a project or upgrade to create more.",
+      "timelineLocked": "Critical path and baselines are part of the Pro plan.",
+      "plans": {
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      },
+      "features": {
+        "CRITICAL_PATH": "Critical path",
+        "BASELINES": "Baselines",
+        "WORKLOAD": "Workload",
+        "ANALYTICS": "Analytics",
+        "PORTFOLIO": "Portfolio",
+        "AUDIT_LOG": "The audit log"
+      },
+      "descriptions": {
+        "CRITICAL_PATH": "See which tasks directly determine the project end date.",
+        "BASELINES": "Capture the schedule and compare it with what actually happened.",
+        "WORKLOAD": "See who is over or under capacity across the coming weeks.",
+        "ANALYTICS": "Follow burndown, burnup, cycle time and throughput for this project.",
+        "PORTFOLIO": "Follow progress and risk across all your projects in one view.",
+        "AUDIT_LOG": "Review and export every change made in the workspace."
+      }
     }
   },
   "dashboard": {
