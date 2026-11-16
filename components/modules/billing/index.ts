@@ -30,6 +30,6 @@ export {
   type DexpayPlan,
   type DexpayPlanPrice,
 } from "./dexpay-api";
-export { findDexpayPlan, formatDexpayPrice } from "./dexpay-price";
+export { findDexpayPlan, formatDexpayPrice, formatUsd } from "./dexpay-price";
 export { DEXPAY_KEYS, useDexpayPlans, useStartDexpayCheckout } from "./use-dexpay";
-export { DexpayCheckoutDialog } from "./dexpay-checkout-dialog";
+export { DexpayCheckoutDialog, type DexpayCheckoutOption } from "./dexpay-checkout-dialog";

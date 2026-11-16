@@ -49,16 +49,15 @@ Then start the app and web containers with the variables below.
 
 ### App
 
-| Variable                                                                 | Description                                                   |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`                 | PostgreSQL connection.                                        |
-| `AUTH_JWKS_URI`                                                          | `https://<web>/api/auth/jwks`, used to verify sign-in tokens. |
-| `CORS_ALLOWED_ORIGINS`                                                   | Public URL of the web app.                                    |
-| `WEB_INTERNAL_URL`                                                       | URL the app uses to reach the web on your private network.    |
-| `WEB_PUBLIC_URL`                                                         | Public URL of the web app, used for links in emails.          |
-| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Object storage.                                               |
-| `MAIL_TRANSPORT`, `MAIL_FROM`                                            | `smtp`, `resend` or `brevo`, and the sender address.          |
-| `INTERNAL_SERVICE_TOKEN`                                                 | Same value as on the web.                                     |
+| Variable                                                                 | Description                                                                                              |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`                 | PostgreSQL connection.                                                                                   |
+| `AUTH_JWKS_URI`                                                          | `https://<web>/api/auth/jwks`, used to verify sign-in tokens.                                            |
+| `CORS_ALLOWED_ORIGINS`                                                   | Public URL of the web app.                                                                               |
+| `WEB_URL`                                                                | Public URL of the web app: email links, payment return page and internal calls.                          |
+| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Object storage.                                                                                          |
+| `MAIL_TRANSPORT`, `MAIL_FROM`                                            | `smtp`, `resend` or `brevo`, or several in order of preference (`resend,brevo`); and the sender address. |
+| `INTERNAL_SERVICE_TOKEN`                                                 | Same value as on the web.                                                                                |
 
 Leave `TUM_CLOUD_ENABLED` unset or `false`. This turns off plan limits and payments, so every workspace gets every feature.
 
