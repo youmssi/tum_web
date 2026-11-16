@@ -5,7 +5,13 @@ export interface ProblemDetail {
   detail?: string;
   instance?: string;
   errors?: Record<string, string[]>;
+  /** Machine-readable error code, set by the backend on errors a client is expected to handle. */
+  code?: string;
+  requiredPlan?: string;
+  reason?: string;
 }
+
+export const PLAN_UPGRADE_REQUIRED = "plan_upgrade_required";
 
 export class ApiError extends Error {
   constructor(
@@ -39,4 +45,9 @@ export function getErrorMessage(error: unknown, fallback = "Something went wrong
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error) return error.message;
   return fallback;
+}
+
+/** True when the backend refused the request because the workspace's plan does not cover it. */
+export function isPlanUpgradeError(error: unknown): error is ApiError {
+  return error instanceof ApiError && error.problem.code === PLAN_UPGRADE_REQUIRED;
 }

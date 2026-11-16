@@ -44,8 +44,9 @@ import { ActivityFeed } from "@/components/modules/activity";
 import { AnalyticsPage, ProjectDashboard, WorkloadView } from "@/components/modules/analytics";
 import { KanbanBoard } from "@/components/modules/board";
 import { CalendarView } from "@/components/modules/calendar";
+import { FeatureGate } from "@/components/modules/billing";
 import { ProjectTimeline } from "@/components/modules/timeline";
-import { TaskList, useRealtimeTasks } from "@/components/modules/tasks";
+import { TASK_SEARCH_PARAM, TaskList, useRealtimeTasks } from "@/components/modules/tasks";
 import { authClient } from "@/lib/auth-client";
 import { ExportProjectButton } from "./export-button";
 import { useProject, useToggleArchive } from "./use-projects";
@@ -60,7 +61,10 @@ export function ProjectDetail({ id }: { id: string }) {
   useRealtimeTasks(id, activeOrg?.id ?? null);
 
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState("overview");
+  // Email links point at ?task=<id>; the list tab is where that task's sheet opens.
+  const [activeTab, setActiveTab] = useState(() =>
+    searchParams.has(TASK_SEARCH_PARAM) ? "list" : "overview",
+  );
 
   // Persisted in URL search params so the timeline date filter survives page refresh.
   const dateRange: DateRange | undefined = (() => {
@@ -288,15 +292,23 @@ export function ProjectDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="timeline" className="mt-4 flex min-h-0 flex-1 flex-col">
-          <ProjectTimeline projectId={project.id} dateRange={dateRange} />
+          <ProjectTimeline
+            projectId={project.id}
+            projectName={project.name}
+            dateRange={dateRange}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-4">
-          <AnalyticsPage projectId={project.id} />
+          <FeatureGate feature="ANALYTICS">
+            <AnalyticsPage projectId={project.id} />
+          </FeatureGate>
         </TabsContent>
 
         <TabsContent value="workload" className="mt-4">
-          <WorkloadView projectId={project.id} />
+          <FeatureGate feature="WORKLOAD">
+            <WorkloadView projectId={project.id} />
+          </FeatureGate>
         </TabsContent>
 
         <TabsContent value="activity" className="mt-4">

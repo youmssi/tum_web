@@ -13,6 +13,7 @@ import {
   CtaSection,
   FooterSection,
 } from "@/components/modules/landing-page";
+import { COMPANY, CONTACT } from "@/lib/constants";
 import { env } from "@/lib/env";
 import { routing, localizedUrl, type Locale } from "@/i18n/routing";
 
@@ -58,10 +59,23 @@ async function structuredData(locale: string) {
       {
         "@type": "Organization",
         "@id": `${env.siteUrl}/#organization`,
-        name: "Tûm",
-        url: env.siteUrl,
-        logo: `${env.siteUrl}/icon.png`,
-        sameAs: ["https://discord.gg/JeJV9M6n"],
+        name: COMPANY.TRADE_NAME,
+        url: COMPANY.URL,
+        legalName: COMPANY.NAME,
+        taxID: COMPANY.TAX_ID,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: COMPANY.ADDRESS,
+          addressCountry: COMPANY.COUNTRY_CODE,
+        },
+        contactPoint: [
+          { "@type": "ContactPoint", contactType: "sales", email: CONTACT.EMAIL },
+          {
+            "@type": "ContactPoint",
+            contactType: "customer support",
+            email: CONTACT.SUPPORT_EMAIL,
+          },
+        ],
       },
       {
         "@type": "SoftwareApplication",
@@ -70,12 +84,14 @@ async function structuredData(locale: string) {
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web, Self-hosted (Docker)",
         url,
+        image: `${env.siteUrl}/icon.png`,
+        publisher: { "@id": `${env.siteUrl}/#organization` },
         description: t("description"),
         offers: {
           "@type": "Offer",
           price: "0",
           priceCurrency: "USD",
-          description: "Free self-hosted version. Cloud plans from $17/mo.",
+          description: "Free cloud plan and free self-hosted edition. Paid plans from $17/mo.",
         },
       },
     ],

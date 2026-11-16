@@ -43,13 +43,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -467,16 +461,10 @@ function AddStatusDialog({ onAdd }: AddStatusDialogProps) {
                     onValueChange={(v) => {
                       field.onChange(v);
                       // Auto-set colour when category changes
-                      form.setValue(
-                        "color",
-                        DEFAULT_COLORS[v as StatusCategory] ?? DEFAULT_COLOR,
-                      );
+                      form.setValue("color", DEFAULT_COLORS[v as StatusCategory] ?? DEFAULT_COLOR);
                     }}
                   >
-                    <SelectTrigger
-                      id="add-status-category"
-                      aria-invalid={fieldState.invalid}
-                    >
+                    <SelectTrigger id="add-status-category" aria-invalid={fieldState.invalid}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

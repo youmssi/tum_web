@@ -1,0 +1,71 @@
+---
+title: Auto-hébergement
+description: Faites tourner Tûm sur votre propre infrastructure sous licence AGPLv3.
+---
+
+Tûm est un logiciel libre distribué sous la [licence publique générale GNU Affero v3](https://www.gnu.org/licenses/agpl-3.0.html). Vous pouvez l'installer gratuitement sur vos propres serveurs. Une installation auto-hébergée dispose de toutes les fonctionnalités, sans limite d'offre.
+
+<Callout title="Obligation de la licence">
+  Si vous modifiez Tûm et que vous le mettez à disposition d'utilisateurs via un réseau, l'AGPLv3
+  vous oblige à leur proposer le code source de votre version modifiée.
+</Callout>
+
+## Composants
+
+| Composant              | Image                           | Rôle                                                             |
+| ---------------------- | ------------------------------- | ---------------------------------------------------------------- |
+| Web                    | `ghcr.io/youmssi/tum_web`       | Interface Next.js et authentification                            |
+| App                    | `ghcr.io/youmssi/tum_app`       | API REST, mises à jour en temps réel, e-mails, tâches planifiées |
+| PostgreSQL 17          | Instance gérée ou auto-hébergée | Base de données partagée                                         |
+| Stockage compatible S3 | MinIO, Cloudflare R2, AWS S3    | Pièces jointes et avatars                                        |
+| E-mail                 | Relais SMTP, Resend ou Brevo    | Notifications et invitations                                     |
+
+## Démarrage rapide
+
+Le [dépôt d'infrastructure](https://github.com/youmssi/tum_infra) contient un fichier Docker Compose pour PostgreSQL, MinIO et un serveur de messagerie local.
+
+```bash
+git clone https://github.com/youmssi/tum_infra.git
+cd tum_infra
+cp .env.example .env
+docker compose up -d
+```
+
+Lancez ensuite les conteneurs app et web avec les variables ci-dessous.
+
+## Configuration requise
+
+### Web
+
+| Variable                      | Description                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------- |
+| `BETTER_AUTH_URL`             | Adresse publique de l'application web, par exemple `https://tum.example.com`. |
+| `NEXT_PUBLIC_BETTER_AUTH_URL` | Même valeur que `BETTER_AUTH_URL`.                                            |
+| `BETTER_AUTH_SECRET`          | Secret aléatoire long. Générez-le avec `openssl rand -base64 32`.             |
+| `DATABASE_URL`                | Chaîne de connexion PostgreSQL.                                               |
+| `NEXT_PUBLIC_API_BASE_URL`    | Adresse publique de l'app (API).                                              |
+| `INTERNAL_API_URL`            | Adresse utilisée par le web pour joindre l'app sur votre réseau privé.        |
+| `INTERNAL_SERVICE_TOKEN`      | Secret partagé entre web et app. Utilisez la même valeur des deux côtés.      |
+
+### App
+
+| Variable                                                                 | Description                                                                 |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`                 | Connexion PostgreSQL.                                                       |
+| `AUTH_JWKS_URI`                                                          | `https://<web>/api/auth/jwks`, pour vérifier les jetons de connexion.       |
+| `CORS_ALLOWED_ORIGINS`                                                   | Adresse publique de l'application web.                                      |
+| `WEB_INTERNAL_URL`                                                       | Adresse utilisée par l'app pour joindre le web sur votre réseau privé.      |
+| `WEB_PUBLIC_URL`                                                         | Adresse publique de l'application web, utilisée pour les liens des e-mails. |
+| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Stockage d'objets.                                                          |
+| `MAIL_TRANSPORT`, `MAIL_FROM`                                            | `smtp`, `resend` ou `brevo`, et l'adresse d'expédition.                     |
+| `INTERNAL_SERVICE_TOKEN`                                                 | Même valeur que côté web.                                                   |
+
+Laissez `TUM_CLOUD_ENABLED` vide ou à `false`. Cela désactive les limites d'offre et les paiements : chaque espace de travail dispose de toutes les fonctionnalités.
+
+## Mises à jour
+
+Récupérez les nouvelles images et redémarrez les conteneurs. Les migrations de la base de données s'exécutent automatiquement au démarrage de l'app. Sauvegardez votre base avant chaque mise à jour.
+
+## Obtenir de l'aide
+
+Ouvrez un ticket sur GitHub pour signaler un bug. Pour une aide à l'installation ou un déploiement géré, écrivez à [contact@mrvin100.de](mailto:contact@mrvin100.de) avec « Tûm » dans l'objet, ou [prenez rendez-vous](https://cal.com/mrvin100/collective).

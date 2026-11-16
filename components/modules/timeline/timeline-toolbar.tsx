@@ -2,15 +2,24 @@
 
 import {
   CalendarCheck2Icon,
+  DownloadIcon,
   GanttChartIcon,
   LinkIcon,
+  LockIcon,
   Maximize2Icon,
   Minimize2Icon,
   RouteIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import type { GanttExportFormat } from "./gantt-export-download";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { type GanttViewMode } from "./gantt-chart";
 
@@ -27,6 +36,10 @@ interface TimelineToolbarProps {
   onCriticalPathToggle: () => void;
   criticalPathCount: number;
   onBaselinesOpen: () => void;
+  criticalPathLocked?: boolean;
+  baselinesLocked?: boolean;
+  onExport?: (format: GanttExportFormat) => void;
+  exportDisabled?: boolean;
 }
 
 const VIEW_MODES: GanttViewMode[] = ["Day", "Week", "Month"];
@@ -44,7 +57,12 @@ export function TimelineToolbar({
   onCriticalPathToggle,
   criticalPathCount,
   onBaselinesOpen,
+  criticalPathLocked = false,
+  baselinesLocked = false,
+  onExport,
+  exportDisabled = false,
 }: TimelineToolbarProps) {
+  const exportT = useTranslations("timeline.export");
   const t = useTranslations("timeline.toolbar");
   const viewModeT = useTranslations("timeline.viewMode");
   const legendT = useTranslations("timeline.legend");
@@ -98,11 +116,15 @@ export function TimelineToolbar({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onBaselinesOpen}>
-              <GanttChartIcon className="size-3.5" />
-              Baselines
+              {baselinesLocked ? (
+                <LockIcon className="size-3.5" />
+              ) : (
+                <GanttChartIcon className="size-3.5" />
+              )}
+              {t("baselines")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Capture and compare schedule baselines</TooltipContent>
+          <TooltipContent side="bottom">{t("baselinesTooltip")}</TooltipContent>
         </Tooltip>
 
         {/* Critical path toggle */}
@@ -114,14 +136,16 @@ export function TimelineToolbar({
               className="h-8 gap-1.5"
               onClick={onCriticalPathToggle}
             >
-              <RouteIcon className="size-3.5" />
-              {criticalPathMode ? `Critical (${criticalPathCount})` : "Critical"}
+              {criticalPathLocked ? (
+                <LockIcon className="size-3.5" />
+              ) : (
+                <RouteIcon className="size-3.5" />
+              )}
+              {criticalPathMode ? t("criticalCount", { count: criticalPathCount }) : t("critical")}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {criticalPathMode
-              ? "Hide critical path"
-              : "Show the critical path — tasks that directly determine the project duration"}
+            {criticalPathMode ? t("criticalHide") : t("criticalShow")}
           </TooltipContent>
         </Tooltip>
 
@@ -136,6 +160,22 @@ export function TimelineToolbar({
           <LinkIcon className="size-3.5" />
           {linkMode ? t("cancelLinking") : t("linkTasks")}
         </Button>
+
+        {onExport && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 gap-1.5" disabled={exportDisabled}>
+                <DownloadIcon className="size-3.5" />
+                {exportT("button")}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => onExport("png")}>{exportT("png")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onExport("pdf")}>{exportT("pdf")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onExport("svg")}>{exportT("svg")}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         {/* Focus mode toggle — Export lives next to the Archive button in the project header so
             there is one canonical place to trigger it. */}

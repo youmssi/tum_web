@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { FeatureGate } from "@/components/modules/billing";
 import { PortfolioPage } from "@/components/modules/portfolio";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function PortfolioRoute() {
-  return <PortfolioPage />;
+  return (
+    <FeatureGate feature="PORTFOLIO">
+      <PortfolioPage />
+    </FeatureGate>
+  );
 }

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const securityHeaders = [
@@ -23,4 +24,6 @@ const nextConfig: NextConfig = {
 // routing can be added in the Phase 10 full-localization epic without re-plumbing message keys.
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-export default withNextIntl(nextConfig);
+const withMDX = createMDX();
+
+export default withMDX(withNextIntl(nextConfig));

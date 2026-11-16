@@ -33,8 +33,9 @@ export type Locale = (typeof routing.locales)[number];
  * locale's public URL all import from here rather than re-deriving it, so they can't drift out
  * of sync with each other or with a future change to localePrefix.
  */
-export function localizedUrl(locale: Locale): string {
-  return locale === routing.defaultLocale ? env.siteUrl : `${env.siteUrl}/${locale}`;
+export function localizedUrl(locale: Locale, path = ""): string {
+  const base = locale === routing.defaultLocale ? env.siteUrl : `${env.siteUrl}/${locale}`;
+  return `${base}${path}`;
 }
 
 export const LOCALE_LABELS: Record<Locale, string> = {

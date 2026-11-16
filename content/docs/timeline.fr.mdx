@@ -1,0 +1,43 @@
+---
+title: Planning et Gantt
+description: Planifiez les tâches, reliez-les par des dépendances et exportez le diagramme.
+---
+
+Le planning affiche chaque tâche datée sous forme de barre sur un diagramme de Gantt. Faites glisser une barre pour déplacer une tâche, ou son bord pour changer sa durée.
+
+## Dépendances
+
+Une dépendance indique qu'une tâche dépend d'une autre. Tûm prend en charge les quatre types standard :
+
+| Type               | Signification                                                                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Fin à début (FD)   | La tâche suivante commence dès la fin de la précédente. Sans décalage, elle peut commencer le jour même. C'est le type le plus courant. |
+| Début à début (DD) | La tâche suivante commence quand la précédente commence.                                                                                |
+| Fin à fin (FF)     | La tâche suivante se termine quand la précédente se termine.                                                                            |
+| Début à fin (DF)   | La tâche suivante se termine quand la précédente commence.                                                                              |
+
+### Décalage et avance
+
+Ajoutez un **décalage** pour attendre un nombre de jours ouvrés après le lien, par exemple le temps de séchage du béton. Utilisez une valeur négative, appelée **avance**, pour que la tâche suivante chevauche la précédente. Les valeurs vont de -365 à 365 jours ouvrés.
+
+Quand une tâche se déplace, les tâches qui en dépendent se déplacent avec elle. Tûm refuse les liens qui créeraient une boucle.
+
+## Chemin critique et références
+
+Avec l'offre Pro, mettez en évidence le **chemin critique** : la suite de tâches dont le moindre retard repousse la fin du projet. Enregistrez une **référence** pour comparer le planning actuel au planning initial.
+
+## Période affichée
+
+Utilisez le filtre de dates au-dessus du diagramme pour vous concentrer sur une période. La période est conservée dans l'adresse de la page : vous pouvez la partager ou l'ajouter à vos favoris.
+
+## Exporter le planning
+
+Choisissez **Exporter** dans la barre d'outils du planning :
+
+- **Image (PNG)** pour les présentations et les messages.
+- **PDF (impression)** ouvre la fenêtre d'impression du navigateur. Choisissez le format paysage pour les plannings larges.
+- **Vectoriel (SVG)** pour les documents qui doivent rester nets à toutes les tailles.
+
+Chaque export porte le nom du projet et la date d'export. Les tâches en retard ou à risque gardent leur couleur, pour que le diagramme se lise de la même façon sur papier.
+
+Pour exporter toutes les tâches avec leurs champs, utilisez **Exporter vers Excel** sur la page du projet.

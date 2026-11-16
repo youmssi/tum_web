@@ -6,6 +6,11 @@ import { type DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatLocalDate, parseLocalDate, todayLocalDate } from "@/lib/date";
 import { toast } from "sonner";
+import { useEntitlements, useFeatureAccess } from "@/components/modules/billing";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { ROUTES } from "@/lib/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -51,6 +56,14 @@ import {
 import { BaselineVarianceDialog } from "./baseline-variance-view";
 import { TimelineToolbar } from "./timeline-toolbar";
 import { TimelineLeftPanel, GANTT_ROW_HEIGHT } from "./timeline-left-panel";
+import { type ExportScale, buildGanttSvg, taskHealth } from "./gantt-export";
+import {
+  type GanttExportFormat,
+  downloadPng,
+  downloadSvg,
+  printPdf,
+  timelineFilename,
+} from "./gantt-export-download";
 
 const GANTT_OPTIONS = {
   bar_height: 28,
@@ -60,6 +73,9 @@ const GANTT_OPTIONS = {
   // line renders on the chart. The button element is hidden via CSS ('.gantt .side-header > *')
   // because we have our own in the toolbar — see the .project-timeline-chart styles below.
 } as const;
+
+// Completed work reads as finished in exports, where there is no status column to say so.
+const DONE_COLOR = "#16a34a";
 
 const LEFT_PANEL_MIN = 240;
 const LEFT_PANEL_MAX = 600;
@@ -73,18 +89,26 @@ function taskColorClass(task: Task, nearDueDays: number): string {
   return "tum-on-track";
 }
 
-const DEP_TYPE_OPTIONS: { value: DependencyType; label: string }[] = [
-  { value: "FINISH_TO_START", label: "Finish → Start" },
-  { value: "START_TO_START", label: "Start → Start" },
-  { value: "FINISH_TO_FINISH", label: "Finish → Finish" },
-  { value: "START_TO_FINISH", label: "Start → Finish" },
+const DEP_TYPE_OPTIONS: {
+  value: DependencyType;
+  labelKey: "finishToStart" | "startToStart" | "finishToFinish" | "startToFinish";
+}[] = [
+  { value: "FINISH_TO_START", labelKey: "finishToStart" },
+  { value: "START_TO_START", labelKey: "startToStart" },
+  { value: "FINISH_TO_FINISH", labelKey: "finishToFinish" },
+  { value: "START_TO_FINISH", labelKey: "startToFinish" },
 ];
+
+/** Lead (negative) or lag (positive) in days; the backend accepts up to a year either way. */
+const MAX_LAG_DAYS = 365;
 
 export function ProjectTimeline({
   projectId,
+  projectName,
   dateRange,
 }: {
   projectId: string;
+  projectName: string;
   dateRange?: DateRange;
 }) {
   const { data: tasks, isLoading } = useTasks(projectId);
@@ -109,7 +133,23 @@ export function ProjectTimeline({
   const [isFocused, setIsFocused] = useState(false);
   const [criticalPathMode, setCriticalPathMode] = useState(false);
   const [baselinesOpen, setBaselinesOpen] = useState(false);
+  const upgradeT = useTranslations("billing.upgrade");
+  const router = useRouter();
+  const criticalPathLocked = useFeatureAccess("CRITICAL_PATH") === "locked";
+  const baselinesLocked = useFeatureAccess("BASELINES") === "locked";
+  const promptUpgrade = () =>
+    toast.info(upgradeT("timelineLocked"), {
+      action: { label: upgradeT("seePlans"), onClick: () => router.push(ROUTES.PRICING) },
+    });
   const queryClient = useQueryClient();
+  const exportT = useTranslations("timeline.export");
+  const legendT = useTranslations("timeline.legend");
+  const panelT = useTranslations("timeline.panel");
+  const timelineT = useTranslations("timeline");
+  const linkT = useTranslations("timeline.linkDialog");
+  const locale = useLocale();
+  const entitlements = useEntitlements();
+  const { data: activeOrg } = authClient.useActiveOrganization();
 
   const { data: criticalPathData } = useCriticalPath(criticalPathMode ? projectId : undefined);
   const criticalTaskIds = useMemo(
@@ -202,9 +242,12 @@ export function ProjectTimeline({
       const colorClass = taskColorClass(t, colors.nearDueDays);
       const isCritical = criticalTaskIds.has(t.id);
       const baseClass = t.milestone ? `${colorClass}-milestone` : colorClass;
-      const cpClass = criticalPathMode && isCritical
-        ? (t.milestone ? "tum-critical-milestone" : "tum-critical")
-        : "";
+      const cpClass =
+        criticalPathMode && isCritical
+          ? t.milestone
+            ? "tum-critical-milestone"
+            : "tum-critical"
+          : "";
       return {
         id: t.id,
         name: t.title,
@@ -218,6 +261,61 @@ export function ProjectTimeline({
       };
     });
   }, [scheduledTasks, depMap, colors.nearDueDays, criticalPathMode, criticalTaskIds]);
+
+  async function handleExport(format: GanttExportFormat) {
+    const now = Date.now();
+    const gantt = buildGanttSvg({
+      title: projectName,
+      subtitle: activeOrg?.name,
+      stamp: exportT("stamp", {
+        date: new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(now),
+      }),
+      // The Free plan credits Tûm on exports; paid plans export without it.
+      footer: entitlements.data?.plan === "FREE" ? exportT("freeFooter") : undefined,
+      tasks: scheduledTasks.map((t) => ({
+        id: t.id,
+        name: t.title,
+        start: t.milestone ? (t.startDate ?? t.endDate)! : t.startDate!,
+        end: t.milestone ? (t.startDate ?? t.endDate)! : t.endDate!,
+        progress: t.progress,
+        milestone: t.milestone,
+        health: taskHealth(t, colors.nearDueDays, now),
+        critical: criticalPathMode && criticalTaskIds.has(t.id),
+      })),
+      dependencies: (allDeps ?? []).map((d) => ({ from: d.fromTaskId, to: d.toTaskId })),
+      colors: {
+        onTrack: colors.onTrackColor,
+        nearDue: colors.nearDueColor,
+        overdue: colors.overdueColor,
+        done: DONE_COLOR,
+      },
+      labels: {
+        task: panelT("headerTask"),
+        start: panelT("headerStart"),
+        end: panelT("headerEnd"),
+        progress: panelT("headerProgress"),
+        today: exportT("today"),
+        critical: exportT("critical"),
+        legend: {
+          onTrack: legendT("onTrack"),
+          nearDue: legendT("nearDue"),
+          overdue: legendT("overdue"),
+          done: exportT("done"),
+        },
+      },
+      scale: viewMode as ExportScale,
+      locale,
+      today: todayLocalDate(),
+    });
+    const filename = timelineFilename(projectName, format);
+    try {
+      if (format === "svg") downloadSvg(gantt, filename);
+      else if (format === "png") await downloadPng(gantt, filename);
+      else printPdf(gantt, projectName);
+    } catch {
+      toast.error(exportT("failed"));
+    }
+  }
 
   const handleDateChange = useCallback(
     async (ganttTask: GanttTask, start: Date, end: Date) => {
@@ -239,10 +337,10 @@ export function ProjectTimeline({
         // Refresh tasks to reflect shifted dates
         queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
       } catch {
-        toast.error("Failed to reschedule task.");
+        toast.error(timelineT("rescheduleFailed"));
       }
     },
-    [projectId, queryClient],
+    [projectId, queryClient, timelineT],
   );
 
   const handleProgressChange = useCallback(
@@ -252,10 +350,10 @@ export function ProjectTimeline({
       try {
         await updateProgress.mutateAsync({ task, progress });
       } catch {
-        toast.error("Failed to update progress.");
+        toast.error(timelineT("progressFailed"));
       }
     },
-    [tasks, updateProgress],
+    [tasks, updateProgress, timelineT],
   );
 
   const handleGanttClick = useCallback(
@@ -289,11 +387,11 @@ export function ProjectTimeline({
         fromTaskId: linkSource,
         toTaskId: linkTarget,
         type,
-        lagDays: linkLagDays > 0 ? linkLagDays : undefined,
+        lagDays: linkLagDays !== 0 ? linkLagDays : undefined,
       });
-      toast.success("Dependency created.");
+      toast.success(linkT("created"));
     } catch {
-      toast.error("Failed to create dependency.");
+      toast.error(linkT("createFailed"));
     } finally {
       setLinkDialogOpen(false);
       setLinkSource(null);
@@ -398,9 +496,15 @@ export function ProjectTimeline({
           onFocusToggle={() => setIsFocused((f) => !f)}
           onJumpToToday={() => ganttHandleRef.current?.scrollToToday()}
           criticalPathMode={criticalPathMode}
-          onCriticalPathToggle={() => setCriticalPathMode((m) => !m)}
+          onCriticalPathToggle={() =>
+            criticalPathLocked ? promptUpgrade() : setCriticalPathMode((m) => !m)
+          }
+          criticalPathLocked={criticalPathLocked}
+          onExport={handleExport}
+          exportDisabled={scheduledTasks.length === 0}
+          baselinesLocked={baselinesLocked}
           criticalPathCount={criticalTaskIds.size}
-          onBaselinesOpen={() => setBaselinesOpen(true)}
+          onBaselinesOpen={() => (baselinesLocked ? promptUpgrade() : setBaselinesOpen(true))}
         />
       </div>
 
@@ -453,12 +557,12 @@ export function ProjectTimeline({
               onProgressChange={(task, progress) =>
                 updateProgress
                   .mutateAsync({ task, progress })
-                  .catch(() => toast.error("Failed to update progress."))
+                  .catch(() => toast.error(timelineT("progressFailed")))
               }
               onMilestoneToggle={(task) =>
                 toggleMilestone
                   .mutateAsync(task)
-                  .catch(() => toast.error("Failed to toggle milestone."))
+                  .catch(() => toast.error(timelineT("milestoneFailed")))
               }
               onDeleteDependency={(dep) =>
                 deleteDependency
@@ -468,9 +572,9 @@ export function ProjectTimeline({
                     toTaskId: dep.toTaskId,
                   })
                   .then(() => {
-                    toast.success("Dependency removed.", {
+                    toast.success(linkT("removed"), {
                       action: {
-                        label: "Undo",
+                        label: linkT("undo"),
                         onClick: () =>
                           createDependency
                             .mutateAsync({
@@ -478,12 +582,12 @@ export function ProjectTimeline({
                               toTaskId: dep.toTaskId,
                               type: dep.type,
                             })
-                            .catch(() => toast.error("Failed to restore dependency.")),
+                            .catch(() => toast.error(linkT("restoreFailed"))),
                       },
                       duration: 6000,
                     });
                   })
-                  .catch(() => toast.error("Failed to remove dependency."))
+                  .catch(() => toast.error(linkT("removeFailed")))
               }
               onDateChange={(task, field, date) =>
                 reschedule
@@ -492,7 +596,7 @@ export function ProjectTimeline({
                     startDate: field === "start" ? date : task.startDate,
                     endDate: field === "end" ? date : task.endDate,
                   })
-                  .catch(() => toast.error("Failed to update date."))
+                  .catch(() => toast.error(timelineT("dateFailed")))
               }
               linkMode={linkMode}
               linkSourceId={linkSource}
@@ -551,13 +655,13 @@ export function ProjectTimeline({
                 <EmptyHeader>
                   <EmptyTitle>
                     {dateRange?.from || dateRange?.to
-                      ? "No tasks in this date range"
-                      : "Set dates to see bars"}
+                      ? timelineT("emptyFilteredTitle")
+                      : timelineT("emptyDatesTitle")}
                   </EmptyTitle>
                   <EmptyDescription>
                     {dateRange?.from || dateRange?.to
-                      ? "No tasks fall within the selected date range."
-                      : "Add start & end dates to tasks to see bars here."}
+                      ? timelineT("emptyFiltered")
+                      : timelineT("emptyDates")}
                   </EmptyDescription>
                 </EmptyHeader>
               </Empty>
@@ -579,16 +683,16 @@ export function ProjectTimeline({
         {" "}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Create dependency</DialogTitle>
+            <DialogTitle>{linkT("title")}</DialogTitle>
             <DialogDescription>
               {linkSourceTask?.title} → {linkTargetTask?.title}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <p className="mb-3 text-sm text-muted-foreground">Select dependency type:</p>
+              <p className="mb-3 text-sm text-muted-foreground">{linkT("selectType")}</p>
               <div className="grid gap-2">
-                {DEP_TYPE_OPTIONS.map(({ value, label }) => (
+                {DEP_TYPE_OPTIONS.map(({ value, labelKey }) => (
                   <Button
                     key={value}
                     variant="outline"
@@ -596,22 +700,31 @@ export function ProjectTimeline({
                     onClick={() => confirmLink(value)}
                     disabled={createDependency.isPending}
                   >
-                    {label}
+                    {linkT(labelKey)}
                   </Button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm text-muted-foreground">Lag / lead (days)</label>
-              <p className="mb-1.5 text-xs text-muted-foreground/70">
-                Positive = delay, negative = overlap. Zero is default.
-              </p>
+              <label htmlFor="dependency-lag" className="block text-sm text-muted-foreground">
+                {linkT("lagLabel")}
+              </label>
+              <p className="mb-1.5 text-xs text-muted-foreground/70">{linkT("lagHint")}</p>
               <Input
+                id="dependency-lag"
                 type="number"
-                min={0}
+                min={-MAX_LAG_DAYS}
+                max={MAX_LAG_DAYS}
+                step={1}
                 value={linkLagDays}
-                onChange={(e) => setLinkLagDays(Math.max(0, parseInt(e.target.value) || 0))}
-                placeholder="0"
+                onChange={(e) => {
+                  const parsed = Number.parseInt(e.target.value, 10);
+                  setLinkLagDays(
+                    Number.isNaN(parsed)
+                      ? 0
+                      : Math.max(-MAX_LAG_DAYS, Math.min(MAX_LAG_DAYS, parsed)),
+                  );
+                }}
               />
             </div>
           </div>

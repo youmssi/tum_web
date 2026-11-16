@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@/i18n/navigation";
 import { useEffect } from "react";
@@ -38,6 +39,7 @@ function toSlug(name: string) {
 
 export function CreateOrgForm() {
   const router = useRouter();
+  const upgradeT = useTranslations("billing.upgrade");
   const form = useForm<CreateOrgValues>({
     resolver: zodResolver(createOrgSchema),
     defaultValues: { name: "", slug: "" },
@@ -57,7 +59,11 @@ export function CreateOrgForm() {
       slug: slug || toSlug(name),
     });
     if (error) {
-      toast.error(error.message ?? "Failed to create organisation.");
+      toast.error(
+        error.code === "YOU_HAVE_REACHED_THE_MAXIMUM_NUMBER_OF_ORGANIZATIONS"
+          ? upgradeT("workspaceLimit")
+          : (error.message ?? "Failed to create organisation."),
+      );
       return;
     }
     // create() doesn't activate the new org on the caller's session — without this, the
