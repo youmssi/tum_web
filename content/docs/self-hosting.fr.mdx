@@ -49,16 +49,15 @@ Lancez ensuite les conteneurs app et web avec les variables ci-dessous.
 
 ### App
 
-| Variable                                                                 | Description                                                                 |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`                 | Connexion PostgreSQL.                                                       |
-| `AUTH_JWKS_URI`                                                          | `https://<web>/api/auth/jwks`, pour vérifier les jetons de connexion.       |
-| `CORS_ALLOWED_ORIGINS`                                                   | Adresse publique de l'application web.                                      |
-| `WEB_INTERNAL_URL`                                                       | Adresse utilisée par l'app pour joindre le web sur votre réseau privé.      |
-| `WEB_PUBLIC_URL`                                                         | Adresse publique de l'application web, utilisée pour les liens des e-mails. |
-| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Stockage d'objets.                                                          |
-| `MAIL_TRANSPORT`, `MAIL_FROM`                                            | `smtp`, `resend` ou `brevo`, et l'adresse d'expédition.                     |
-| `INTERNAL_SERVICE_TOKEN`                                                 | Même valeur que côté web.                                                   |
+| Variable                                                                 | Description                                                                                                     |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`                 | Connexion PostgreSQL.                                                                                           |
+| `AUTH_JWKS_URI`                                                          | `https://<web>/api/auth/jwks`, pour vérifier les jetons de connexion.                                           |
+| `CORS_ALLOWED_ORIGINS`                                                   | Adresse publique de l'application web.                                                                          |
+| `WEB_URL`                                                                | Adresse publique de l'application web : liens des e-mails, retour après paiement et appels internes.            |
+| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Stockage d'objets.                                                                                              |
+| `MAIL_TRANSPORT`, `MAIL_FROM`                                            | `smtp`, `resend` ou `brevo`, ou plusieurs par ordre de préférence (`resend,brevo`) ; et l'adresse d'expédition. |
+| `INTERNAL_SERVICE_TOKEN`                                                 | Même valeur que côté web.                                                                                       |
 
 Laissez `TUM_CLOUD_ENABLED` vide ou à `false`. Cela désactive les limites d'offre et les paiements : chaque espace de travail dispose de toutes les fonctionnalités.
 

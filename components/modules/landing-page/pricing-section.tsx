@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,13 +11,11 @@ import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
 import { productMailto } from "@/lib/contact";
 import {
   DexpayCheckoutDialog,
-  type DexpayPlanPrice,
+  type DexpayCheckoutOption,
   findDexpayPlan,
-  formatDexpayPrice,
   useBillingState,
   useDexpayPlans,
   useEntitlements,
-  useStartCheckout,
 } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { trackEvent } from "@/lib/analytics";
@@ -76,25 +74,11 @@ export function PricingSection() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();
-  const startCheckout = useStartCheckout();
   const billing = useBillingState({ enabled: !!session });
   const [annual, setAnnual] = useState(true);
-  const [pendingPlan, setPendingPlan] = useState<"pro" | "enterprise" | null>(null);
-  const locale = useLocale();
   const dexpayPlans = useDexpayPlans();
   const entitlements = useEntitlements();
-  const [dexpayCheckout, setDexpayCheckout] = useState<DexpayPlanPrice | null>(null);
-
-  // Where Dexpay sells a plan it is the default: its price, in local currency, is what the
-  // card shows and its checkout is the one that opens.
-  const dexpayPriceFor = (key: PlanKey) =>
-    key === "pro" || key === "enterprise"
-      ? findDexpayPlan(
-          dexpayPlans.data,
-          key === "pro" ? "PRO" : "ENTERPRISE",
-          annual ? "YEARLY" : "MONTHLY",
-        )
-      : undefined;
+  const [dexpayCheckout, setDexpayCheckout] = useState<DexpayCheckoutOption | null>(null);
 
   // Role check: only the org owner can take on a subscription. Members + admins clicking the CTA
   // would tie billing to a workspace they can't manage. The button stays visible but is disabled
@@ -111,10 +95,9 @@ export function PricingSection() {
     Array.from({ length: 8 }, (_, i) => plans(`${key}.features.${i}`));
 
   /**
-   * Plan CTA dispatch. Authenticated visitors are routed straight to a Polar checkout via the
-   * Better Auth adapter using the slug configured in auth.config.ts; visitors who aren't signed
-   * in fall through to the signup flow with an upgrade intent the post-signup page can pick up.
-   * Polar handles the entire payment surface (card, PayPal, subscription management).
+   * Plan CTA dispatch. Visitors who aren't signed in go through sign-up with an upgrade intent;
+   * signed-in owners open the Dexpay checkout, where they pay by card or mobile money. Prices are
+   * always shown in US dollars; Dexpay charges the equivalent in the buyer's local currency.
    */
   function handlePaidPlanClick(plan: "pro" | "enterprise") {
     trackEvent("pricing_cta_click", { plan, annual, signedIn: !!session });
@@ -122,42 +105,28 @@ export function PricingSection() {
       router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
       return;
     }
-    // Subscriptions are per-workspace. Without an active org the resulting subscription would
-    // be orphaned (no organizationId to forward to the backend), so route the user through the
-    // workspace picker first — they'll land back on the pricing tile after creating / picking
-    // one.
+    // Subscriptions are per-workspace: without an active workspace there is nothing to bill.
     if (!activeOrg?.id) {
       router.push(`${ROUTES.WORKSPACES}?intent=upgrade-${plan}`);
       return;
     }
-    // Already-subscribed dedupe: if the workspace has an active subscription, send the user
-    // straight to /billing where they can manage / change it. Stops a second click from
-    // creating a parallel Polar subscription.
+    // A second checkout would start a parallel subscription; manage the current one instead.
     if (hasActiveSubscription) {
       router.push(ROUTES.BILLING);
       return;
     }
-    const localPrice = dexpayPriceFor(plan);
-    if (localPrice) {
-      setDexpayCheckout(localPrice);
+    const dexpayPlan = plan === "pro" ? "PRO" : "ENTERPRISE";
+    const interval = annual ? "YEARLY" : "MONTHLY";
+    if (!findDexpayPlan(dexpayPlans.data, dexpayPlan, interval)) {
+      toast.error(t("checkoutUnavailable"));
       return;
     }
-    setPendingPlan(plan);
-    // Delegates to the billing service — the hook handles the Polar customer backfill so the
-    // existing-user case (signed up before Polar was wired) succeeds on the first click. Polar
-    // SDK navigates the browser away on success, so onSuccess only fires when checkout resolved
-    // without redirect (which is the same failure surface as onError in practice).
-    startCheckout.mutate(
-      { slug: plan, organizationId: activeOrg.id },
-      {
-        onError: (error) => {
-          toast.error(
-            error instanceof Error ? error.message : "Could not start checkout. Try again.",
-          );
-          setPendingPlan(null);
-        },
-      },
-    );
+    const prices = PLAN_PRICES[plan];
+    setDexpayCheckout({
+      plan: dexpayPlan,
+      interval,
+      usdAmount: annual ? prices.annual * 12 : prices.monthly,
+    });
   }
 
   return (
@@ -204,8 +173,6 @@ export function PricingSection() {
         <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
           {PLAN_CONFIG.map((plan, idx) => {
             const isPaid = plan.key === "pro" || plan.key === "enterprise";
-            const pending = pendingPlan === plan.key;
-            const localPrice = dexpayPriceFor(plan.key);
             return (
               <div
                 key={plan.key}
@@ -232,16 +199,7 @@ export function PricingSection() {
                 </div>
 
                 <div className="mb-6 pb-6 border-b border-foreground/10">
-                  {localPrice ? (
-                    <div className="flex flex-wrap items-baseline gap-x-1">
-                      <span className="text-3xl font-bold">
-                        {formatDexpayPrice(localPrice, locale)}
-                      </span>
-                      <span className="text-muted-foreground text-sm">
-                        {t(annual ? "perWorkspaceYear" : "perWorkspace")}
-                      </span>
-                    </div>
-                  ) : plan.monthly !== null ? (
+                  {plan.monthly !== null ? (
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold">
                         ${annual ? plan.annual : plan.monthly}
@@ -290,12 +248,9 @@ export function PricingSection() {
                         variant={plan.popular ? "default" : "outline"}
                         className="w-full rounded-full group"
                         onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
-                        disabled={pending}
                       >
-                        {pending ? "Opening checkout…" : plans(`${plan.key}.cta`)}
-                        {!pending && (
-                          <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-                        )}
+                        {plans(`${plan.key}.cta`)}
+                        <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     )}
                     {plan.key === "enterprise" && (

@@ -17,13 +17,20 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { ApiError } from "@/lib/api-error";
-import type { DexpayPlanPrice } from "./dexpay-api";
-import { INTERNATIONAL_PHONE, formatDexpayPrice } from "./dexpay-price";
+import type { DexpayInterval, DexpayPlan } from "./dexpay-api";
+import { INTERNATIONAL_PHONE, formatUsd } from "./dexpay-price";
 import { useStartDexpayCheckout } from "./use-dexpay";
+
+/** What the buyer picked on the pricing page, with the price shown there in US dollars. */
+export interface DexpayCheckoutOption {
+  plan: DexpayPlan;
+  interval: DexpayInterval;
+  usdAmount: number;
+}
 
 interface DexpayCheckoutDialogProps {
   /** The option being bought; the dialog is open while this is set. */
-  price: DexpayPlanPrice | null;
+  price: DexpayCheckoutOption | null;
   defaultName?: string;
   defaultEmail?: string;
   onClose: () => void;
@@ -76,7 +83,7 @@ export function DexpayCheckoutDialog({
           <DialogDescription>
             {price &&
               t(price.interval === "YEARLY" ? "summaryYearly" : "summaryMonthly", {
-                price: formatDexpayPrice(price, locale),
+                price: formatUsd(price.usdAmount, locale),
               })}
           </DialogDescription>
         </DialogHeader>

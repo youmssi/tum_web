@@ -18,5 +18,14 @@ export function formatDexpayPrice(price: DexpayPlanPrice, locale: string): strin
   }).format(price.amount);
 }
 
+/** Prices on the site are always in US dollars; Dexpay converts at payment time. */
+export function formatUsd(amount: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 /** International format, as Dexpay requires: a plus sign, then 8 to 15 digits. */
 export const INTERNATIONAL_PHONE = /^\+[1-9][0-9]{7,14}$/;

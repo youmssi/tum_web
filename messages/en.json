@@ -185,8 +185,8 @@
     },
     "dexpay": {
       "title": "Pay with mobile money or card",
-      "summaryMonthly": "{price} per month for this workspace. You will finish the payment on the secure Dexpay page.",
-      "summaryYearly": "{price} per year for this workspace. You will finish the payment on the secure Dexpay page.",
+      "summaryMonthly": "{price} per month for this workspace. On the secure Dexpay page you pay by card (Visa, Mastercard) or mobile money, in your local currency at the day's rate.",
+      "summaryYearly": "{price} per year for this workspace. On the secure Dexpay page you pay by card (Visa, Mastercard) or mobile money, in your local currency at the day's rate.",
       "nameLabel": "Full name",
       "nameRequired": "Enter your name.",
       "emailLabel": "Email",
@@ -890,7 +890,7 @@
       },
       "customPlan": "Need a custom plan?",
       "talkToSales": "Talk to sales",
-      "perWorkspaceYear": "/yr per workspace"
+      "checkoutUnavailable": "Online payment is not available for this plan yet. Write to contact@mrvin100.de and we will set up your subscription."
     },
     "testimonials": {
       "sectionLabel": "Testimonials",
