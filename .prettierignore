@@ -6,3 +6,5 @@ public
 *.tsbuildinfo
 # shadcn primitives — generated/external
 components/ui
+# fumadocs-mdx generated collections
+.source

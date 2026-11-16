@@ -1,10 +1,15 @@
 import { routing, localizedUrl } from "@/i18n/routing";
 import { COMPANY, CONTACT, ROUTES } from "@/lib/constants";
+import { docsSource } from "@/lib/docs/source";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-static";
 
 export function GET() {
+  const docs = docsSource
+    .getPages(routing.defaultLocale)
+    .map((p) => `- [${p.data.title}](${env.siteUrl}${p.url}): ${p.data.description ?? ""}`)
+    .join("\n");
   const locales = routing.locales.map((l) => `- [${l}](${localizedUrl(l)})`).join("\n");
   const body = `# Tûm
 
@@ -20,6 +25,10 @@ Tûm is built and operated by ${COMPANY.NAME} (${COMPANY.URL}). The source code 
 - [Legal notice](${env.siteUrl}${ROUTES.LEGAL}): publisher and registration details
 - [Sign up](${env.siteUrl}/signup): create a workspace
 - [Sign in](${env.siteUrl}/login)
+
+## Documentation
+
+${docs}
 
 ## Languages
 
