@@ -1,0 +1,12 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "getting-started",
+    "projects-and-tasks",
+    "timeline",
+    "team",
+    "plans-and-billing",
+    "self-hosting"
+  ]
+}

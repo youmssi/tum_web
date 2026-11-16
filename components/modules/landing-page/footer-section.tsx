@@ -9,6 +9,7 @@ type LinkKey =
   | "features"
   | "howItWorks"
   | "pricing"
+  | "docs"
   | "dashboard"
   | "timeline"
   | "board"
@@ -41,6 +42,7 @@ export async function FooterSection() {
         { key: "features", href: ROUTES.FEATURES },
         { key: "howItWorks", href: ROUTES.HOW_IT_WORKS },
         { key: "pricing", href: ROUTES.PRICING },
+        { key: "docs", href: ROUTES.DOCS },
       ],
     },
     {

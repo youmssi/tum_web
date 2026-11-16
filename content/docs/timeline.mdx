@@ -1,0 +1,43 @@
+---
+title: Timeline and Gantt
+description: Schedule tasks, link them with dependencies and export the chart.
+---
+
+The timeline shows every dated task as a bar on a Gantt chart. Drag a bar to move a task, or drag its edge to change its duration.
+
+## Dependencies
+
+A dependency says that one task depends on another. Tûm supports the four standard types:
+
+| Type                  | Meaning                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------- |
+| Finish to start (FS)  | The next task starts after the previous one finishes. This is the most common type. |
+| Start to start (SS)   | The next task starts when the previous one starts.                                  |
+| Finish to finish (FF) | The next task finishes when the previous one finishes.                              |
+| Start to finish (SF)  | The next task finishes when the previous one starts.                                |
+
+### Lag and lead
+
+Add a **lag** to wait a number of working days after the link, for example to let concrete dry. Use a negative value, called a **lead**, to let the next task overlap the previous one. Values range from -365 to 365 working days.
+
+When a task moves, the tasks that depend on it move with it. Tûm refuses links that would create a loop.
+
+## Critical path and baselines
+
+On the Pro plan, highlight the **critical path**: the chain of tasks where any delay pushes back the end of the project. Save a **baseline** to compare the current plan with the original one.
+
+## Date range
+
+Use the date filter above the chart to focus on a period. The range is kept in the page address, so you can share or bookmark it.
+
+## Exporting the timeline
+
+Choose **Export** in the timeline toolbar:
+
+- **Image (PNG)** for slides and messages.
+- **PDF (print)** opens your browser's print dialog. Choose landscape for wide schedules.
+- **Vector (SVG)** for documents that need to stay sharp at any size.
+
+Each export carries the project name and the export date. Late tasks and tasks at risk keep their colour so the chart reads the same on paper.
+
+To export all tasks with their fields, use **Export to Excel** on the project page.

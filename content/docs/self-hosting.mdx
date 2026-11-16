@@ -1,0 +1,71 @@
+---
+title: Self-hosting
+description: Run Tûm on your own infrastructure under the AGPLv3 licence.
+---
+
+Tûm is open source under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html). You can run it on your own servers for free. A self-hosted installation has every feature with no plan limits.
+
+<Callout title="Licence obligation">
+  If you modify Tûm and let people use it over a network, the AGPLv3 requires you to offer them the
+  source code of your modified version.
+</Callout>
+
+## Components
+
+| Component             | Image                            | Role                                                |
+| --------------------- | -------------------------------- | --------------------------------------------------- |
+| Web                   | `ghcr.io/youmssi/tum_web`        | Next.js interface and authentication                |
+| App                   | `ghcr.io/youmssi/tum_app`        | REST API, real-time updates, emails, scheduled jobs |
+| PostgreSQL 17         | Any managed or self-run instance | Shared database                                     |
+| S3-compatible storage | MinIO, Cloudflare R2, AWS S3     | Attachments and avatars                             |
+| Email                 | SMTP relay, Resend or Brevo      | Notifications and invitations                       |
+
+## Quick start
+
+The [infrastructure repository](https://github.com/youmssi/tum_infra) contains a Docker Compose file for PostgreSQL, MinIO and a local mail catcher.
+
+```bash
+git clone https://github.com/youmssi/tum_infra.git
+cd tum_infra
+cp .env.example .env
+docker compose up -d
+```
+
+Then start the app and web containers with the variables below.
+
+## Required configuration
+
+### Web
+
+| Variable                      | Description                                                       |
+| ----------------------------- | ----------------------------------------------------------------- |
+| `BETTER_AUTH_URL`             | Public URL of the web app, for example `https://tum.example.com`. |
+| `NEXT_PUBLIC_BETTER_AUTH_URL` | Same value as `BETTER_AUTH_URL`.                                  |
+| `BETTER_AUTH_SECRET`          | Long random secret. Generate one with `openssl rand -base64 32`.  |
+| `DATABASE_URL`                | PostgreSQL connection string.                                     |
+| `NEXT_PUBLIC_API_BASE_URL`    | Public URL of the app (API).                                      |
+| `INTERNAL_API_URL`            | URL the web uses to reach the app on your private network.        |
+| `INTERNAL_SERVICE_TOKEN`      | Shared secret between web and app. Use the same value on both.    |
+
+### App
+
+| Variable                                                                 | Description                                                   |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`                 | PostgreSQL connection.                                        |
+| `AUTH_JWKS_URI`                                                          | `https://<web>/api/auth/jwks`, used to verify sign-in tokens. |
+| `CORS_ALLOWED_ORIGINS`                                                   | Public URL of the web app.                                    |
+| `WEB_INTERNAL_URL`                                                       | URL the app uses to reach the web on your private network.    |
+| `WEB_PUBLIC_URL`                                                         | Public URL of the web app, used for links in emails.          |
+| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Object storage.                                               |
+| `MAIL_TRANSPORT`, `MAIL_FROM`                                            | `smtp`, `resend` or `brevo`, and the sender address.          |
+| `INTERNAL_SERVICE_TOKEN`                                                 | Same value as on the web.                                     |
+
+Leave `TUM_CLOUD_ENABLED` unset or `false`. This turns off plan limits and payments, so every workspace gets every feature.
+
+## Updating
+
+Pull the new images and restart the containers. Database migrations run automatically when the app starts. Back up your database before each update.
+
+## Getting help
+
+Open an issue on GitHub for bugs. For installation support or a managed deployment, write to [contact@mrvin100.de](mailto:contact@mrvin100.de) with "Tûm" in the subject, or [book a call](https://cal.com/mrvin100/collective).

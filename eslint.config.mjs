@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "coverage/**",
     // shadcn primitives — generated/external, not linted
     "components/ui/**",
+    // fumadocs-mdx generated collections
+    ".source/**",
   ]),
 ]);
 
