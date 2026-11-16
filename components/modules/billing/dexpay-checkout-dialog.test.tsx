@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithIntl as render } from "@/components/modules/auth/test-utils";
 import { ApiError } from "@/lib/api-error";
-import type { DexpayCheckoutInput, DexpayPlanPrice } from "./dexpay-api";
-import { DexpayCheckoutDialog } from "./dexpay-checkout-dialog";
+import type { DexpayCheckoutInput } from "./dexpay-api";
+import { DexpayCheckoutDialog, type DexpayCheckoutOption } from "./dexpay-checkout-dialog";
 
 // A plain holder rather than vi.fn(): Vitest reports a rejected promise returned by a mock as a
 // test error, which would fail the refusal cases even though the dialog handles them.
@@ -24,7 +24,7 @@ vi.mock("./dexpay-api", () => ({
   },
 }));
 
-const price: DexpayPlanPrice = { plan: "PRO", interval: "MONTHLY", amount: 12000, currency: "XAF" };
+const price: DexpayCheckoutOption = { plan: "PRO", interval: "MONTHLY", usdAmount: 20 };
 const assign = vi.fn();
 
 function renderDialog() {
@@ -50,10 +50,12 @@ describe("DexpayCheckoutDialog", () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it("shows the local price and prefills the billing contact", () => {
+  it("shows the price in US dollars, the payment methods, and prefills the billing contact", () => {
     renderDialog();
 
-    expect(screen.getByText(/XAF\s12,000 per month/)).toBeInTheDocument();
+    expect(screen.getByText(/\$20 per month/)).toBeInTheDocument();
+    expect(screen.getByText(/card \(Visa, Mastercard\) or mobile money/)).toBeInTheDocument();
+    expect(screen.queryByText(/XAF/)).not.toBeInTheDocument();
     expect(screen.getByLabelText("Full name")).toHaveValue("Ada Owner");
     expect(screen.getByLabelText("Email")).toHaveValue("ada@example.test");
   });
