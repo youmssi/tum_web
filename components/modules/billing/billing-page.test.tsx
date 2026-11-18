@@ -5,6 +5,7 @@ import { renderWithIntl as render } from "@/components/modules/auth/test-utils";
 import type { DexpaySubscription } from "./dexpay-api";
 
 const state = vi.hoisted(() => ({
+  params: new URLSearchParams(),
   subscription: null as DexpaySubscription | null,
   role: "owner",
   cancel: vi.fn(),
@@ -23,6 +24,7 @@ vi.mock("@/i18n/navigation", () => ({
     <a href={href}>{children}</a>
   ),
 }));
+vi.mock("next/navigation", () => ({ useSearchParams: () => state.params }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock("./use-dexpay", () => ({
   useDexpaySubscription: () => ({ data: state.subscription, isLoading: false, isError: false }),
@@ -41,6 +43,7 @@ const active: DexpaySubscription = {
 describe("BillingPage", () => {
   beforeEach(() => {
     state.subscription = null;
+    state.params = new URLSearchParams();
     state.role = "owner";
     state.cancel.mockClear();
   });
@@ -90,5 +93,12 @@ describe("BillingPage", () => {
 
     expect(screen.getByText(/Only the workspace owner or an admin/)).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Change plan" })).not.toBeInTheDocument();
+  });
+
+  it("explains a payment that did not go through", () => {
+    state.params = new URLSearchParams("payment=failed");
+    render(<BillingPage />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("The payment was not completed");
   });
 });

@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowUpRightIcon, CreditCardIcon } from "lucide-react";
+import { AlertTriangleIcon, ArrowUpRightIcon, CreditCardIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -33,6 +34,8 @@ export function BillingPage() {
   const locale = useLocale();
   const subscription = useDexpaySubscription();
   const cancel = useCancelDexpaySubscription();
+  // Dexpay sends the buyer back here with this flag when the payment did not go through.
+  const paymentFailed = useSearchParams().get("payment") === "failed";
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();
   const role = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role;
@@ -54,6 +57,20 @@ export function BillingPage() {
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
+
+      {paymentFailed && (
+        <Card role="alert" className="border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20">
+          <CardHeader>
+            <div className="flex items-start gap-3">
+              <AlertTriangleIcon className="size-5 shrink-0 text-amber-600" aria-hidden />
+              <div>
+                <CardTitle className="text-base">{t("paymentFailed.title")}</CardTitle>
+                <CardDescription>{t("paymentFailed.description")}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
 
       {subscription.isLoading && <Skeleton className="h-40 w-full" />}
 

@@ -139,6 +139,10 @@
     "title": "Billing",
     "subtitle": "Your workspace plan, when it renews, and cancellation.",
     "loadFailed": "Could not load your billing details.",
+    "paymentFailed": {
+      "title": "The payment was not completed",
+      "description": "Your plan has not changed. You can try again from the plans page, with another card or mobile money account if needed."
+    },
     "ownerOnly": "Only the workspace owner or an admin can change or cancel the plan.",
     "status": {
       "TRIALING": "Trial",
@@ -224,7 +228,9 @@
       "cancel": "Cancel",
       "submit": "Continue to payment",
       "ownerOnly": "Only a workspace owner or admin can subscribe.",
-      "failed": "The payment page could not be opened. Please try again."
+      "failed": "The payment page could not be opened. Please try again.",
+      "changeNote": "Your new plan starts as soon as Dexpay confirms the payment. The current plan then stops renewing; its remaining days are not refunded.",
+      "alreadyOnPlan": "This workspace is already on this plan."
     }
   },
   "dashboard": {
@@ -912,7 +918,10 @@
       },
       "customPlan": "Need a custom plan?",
       "talkToSales": "Talk to sales",
-      "checkoutUnavailable": "Online payment is not available for this plan yet. Write to contact@mrvin100.de and we will set up your subscription."
+      "checkoutUnavailable": "Online payment is not available for this plan yet. Write to contact@mrvin100.de and we will set up your subscription.",
+      "currentPlan": "Current plan",
+      "switchTo": "Switch to {plan}",
+      "ownerOnly": "Only the workspace owner or an admin can change the plan."
     },
     "testimonials": {
       "sectionLabel": "Testimonials",
