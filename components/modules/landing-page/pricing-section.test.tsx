@@ -111,4 +111,13 @@ describe("PricingSection", () => {
 
     expect(screen.getAllByText(/Only the workspace owner or an admin/).length).toBeGreaterThan(0);
   });
+
+  it("shows the amount of the Dexpay product when it is priced in dollars", () => {
+    state.plans = [{ plan: "PRO", interval: "YEARLY", amount: 199, currency: "USD" }];
+    render(<PricingSection />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+
+    expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $199");
+  });
 });

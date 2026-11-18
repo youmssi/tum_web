@@ -54,7 +54,9 @@ describe("DexpayCheckoutDialog", () => {
     renderDialog();
 
     expect(screen.getByText(/\$20 per month/)).toBeInTheDocument();
-    expect(screen.getByText(/card \(Visa, Mastercard\) or mobile money/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/in US dollars .* by card \(Visa, Mastercard\) or mobile money/),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/XAF/)).not.toBeInTheDocument();
     expect(screen.getByLabelText("Full name")).toHaveValue("Ada Owner");
     expect(screen.getByLabelText("Email")).toHaveValue("ada@example.test");

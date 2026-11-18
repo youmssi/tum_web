@@ -91,7 +91,7 @@ export function PricingSection() {
   /**
    * Plan CTA dispatch. Visitors who aren't signed in go through sign-up with an upgrade intent;
    * signed-in owners open the Dexpay checkout, where they pay by card or mobile money. Prices are
-   * always shown in US dollars; Dexpay charges the equivalent in the buyer's local currency.
+   * shown in US dollars, the currency of the Dexpay products.
    */
   function handlePaidPlanClick(plan: "pro" | "enterprise") {
     trackEvent("pricing_cta_click", { plan, annual, signedIn: !!session });
@@ -110,15 +110,18 @@ export function PricingSection() {
       return;
     }
     const interval = annual ? "YEARLY" : "MONTHLY";
-    if (!findDexpayPlan(dexpayPlans.data, dexpayPlan, interval)) {
+    const dexpayPrice = findDexpayPlan(dexpayPlans.data, dexpayPlan, interval);
+    if (!dexpayPrice) {
       toast.error(t("checkoutUnavailable"));
       return;
     }
     const prices = PLAN_PRICES[plan];
+    // The checkout must show what Dexpay will charge; the product price wins over the list price.
+    const listAmount = annual ? prices.annual * 12 : prices.monthly;
     setDexpayCheckout({
       plan: dexpayPlan,
       interval,
-      usdAmount: annual ? prices.annual * 12 : prices.monthly,
+      usdAmount: dexpayPrice.currency === "USD" ? dexpayPrice.amount : listAmount,
       // Moving between paid plans: the new subscription replaces the current one once paid.
       change: currentPlan !== "FREE",
     });
