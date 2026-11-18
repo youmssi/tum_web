@@ -141,7 +141,7 @@
     "loadFailed": "Could not load your billing details.",
     "paymentFailed": {
       "title": "The payment was not completed",
-      "description": "Your plan has not changed. You can try again from the plans page, with another card or mobile money account if needed."
+      "description": "Your plan has not changed. You can try again from the plans page, with another mobile money account if needed."
     },
     "ownerOnly": "Only the workspace owner or an admin can change or cancel the plan.",
     "status": {
@@ -154,7 +154,7 @@
     },
     "current": {
       "title": "{plan} plan",
-      "description": "Paid through Dexpay, by card or mobile money.",
+      "description": "Paid through Dexpay, by mobile money.",
       "renewsOn": "Renews on",
       "endsOn": "Ends on",
       "renewalNote": "Before each renewal, Dexpay emails a payment link to the billing contact.",
@@ -215,8 +215,8 @@
     },
     "dexpay": {
       "title": "One last detail",
-      "summaryMonthly": "{price} per month for this workspace. You pay this amount in US dollars on the secure Dexpay page, by card (Visa, Mastercard) or mobile money.",
-      "summaryYearly": "{price} per year for this workspace. You pay this amount in US dollars on the secure Dexpay page, by card (Visa, Mastercard) or mobile money.",
+      "summaryMonthly": "{price} per month for this workspace. On the secure Dexpay page you pay the equivalent in Guinean francs (GNF) by mobile money.",
+      "summaryYearly": "{price} per year for this workspace. On the secure Dexpay page you pay the equivalent in Guinean francs (GNF) by mobile money.",
       "phoneLabel": "Phone number",
       "phoneInvalid": "Use the international format, for example +224621234567.",
       "phoneHint": "Asked once for this workspace. Dexpay uses it to identify you and fills it in on its payment page.",
@@ -917,7 +917,8 @@
       "currentPlan": "Current plan",
       "switchTo": "Switch to {plan}",
       "switchNote": "The new plan starts once Dexpay confirms the payment; the current one stops renewing, without refund of its remaining days.",
-      "ownerOnly": "Only the workspace owner or an admin can change the plan."
+      "ownerOnly": "Only the workspace owner or an admin can change the plan.",
+      "paymentNote": "Prices in US dollars. You pay the equivalent in Guinean francs (GNF) by mobile money (Orange Money) on the secure Dexpay page. Card payments (Visa, Mastercard) are coming soon; meanwhile, write to contact@mrvin100.de to subscribe from abroad."
     },
     "testimonials": {
       "sectionLabel": "Testimonials",

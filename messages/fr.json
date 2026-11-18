@@ -141,7 +141,7 @@
     "loadFailed": "Impossible de charger vos informations de facturation.",
     "paymentFailed": {
       "title": "Le paiement n’a pas abouti",
-      "description": "Votre offre n’a pas changé. Vous pouvez réessayer depuis la page des offres, avec une autre carte ou un autre compte mobile money si besoin."
+      "description": "Votre offre n’a pas changé. Vous pouvez réessayer depuis la page des offres, avec un autre compte mobile money si besoin."
     },
     "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer ou résilier l’offre.",
     "status": {
@@ -154,7 +154,7 @@
     },
     "current": {
       "title": "Offre {plan}",
-      "description": "Payée via Dexpay, par carte ou mobile money.",
+      "description": "Payée via Dexpay, par mobile money.",
       "renewsOn": "Renouvellement le",
       "endsOn": "Prend fin le",
       "renewalNote": "Avant chaque renouvellement, Dexpay envoie un lien de paiement à l’adresse de facturation.",
@@ -215,8 +215,8 @@
     },
     "dexpay": {
       "title": "Une dernière information",
-      "summaryMonthly": "{price} par mois pour cet espace de travail. Vous réglez ce montant en dollars américains sur la page sécurisée Dexpay, par carte (Visa, Mastercard) ou mobile money.",
-      "summaryYearly": "{price} par an pour cet espace de travail. Vous réglez ce montant en dollars américains sur la page sécurisée Dexpay, par carte (Visa, Mastercard) ou mobile money.",
+      "summaryMonthly": "{price} par mois pour cet espace de travail. Sur la page sécurisée Dexpay, vous réglez l’équivalent en francs guinéens (GNF) par mobile money.",
+      "summaryYearly": "{price} par an pour cet espace de travail. Sur la page sécurisée Dexpay, vous réglez l’équivalent en francs guinéens (GNF) par mobile money.",
       "phoneLabel": "Numéro de téléphone",
       "phoneInvalid": "Utilisez le format international, par exemple +224621234567.",
       "phoneHint": "Demandé une seule fois pour cet espace de travail. Dexpay s’en sert pour vous identifier et le pré-remplit sur sa page de paiement.",
@@ -917,7 +917,8 @@
       "currentPlan": "Offre actuelle",
       "switchTo": "Passer à l’offre {plan}",
       "switchNote": "La nouvelle offre démarre dès que Dexpay confirme le paiement ; l’actuelle cesse d’être renouvelée, sans remboursement des jours restants.",
-      "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer l’offre."
+      "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer l’offre.",
+      "paymentNote": "Prix en dollars américains. Vous réglez l’équivalent en francs guinéens (GNF) par mobile money (Orange Money) sur la page sécurisée Dexpay. Le paiement par carte (Visa, Mastercard) arrive bientôt ; en attendant, écrivez à contact@mrvin100.de pour souscrire depuis l’étranger."
     },
     "testimonials": {
       "sectionLabel": "Témoignages",

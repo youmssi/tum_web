@@ -91,8 +91,8 @@ export function PricingSection() {
 
   /**
    * Plan CTA dispatch. Visitors who aren't signed in go through sign-up with an upgrade intent;
-   * signed-in owners open the Dexpay checkout, where they pay by card or mobile money. Prices are
-   * shown in US dollars, the currency of the Dexpay products.
+   * signed-in owners open the Dexpay checkout. Prices are shown in US dollars; Dexpay only charges
+   * XOF, XAF or GNF, so its products are priced in Guinean francs and paid by mobile money.
    */
   function handlePaidPlanClick(plan: "pro" | "enterprise") {
     trackEvent("pricing_cta_click", { plan, annual, signedIn: !!session });
@@ -297,7 +297,8 @@ export function PricingSection() {
           })}
         </div>
 
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className="mt-8 text-center text-sm text-muted-foreground">{t("paymentNote")}</p>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           {t("footer")} <span className="font-mono text-xs">{t("fairCodeNote")}</span>
         </p>
       </div>
