@@ -848,6 +848,7 @@
       "intro": "Start on Tûm Cloud for free and upgrade for advanced scheduling and reporting. Tûm is also open source under the GNU AGPLv3, so you can self-host it at no cost.",
       "monthly": "Monthly",
       "annual": "Annual",
+      "annualToggle": "Bill yearly",
       "annualSavings": "Save 15%",
       "perWorkspace": "/mo per workspace",
       "custom": "Custom",

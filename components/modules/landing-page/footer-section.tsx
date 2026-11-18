@@ -79,7 +79,7 @@ export async function FooterSection() {
           {/* Link sections */}
           {sections.map(({ section, items }) => (
             <div key={section}>
-              <h4 className="text-sm font-semibold mb-4">{t(`sections.${section}`)}</h4>
+              <h2 className="text-sm font-semibold mb-4">{t(`sections.${section}`)}</h2>
               <ul className="space-y-3">
                 {items.map((item) => (
                   <li key={item.key}>
@@ -96,7 +96,7 @@ export async function FooterSection() {
           ))}
 
           <div>
-            <h4 className="text-sm font-semibold mb-4">{t("sections.company")}</h4>
+            <h2 className="text-sm font-semibold mb-4">{t("sections.company")}</h2>
             <ul className="space-y-3">
               {legalLinks.map((item) => (
                 <li key={item.key}>
