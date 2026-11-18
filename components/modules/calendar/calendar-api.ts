@@ -28,8 +28,6 @@ export const calendarApi = {
 // ── Task calendar view API (E27) ──
 
 export const taskCalendarApi = {
-  reschedule: (
-    id: string,
-    data: { dueDate?: string | null; startDate?: string | null; endDate?: string | null },
-  ) => api.patch(`api/tasks/${id}/schedule`, { json: data }).json(),
+  reschedule: (id: string, data: { dueDate?: string | null; startDate?: string | null; endDate?: string | null }) =>
+    api.patch(`api/tasks/${id}/schedule`, { json: data }).json(),
 };

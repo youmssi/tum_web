@@ -4,10 +4,10 @@ Dynamic field definitions per project and field value display per task.
 
 ## Exports
 
-| Export                     | Type      | Description                                                     |
-| -------------------------- | --------- | --------------------------------------------------------------- |
+| Export | Type | Description |
+|--------|------|-------------|
 | `CustomFieldsSettingsCard` | Component | Drag-to-reorder field definitions with type/name/options editor |
-| `CustomFieldValues`        | Component | Inline display + editing of field values on a task              |
+| `CustomFieldValues` | Component | Inline display + editing of field values on a task |
 
 ## Key patterns
 

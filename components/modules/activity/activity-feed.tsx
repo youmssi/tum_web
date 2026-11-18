@@ -144,7 +144,9 @@ export function ActivityFeed({ projectId, limit }: ActivityFeedProps) {
             <ActivityIcon />
           </EmptyMedia>
           <EmptyTitle>No activity yet</EmptyTitle>
-          <EmptyDescription>Create tasks and add comments to see the feed.</EmptyDescription>
+          <EmptyDescription>
+            Create tasks and add comments to see the feed.
+          </EmptyDescription>
         </EmptyHeader>
       </Empty>
     );

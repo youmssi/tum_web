@@ -22,7 +22,8 @@ export function useSavedFilters(projectId?: string) {
 export function useCreateSavedFilter(projectId?: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateSavedFilterPayload) => savedFilterApi.create(data, projectId),
+    mutationFn: (data: CreateSavedFilterPayload) =>
+      savedFilterApi.create(data, projectId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: SAVED_FILTER_KEYS.byProject(projectId) });
       toast.success("Filter saved.");

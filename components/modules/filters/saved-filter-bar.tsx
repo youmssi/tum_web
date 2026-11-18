@@ -19,16 +19,10 @@ export function SavedFilterBar({ config, onClearDimension, onClearAll }: SavedFi
   const badges: { label: string; key: keyof SavedFilterConfig }[] = [];
 
   if (config.statuses?.length) {
-    badges.push({
-      label: `${config.statuses.length} status${config.statuses.length > 1 ? "es" : ""}`,
-      key: "statuses",
-    });
+    badges.push({ label: `${config.statuses.length} status${config.statuses.length > 1 ? "es" : ""}`, key: "statuses" });
   }
   if (config.priorities?.length) {
-    badges.push({
-      label: `${config.priorities.length} priorit${config.priorities.length > 1 ? "ies" : "y"}`,
-      key: "priorities",
-    });
+    badges.push({ label: `${config.priorities.length} priorit${config.priorities.length > 1 ? "ies" : "y"}`, key: "priorities" });
   }
   if (config.assigneeIds?.length) {
     const names = config.assigneeIds
@@ -40,10 +34,7 @@ export function SavedFilterBar({ config, onClearDimension, onClearAll }: SavedFi
     badges.push({ label: names, key: "assigneeIds" });
   }
   if (config.labels?.length) {
-    badges.push({
-      label: `${config.labels.length} label${config.labels.length > 1 ? "s" : ""}`,
-      key: "labels",
-    });
+    badges.push({ label: `${config.labels.length} label${config.labels.length > 1 ? "s" : ""}`, key: "labels" });
   }
   if (config.dueFrom || config.dueTo) {
     badges.push({ label: "Due date range", key: "dueFrom" });
@@ -52,10 +43,7 @@ export function SavedFilterBar({ config, onClearDimension, onClearAll }: SavedFi
     badges.push({ label: `"${config.q}"`, key: "q" });
   }
   if (config.customFields && Object.keys(config.customFields).length > 0) {
-    badges.push({
-      label: `${Object.keys(config.customFields).length} custom field${Object.keys(config.customFields).length > 1 ? "s" : ""}`,
-      key: "customFields",
-    });
+    badges.push({ label: `${Object.keys(config.customFields).length} custom field${Object.keys(config.customFields).length > 1 ? "s" : ""}`, key: "customFields" });
   }
 
   if (badges.length === 0) return null;
@@ -74,12 +62,7 @@ export function SavedFilterBar({ config, onClearDimension, onClearAll }: SavedFi
           </button>
         </Badge>
       ))}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-6 gap-1 px-2 text-xs text-muted-foreground"
-        onClick={onClearAll}
-      >
+      <Button variant="ghost" size="sm" className="h-6 gap-1 px-2 text-xs text-muted-foreground" onClick={onClearAll}>
         <RotateCcwIcon className="size-3" />
         Clear all
       </Button>

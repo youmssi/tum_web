@@ -112,7 +112,9 @@ export function AuditLog() {
             <ShieldAlertIcon />
           </EmptyMedia>
           <EmptyTitle>Access restricted</EmptyTitle>
-          <EmptyDescription>Only admins and owners can view the audit log.</EmptyDescription>
+          <EmptyDescription>
+            Only admins and owners can view the audit log.
+          </EmptyDescription>
         </EmptyHeader>
       </Empty>
     );

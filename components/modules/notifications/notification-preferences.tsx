@@ -61,7 +61,9 @@ export function NotificationPreferences() {
   return (
     <FieldSet className="w-full">
       <FieldLegend variant="label">Notification Preferences</FieldLegend>
-      <FieldDescription>Choose how you receive notifications for each event type.</FieldDescription>
+      <FieldDescription>
+        Choose how you receive notifications for each event type.
+      </FieldDescription>
       <div className="flex items-center gap-4 px-0.5 pb-1">
         <span className="flex-1 text-xs text-muted-foreground">Notification type</span>
         <div className="flex w-[92px] gap-6 text-xs text-muted-foreground">

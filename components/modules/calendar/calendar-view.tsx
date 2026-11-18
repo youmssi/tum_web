@@ -12,7 +12,12 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { ChevronLeftIcon, ChevronRightIcon, SunIcon, CalendarDaysIcon } from "lucide-react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SunIcon,
+  CalendarDaysIcon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -46,7 +51,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 function TaskCard({ task }: { task: Task }) {
   const { data: directory } = useDirectory();
-  const assignee = task.assigneeId ? directory?.find((m) => m.userId === task.assigneeId) : null;
+  const assignee = task.assigneeId
+    ? directory?.find((m) => m.userId === task.assigneeId)
+    : null;
 
   return (
     <div
@@ -63,7 +70,9 @@ function TaskCard({ task }: { task: Task }) {
       title={`${task.title}${assignee ? ` — ${assignee.name}` : ""}`}
     >
       <div className="line-clamp-1">
-        {task.milestone && <span className="mr-1 text-amber-500">◆</span>}
+        {task.milestone && (
+          <span className="mr-1 text-amber-500">◆</span>
+        )}
         {task.title}
       </div>
       {assignee && (
@@ -126,7 +135,9 @@ function CalendarDay({
           <TaskCard key={task.id} task={task} />
         ))}
         {tasks.length > 3 && (
-          <span className="text-[10px] text-muted-foreground">+{tasks.length - 3} more</span>
+          <span className="text-[10px] text-muted-foreground">
+            +{tasks.length - 3} more
+          </span>
         )}
       </div>
       {tasks.length === 0 && (
@@ -176,10 +187,7 @@ function WeekView({
         return (
           <div
             key={key}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = "move";
-            }}
+            onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
             onDrop={(e) => {
               e.preventDefault();
               const taskId = e.dataTransfer.getData("text/plain");
@@ -190,12 +198,10 @@ function WeekView({
               isToday(day) && "bg-accent/30",
             )}
           >
-            <span
-              className={cn(
-                "flex size-6 items-center justify-center rounded-full text-sm font-medium",
-                isToday(day) && "bg-primary text-primary-foreground",
-              )}
-            >
+            <span className={cn(
+              "flex size-6 items-center justify-center rounded-full text-sm font-medium",
+              isToday(day) && "bg-primary text-primary-foreground",
+            )}>
               {format(day, "d")}
             </span>
             <div className="flex flex-col gap-1">
@@ -357,12 +363,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
           <Button variant="ghost" size="icon" className="size-8" onClick={prevMonth}>
             <ChevronLeftIcon className="size-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToToday}
-            className="gap-1 text-sm font-medium"
-          >
+          <Button variant="ghost" size="sm" onClick={goToToday} className="gap-1 text-sm font-medium">
             <SunIcon className="size-3.5" />
             {headerLabel}
           </Button>
