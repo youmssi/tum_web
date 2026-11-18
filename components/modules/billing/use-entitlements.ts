@@ -11,13 +11,17 @@ export const ENTITLEMENT_KEYS = {
 };
 
 /** What the active workspace's plan allows. Keyed by workspace so switching refetches. */
-export function useEntitlements() {
+export function useEntitlements(options?: { pollUntilPaid?: boolean }) {
   const { data: activeOrg } = authClient.useActiveOrganization();
   return useQuery<Entitlements>({
     queryKey: ENTITLEMENT_KEYS.forOrganization(activeOrg?.id),
     queryFn: () => entitlementsApi.get(),
     enabled: !!activeOrg?.id,
-    staleTime: 60_000,
+    staleTime: options?.pollUntilPaid ? 0 : 60_000,
+    // Right after a payment the plan changes only once Dexpay's webhook lands, so the success
+    // page keeps asking until it does.
+    refetchInterval: (query) =>
+      options?.pollUntilPaid && (query.state.data?.plan ?? "FREE") === "FREE" ? 3_000 : false,
   });
 }
 

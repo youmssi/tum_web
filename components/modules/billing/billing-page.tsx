@@ -1,144 +1,147 @@
 "use client";
 
-import {
-  AlertTriangleIcon,
-  ArrowUpRightIcon,
-  CreditCardIcon,
-  ExternalLinkIcon,
-  RefreshCwIcon,
-} from "lucide-react";
-import { useTranslations } from "next-intl";
+import { ArrowUpRightIcon, CreditCardIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
+import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
-import { useBillingState, useOpenCustomerPortal } from "./use-billing";
-import { useEntitlements } from "./use-entitlements";
+import { useCancelDexpaySubscription, useDexpaySubscription } from "./use-dexpay";
 
 /**
- * Customer billing page. Three terminal states (besides loading): {@code no-subscription},
- * {@code subscription} (active plan + portal), and {@code unconfigured} (Polar token missing
- * or under-scoped — surface a clear admin-action notice instead of crashing).
+ * Workspace billing. Plans are sold through Dexpay only: this page shows the current plan, when
+ * it renews or ends, and lets an owner or admin change or cancel it.
  */
 export function BillingPage() {
   const t = useTranslations("billing");
-  const billing = useBillingState();
-  // A plan that Polar does not know about was bought through another provider (Dexpay).
-  const entitlements = useEntitlements();
-  const paidPlan =
-    entitlements.data && entitlements.data.plan !== "FREE" ? entitlements.data.plan : null;
-  const openPortal = useOpenCustomerPortal();
+  const locale = useLocale();
+  const subscription = useDexpaySubscription();
+  const cancel = useCancelDexpaySubscription();
+  const { data: session } = authClient.useSession();
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  const role = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role;
+  const canManage = role === "owner" || role === "admin";
 
-  function handleOpenPortal() {
-    openPortal.mutate(undefined, {
-      onError: (err) => toast.error(err instanceof Error ? err.message : t("portalFailed")),
+  const formatDate = (iso: string) =>
+    new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(iso));
+
+  function handleCancel() {
+    cancel.mutate(undefined, {
+      onSuccess: () => toast.success(t("cancelDialog.done")),
+      onError: () => toast.error(t("cancelDialog.failed")),
     });
-  }
-
-  if (billing.isLoading) {
-    return (
-      <div className="mx-auto w-full max-w-2xl space-y-4">
-        <Skeleton className="h-8 w-40" />
-        <Skeleton className="h-40 w-full" />
-      </div>
-    );
   }
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-        {/* Manual refresh — useful when a payment has just completed and the Polar webhook is
-            taking a few seconds to land. Saves the user from refreshing the whole page. */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => billing.refetch()}
-          disabled={billing.isFetching}
-          title="Refresh billing state"
-        >
-          <RefreshCwIcon
-            className={`size-4 ${billing.isFetching ? "animate-spin" : ""}`}
-            aria-hidden
-          />
-        </Button>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      {billing.data?.kind === "subscription" && (
+      {subscription.isLoading && <Skeleton className="h-40 w-full" />}
+
+      {subscription.isError && (
+        <Card className="border-destructive/40">
+          <CardContent className="pt-6 text-sm text-destructive">{t("loadFailed")}</CardContent>
+        </Card>
+      )}
+
+      {subscription.data && (
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  {billing.data.subscription.productName}
-                  <Badge variant="outline">{billing.data.subscription.status}</Badge>
+                  {t("current.title", { plan: t(`upgrade.plans.${subscription.data.plan}`) })}
+                  <Badge variant="outline">
+                    {subscription.data.cancelAtPeriodEnd
+                      ? t("status.CANCELLING")
+                      : t(`status.${subscription.data.status}`)}
+                  </Badge>
                 </CardTitle>
-                <CardDescription>{t("activePlan")}</CardDescription>
+                <CardDescription>{t("current.description")}</CardDescription>
               </div>
-              <CreditCardIcon className="size-5 text-muted-foreground" />
+              <CreditCardIcon className="size-5 text-muted-foreground" aria-hidden />
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <dl className="grid grid-cols-2 gap-3 text-sm">
-              {billing.data.subscription.amount !== null && billing.data.subscription.currency && (
-                <div>
-                  <dt className="text-muted-foreground">{t("amount")}</dt>
-                  <dd className="font-medium">
-                    {(billing.data.subscription.amount / 100).toLocaleString(undefined, {
-                      style: "currency",
-                      currency: billing.data.subscription.currency.toUpperCase(),
-                    })}
-                    {billing.data.subscription.recurringInterval &&
-                      ` / ${billing.data.subscription.recurringInterval}`}
-                  </dd>
-                </div>
-              )}
-              {billing.data.subscription.currentPeriodEnd && (
-                <div>
-                  <dt className="text-muted-foreground">{t("renewsOn")}</dt>
-                  <dd className="font-medium">
-                    {new Date(billing.data.subscription.currentPeriodEnd).toLocaleDateString()}
-                  </dd>
-                </div>
-              )}
-            </dl>
-            <Button onClick={handleOpenPortal} disabled={openPortal.isPending}>
-              {openPortal.isPending ? (
-                <>
-                  <Spinner data-icon="inline-start" />
-                  {t("openingPortal")}
-                </>
-              ) : (
-                <>
-                  {t("openPortal")}
-                  <ExternalLinkIcon data-icon="inline-end" className="size-4" />
-                </>
-              )}
-            </Button>
+          <CardContent className="space-y-4 text-sm">
+            <p>
+              <span className="text-muted-foreground">
+                {subscription.data.cancelAtPeriodEnd ? t("current.endsOn") : t("current.renewsOn")}
+              </span>{" "}
+              <span className="font-medium">{formatDate(subscription.data.currentPeriodEnd)}</span>
+            </p>
+            <p className="text-muted-foreground">
+              {subscription.data.cancelAtPeriodEnd
+                ? t("current.cancelledNote", {
+                    plan: t(`upgrade.plans.${subscription.data.plan}`),
+                    date: formatDate(subscription.data.currentPeriodEnd),
+                  })
+                : subscription.data.status === "PAST_DUE"
+                  ? t("current.pastDue")
+                  : t("current.renewalNote")}
+            </p>
+            {canManage ? (
+              <div className="flex flex-wrap gap-3">
+                <Button asChild variant="outline">
+                  <Link href={ROUTES.PRICING}>{t("current.changePlan")}</Link>
+                </Button>
+                {!subscription.data.cancelAtPeriodEnd && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" disabled={cancel.isPending}>
+                        {t("current.cancel")}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {t("cancelDialog.title", {
+                            plan: t(`upgrade.plans.${subscription.data.plan}`),
+                          })}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t("cancelDialog.description", {
+                            plan: t(`upgrade.plans.${subscription.data.plan}`),
+                            date: formatDate(subscription.data.currentPeriodEnd),
+                          })}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("cancelDialog.keep")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleCancel}>
+                          {t("cancelDialog.confirm")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+            ) : (
+              <p className="text-muted-foreground">{t("ownerOnly")}</p>
+            )}
           </CardContent>
         </Card>
       )}
 
-      {billing.data?.kind === "no-subscription" && paidPlan && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {t("otherProvider.title", { plan: t(`upgrade.plans.${paidPlan}`) })}
-            </CardTitle>
-            <CardDescription>{t("otherProvider.description")}</CardDescription>
-          </CardHeader>
-        </Card>
-      )}
-
-      {billing.data?.kind === "no-subscription" && !paidPlan && (
+      {subscription.data === null && (
         <Card>
           <CardHeader>
             <CardTitle>{t("noPlan.title")}</CardTitle>
@@ -148,31 +151,9 @@ export function BillingPage() {
             <Button asChild>
               <Link href={ROUTES.PRICING}>
                 {t("noPlan.viewPlans")}
-                <ArrowUpRightIcon className="ml-2 size-4" />
+                <ArrowUpRightIcon className="ml-2 size-4" aria-hidden />
               </Link>
             </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {billing.data?.kind === "unconfigured" && (
-        <Card className="border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20">
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <AlertTriangleIcon className="size-5 shrink-0 text-amber-600" />
-              <div>
-                <CardTitle className="text-base">{t("unconfigured.title")}</CardTitle>
-                <CardDescription>{t("unconfigured.description")}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      )}
-
-      {billing.isError && (
-        <Card className="border-destructive/40">
-          <CardContent className="pt-6 text-sm text-destructive">
-            {billing.error instanceof Error ? billing.error.message : t("loadFailed")}
           </CardContent>
         </Card>
       )}
