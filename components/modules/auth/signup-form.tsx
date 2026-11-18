@@ -70,7 +70,9 @@ export function SignupForm() {
     return (
       <Card className="w-full text-center">
         <CardHeader>
-          <CardTitle className="text-xl">{t("checkEmailTitle")}</CardTitle>
+          <CardTitle className="text-xl">
+            <h1>{t("checkEmailTitle")}</h1>
+          </CardTitle>
           <CardDescription>
             {t("checkEmailBody", { email: form.getValues("email") })}
           </CardDescription>
@@ -96,7 +98,9 @@ export function SignupForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl">{heading}</CardTitle>
+        <CardTitle className="text-xl">
+          <h1>{heading}</h1>
+        </CardTitle>
         <CardDescription>{subtitle}</CardDescription>
       </CardHeader>
 
