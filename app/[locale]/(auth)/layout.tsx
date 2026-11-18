@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen grid place-items-center bg-muted/30 p-4">
+    <main className="min-h-screen grid place-items-center bg-muted/30 p-4">
       <div className="w-full max-w-sm space-y-4">
         <Link
           href={ROUTES.HOME}
@@ -21,6 +21,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
         {children}
       </div>
-    </div>
+    </main>
   );
 }

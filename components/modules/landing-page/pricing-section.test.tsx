@@ -120,4 +120,13 @@ describe("PricingSection", () => {
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $199");
   });
+
+  it("exposes the billing period toggle as a named switch", () => {
+    render(<PricingSection />);
+
+    const toggle = screen.getByRole("switch", { name: "Bill yearly" });
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+  });
 });

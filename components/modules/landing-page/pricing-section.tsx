@@ -149,8 +149,12 @@ export function PricingSection() {
             {t("monthly")}
           </span>
           <button
+            type="button"
+            role="switch"
+            aria-checked={annual}
+            aria-label={t("annualToggle")}
             onClick={() => setAnnual(!annual)}
-            className="relative w-12 h-6 bg-foreground/15 rounded-full p-0.5 transition-colors hover:bg-foreground/25"
+            className="relative w-12 h-6 bg-foreground/15 rounded-full p-0.5 transition-colors hover:bg-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             <div
               className={`size-5 bg-foreground rounded-full transition-transform duration-300 ${
@@ -176,7 +180,7 @@ export function PricingSection() {
                 key={plan.key}
                 className={`relative p-6 rounded-2xl border transition-all ${
                   plan.popular
-                    ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
+                    ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10 [&_.text-muted-foreground]:text-foreground/70"
                     : "border-foreground/10 bg-card"
                 }`}
               >

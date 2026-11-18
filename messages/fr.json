@@ -848,6 +848,7 @@
       "intro": "Commencez gratuitement sur Tûm Cloud et changez d’offre pour la planification avancée et les rapports. Tûm est aussi open source sous licence GNU AGPLv3 : vous pouvez l’auto-héberger sans frais.",
       "monthly": "Mensuel",
       "annual": "Annuel",
+      "annualToggle": "Facturation annuelle",
       "annualSavings": "Économisez 15 %",
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
