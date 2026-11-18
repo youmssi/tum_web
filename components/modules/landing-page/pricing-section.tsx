@@ -13,7 +13,6 @@ import {
   DexpayCheckoutDialog,
   type DexpayCheckoutOption,
   findDexpayPlan,
-  useBillingState,
   useDexpayPlans,
   useEntitlements,
 } from "@/components/modules/billing";
@@ -74,7 +73,6 @@ export function PricingSection() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();
-  const billing = useBillingState({ enabled: !!session });
   const [annual, setAnnual] = useState(true);
   const dexpayPlans = useDexpayPlans();
   const entitlements = useEntitlements();
@@ -85,10 +83,8 @@ export function PricingSection() {
   // with an explainer for non-owners; only fully-anonymous visitors see no role gate.
   const currentRole = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? null;
   const isOwner = currentRole === "owner";
-  // The Polar state only knows Polar subscriptions; the entitlements cover every provider.
   const hasActiveSubscription =
-    billing.data?.kind === "subscription" ||
-    (entitlements.data !== undefined && entitlements.data.plan !== "FREE");
+    entitlements.data !== undefined && entitlements.data.plan !== "FREE";
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>

@@ -137,22 +137,48 @@
   },
   "billing": {
     "title": "Facturation",
-    "subtitle": "Gérez votre abonnement, votre moyen de paiement et vos factures.",
-    "activePlan": "Plan actif",
-    "amount": "Montant",
-    "renewsOn": "Prochain renouvellement",
-    "openPortal": "Ouvrir le portail de facturation",
-    "openingPortal": "Ouverture du portail…",
+    "subtitle": "L’offre de votre espace de travail, son renouvellement et sa résiliation.",
     "loadFailed": "Impossible de charger vos informations de facturation.",
-    "portalFailed": "Impossible d’ouvrir le portail de facturation.",
+    "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer ou résilier l’offre.",
+    "status": {
+      "TRIALING": "Essai",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Paiement en attente",
+      "CANCELED": "Résiliée",
+      "REVOKED": "Terminée",
+      "CANCELLING": "Prend fin bientôt"
+    },
+    "current": {
+      "title": "Offre {plan}",
+      "description": "Payée via Dexpay, par carte ou mobile money.",
+      "renewsOn": "Renouvellement le",
+      "endsOn": "Prend fin le",
+      "renewalNote": "Avant chaque renouvellement, Dexpay envoie un lien de paiement à l’adresse de facturation.",
+      "pastDue": "Votre renouvellement n’est pas réglé. Payez-le avec le lien envoyé par Dexpay dans les 7 jours suivant l’échéance pour conserver l’offre.",
+      "cancelledNote": "Les renouvellements sont arrêtés. L’espace de travail conserve l’offre {plan} jusqu’au {date}, puis repasse sur l’offre Free.",
+      "changePlan": "Changer d’offre",
+      "cancel": "Résilier l’abonnement"
+    },
+    "cancelDialog": {
+      "title": "Résilier l’offre {plan} ?",
+      "description": "Les renouvellements s’arrêtent dès maintenant. Votre espace de travail conserve l’offre {plan} jusqu’au {date}, puis repasse sur l’offre Free. Vos données sont conservées.",
+      "keep": "Garder mon offre",
+      "confirm": "Résilier l’abonnement",
+      "done": "Abonnement résilié.",
+      "failed": "Impossible de résilier l’abonnement. Veuillez réessayer."
+    },
+    "success": {
+      "title": "Paiement reçu",
+      "pending": "En attente de la confirmation du paiement par Dexpay…",
+      "active": "Votre espace de travail est sur l’offre {plan}.",
+      "description": "L’offre change dès que Dexpay confirme le paiement, en général en moins d’une minute. Vous recevrez aussi un e-mail de confirmation.",
+      "dashboard": "Aller au tableau de bord",
+      "billing": "Voir la facturation"
+    },
     "noPlan": {
       "title": "Vous êtes sur le plan gratuit",
       "description": "Passez à Pro pour des projets et membres illimités, le chemin critique, les références de planning, la charge de travail, les analyses et le tableau de bord portefeuille.",
       "viewPlans": "Voir les plans"
-    },
-    "unconfigured": {
-      "title": "La facturation est temporairement indisponible",
-      "description": "Nous ne pouvons pas joindre le fournisseur de paiement avec les identifiants actuels. Un administrateur doit régénérer le jeton Polar avec tous les scopes (customers, subscriptions, customer_sessions, checkouts). Votre compte et vos données restent intacts."
     },
     "upgrade": {
       "title": "{feature} fait partie de l’offre {plan}",
@@ -199,10 +225,6 @@
       "submit": "Continuer vers le paiement",
       "ownerOnly": "Seul un propriétaire ou un administrateur de l’espace de travail peut souscrire.",
       "failed": "La page de paiement n’a pas pu être ouverte. Veuillez réessayer."
-    },
-    "otherProvider": {
-      "title": "Votre espace de travail est sur l’offre {plan}",
-      "description": "Cet abonnement est payé via Dexpay. Avant chaque renouvellement, vous recevez un e-mail avec un lien de paiement ; l’offre reste active 7 jours après l’échéance."
     }
   },
   "dashboard": {
