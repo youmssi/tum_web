@@ -78,13 +78,11 @@ export function PricingSection() {
   const entitlements = useEntitlements();
   const [dexpayCheckout, setDexpayCheckout] = useState<DexpayCheckoutOption | null>(null);
 
-  // Role check: only the org owner can take on a subscription. Members + admins clicking the CTA
-  // would tie billing to a workspace they can't manage. The button stays visible but is disabled
-  // with an explainer for non-owners; only fully-anonymous visitors see no role gate.
+  // Only an owner or admin may commit the workspace to a subscription; the backend enforces the
+  // same rule. Members see the button disabled with an explanation.
   const currentRole = activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? null;
-  const isOwner = currentRole === "owner";
-  const hasActiveSubscription =
-    entitlements.data !== undefined && entitlements.data.plan !== "FREE";
+  const canManageBilling = currentRole === "owner" || currentRole === "admin";
+  const currentPlan = entitlements.data?.plan ?? "FREE";
 
   // Tell next-intl this is an array so the count comes back as a number rather than an error.
   const featuresFor = (key: PlanKey): string[] =>
@@ -106,12 +104,11 @@ export function PricingSection() {
       router.push(`${ROUTES.WORKSPACES}?intent=upgrade-${plan}`);
       return;
     }
-    // A second checkout would start a parallel subscription; manage the current one instead.
-    if (hasActiveSubscription) {
+    const dexpayPlan = plan === "pro" ? "PRO" : "ENTERPRISE";
+    if (currentPlan === dexpayPlan) {
       router.push(ROUTES.BILLING);
       return;
     }
-    const dexpayPlan = plan === "pro" ? "PRO" : "ENTERPRISE";
     const interval = annual ? "YEARLY" : "MONTHLY";
     if (!findDexpayPlan(dexpayPlans.data, dexpayPlan, interval)) {
       toast.error(t("checkoutUnavailable"));
@@ -122,6 +119,8 @@ export function PricingSection() {
       plan: dexpayPlan,
       interval,
       usdAmount: annual ? prices.annual * 12 : prices.monthly,
+      // Moving between paid plans: the new subscription replaces the current one once paid.
+      change: currentPlan !== "FREE",
     });
   }
 
@@ -218,25 +217,22 @@ export function PricingSection() {
 
                 {isPaid ? (
                   <div className="space-y-2">
-                    {/* Three states for the paid CTA. Signed-in non-owners get a disabled button
-                        with a "ask your owner" hint; signed-in owners who already pay see "Manage
-                        billing" pointing at /billing; everyone else gets the upgrade button. */}
-                    {session && activeOrg?.id && !isOwner ? (
+                    {session && activeOrg?.id && !canManageBilling ? (
                       <>
                         <Button variant="outline" className="w-full rounded-full" disabled>
                           {plans(`${plan.key}.cta`)}
                         </Button>
                         <p className="text-center text-xs text-muted-foreground">
-                          Only the workspace owner can upgrade. Ask them to start the checkout.
+                          {t("ownerOnly")}
                         </p>
                       </>
-                    ) : hasActiveSubscription ? (
+                    ) : currentPlan === plan.key.toUpperCase() ? (
                       <Button
                         variant="outline"
                         className="w-full rounded-full group"
                         onClick={() => router.push(ROUTES.BILLING)}
                       >
-                        Manage billing
+                        {t("currentPlan")}
                         <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     ) : (
@@ -245,7 +241,9 @@ export function PricingSection() {
                         className="w-full rounded-full group"
                         onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
                       >
-                        {plans(`${plan.key}.cta`)}
+                        {currentPlan === "FREE"
+                          ? plans(`${plan.key}.cta`)
+                          : t("switchTo", { plan: plans(`${plan.key}.name`) })}
                         <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     )}
