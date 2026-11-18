@@ -139,6 +139,10 @@
     "title": "Facturation",
     "subtitle": "L’offre de votre espace de travail, son renouvellement et sa résiliation.",
     "loadFailed": "Impossible de charger vos informations de facturation.",
+    "paymentFailed": {
+      "title": "Le paiement n’a pas abouti",
+      "description": "Votre offre n’a pas changé. Vous pouvez réessayer depuis la page des offres, avec une autre carte ou un autre compte mobile money si besoin."
+    },
     "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer ou résilier l’offre.",
     "status": {
       "TRIALING": "Essai",
@@ -224,7 +228,9 @@
       "cancel": "Annuler",
       "submit": "Continuer vers le paiement",
       "ownerOnly": "Seul un propriétaire ou un administrateur de l’espace de travail peut souscrire.",
-      "failed": "La page de paiement n’a pas pu être ouverte. Veuillez réessayer."
+      "failed": "La page de paiement n’a pas pu être ouverte. Veuillez réessayer.",
+      "changeNote": "Votre nouvelle offre démarre dès que Dexpay confirme le paiement. L’offre actuelle cesse alors d’être renouvelée ; ses jours restants ne sont pas remboursés.",
+      "alreadyOnPlan": "Cet espace de travail est déjà sur cette offre."
     }
   },
   "dashboard": {
@@ -912,7 +918,10 @@
       },
       "customPlan": "Besoin d’une offre sur mesure ?",
       "talkToSales": "Contacter l’équipe commerciale",
-      "checkoutUnavailable": "Le paiement en ligne n’est pas encore disponible pour cette offre. Écrivez à contact@mrvin100.de et nous mettrons en place votre abonnement."
+      "checkoutUnavailable": "Le paiement en ligne n’est pas encore disponible pour cette offre. Écrivez à contact@mrvin100.de et nous mettrons en place votre abonnement.",
+      "currentPlan": "Offre actuelle",
+      "switchTo": "Passer à l’offre {plan}",
+      "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer l’offre."
     },
     "testimonials": {
       "sectionLabel": "Témoignages",

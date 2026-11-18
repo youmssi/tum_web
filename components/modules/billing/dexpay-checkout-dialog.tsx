@@ -26,6 +26,8 @@ export interface DexpayCheckoutOption {
   plan: DexpayPlan;
   interval: DexpayInterval;
   usdAmount: number;
+  /** True when the workspace already pays for the other plan. */
+  change?: boolean;
 }
 
 interface DexpayCheckoutDialogProps {
@@ -68,8 +70,11 @@ export function DexpayCheckoutDialog({
       });
       window.location.assign(paymentUrl);
     } catch (error) {
-      const forbidden = error instanceof ApiError && error.status === 403;
-      form.setError("root", { message: forbidden ? t("ownerOnly") : t("failed") });
+      const status = error instanceof ApiError ? error.status : undefined;
+      form.setError("root", {
+        message:
+          status === 403 ? t("ownerOnly") : status === 409 ? t("alreadyOnPlan") : t("failed"),
+      });
     }
   }
 
@@ -86,6 +91,7 @@ export function DexpayCheckoutDialog({
                 price: formatUsd(price.usdAmount, locale),
               })}
           </DialogDescription>
+          {price?.change && <p className="text-sm text-muted-foreground">{t("changeNote")}</p>}
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-4">
           <FieldGroup className="gap-4">

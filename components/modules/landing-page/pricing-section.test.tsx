@@ -4,7 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithIntl as render } from "@/components/modules/auth/test-utils";
 
 const { state, toastError, push } = vi.hoisted(() => ({
-  state: { plans: [] as { plan: string; interval: string; amount: number; currency: string }[] },
+  state: {
+    plans: [] as { plan: string; interval: string; amount: number; currency: string }[],
+    currentPlan: "FREE",
+    role: "owner",
+  },
   toastError: vi.fn(),
   push: vi.fn(),
 }));
@@ -13,7 +17,7 @@ vi.mock("@/lib/auth-client", () => ({
   authClient: {
     useSession: () => ({ data: { user: { id: "u1", name: "Ada", email: "ada@example.test" } } }),
     useActiveOrganization: () => ({
-      data: { id: "org-1", members: [{ userId: "u1", role: "owner" }] },
+      data: { id: "org-1", members: [{ userId: "u1", role: state.role }] },
     }),
   },
 }));
@@ -29,10 +33,15 @@ vi.mock("@/components/modules/billing", async () => {
   const price = await import("@/components/modules/billing/dexpay-price");
   return {
     findDexpayPlan: price.findDexpayPlan,
-    useEntitlements: () => ({ data: { plan: "FREE" } }),
+    useEntitlements: () => ({ data: { plan: state.currentPlan } }),
     useDexpayPlans: () => ({ data: state.plans }),
-    DexpayCheckoutDialog: ({ price }: { price: { usdAmount: number } | null }) =>
-      price ? <div role="dialog">Dexpay checkout for ${price.usdAmount}</div> : null,
+    DexpayCheckoutDialog: ({ price }: { price: { usdAmount: number; change?: boolean } | null }) =>
+      price ? (
+        <div role="dialog">
+          Dexpay checkout for ${price.usdAmount}
+          {price.change ? " (plan change)" : ""}
+        </div>
+      ) : null,
   };
 });
 
@@ -43,6 +52,8 @@ describe("PricingSection", () => {
     toastError.mockClear();
     push.mockClear();
     state.plans = [];
+    state.currentPlan = "FREE";
+    state.role = "owner";
   });
 
   it("shows plan prices in US dollars only", () => {
@@ -71,5 +82,33 @@ describe("PricingSection", () => {
     expect(toastError).toHaveBeenCalledWith(expect.stringContaining("contact@mrvin100.de"));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it("lets a Pro workspace switch to Enterprise as a plan change", () => {
+    state.currentPlan = "PRO";
+    state.plans = [{ plan: "ENTERPRISE", interval: "YEARLY", amount: 605000, currency: "XAF" }];
+    render(<PricingSection />);
+
+    expect(screen.getByRole("button", { name: /Current plan/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Switch to Enterprise/ }));
+
+    expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $1008 (plan change)");
+  });
+
+  it("sends the current plan's button to billing instead of a second checkout", () => {
+    state.currentPlan = "PRO";
+    render(<PricingSection />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Current plan/ }));
+
+    expect(push).toHaveBeenCalledWith("/billing");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("lets an admin subscribe but not a member", () => {
+    state.role = "member";
+    render(<PricingSection />);
+
+    expect(screen.getAllByText(/Only the workspace owner or an admin/).length).toBeGreaterThan(0);
   });
 });
