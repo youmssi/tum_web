@@ -22,27 +22,27 @@
 
 ## Tech stack
 
-| Layer             | Technology                            | Version        |
-| ----------------- | ------------------------------------- | -------------- |
-| Framework         | Next.js (App Router)                  | 16.2.6         |
-| UI runtime        | React                                 | 19.2.4         |
-| Language          | TypeScript                            | 5.x            |
-| Styling           | Tailwind CSS                          | 4.x            |
-| Component library | shadcn/ui (Radix primitives)          | latest         |
-| Server state      | TanStack Query                        | 5.x            |
-| HTTP client       | KY                                    | 2.0.2          |
-| Client state      | Zustand                               | 5.x            |
-| Forms             | React Hook Form + Zod                 | 7.x / 4.x      |
-| Auth              | Better Auth                           | 1.6.11         |
-| Real-time         | @stomp/stompjs                        | 7.3.0          |
-| Drag & drop       | dnd-kit                               | 6.x / 10.x     |
-| Timeline / Gantt  | Frappe Gantt                          | 1.2.2          |
-| Charts            | Recharts                              | 3.x            |
-| Data tables       | TanStack Table                        | 8.21.3         |
-| Billing           | Polar (`@polar-sh/better-auth` + SDK) | 1.8.4 / 0.47.1 |
-| Analytics         | Umami (optional, env-gated)           | —              |
-| Database (auth)   | PostgreSQL via `pg`                   | 8.x            |
-| Testing           | Vitest + React Testing Library        | 4.x / 16.x     |
+| Layer             | Technology                                       | Version    |
+| ----------------- | ------------------------------------------------ | ---------- |
+| Framework         | Next.js (App Router)                             | 16.2.6     |
+| UI runtime        | React                                            | 19.2.4     |
+| Language          | TypeScript                                       | 5.x        |
+| Styling           | Tailwind CSS                                     | 4.x        |
+| Component library | shadcn/ui (Radix primitives)                     | latest     |
+| Server state      | TanStack Query                                   | 5.x        |
+| HTTP client       | KY                                               | 2.0.2      |
+| Client state      | Zustand                                          | 5.x        |
+| Forms             | React Hook Form + Zod                            | 7.x / 4.x  |
+| Auth              | Better Auth                                      | 1.6.11     |
+| Real-time         | @stomp/stompjs                                   | 7.3.0      |
+| Drag & drop       | dnd-kit                                          | 6.x / 10.x |
+| Timeline / Gantt  | Frappe Gantt                                     | 1.2.2      |
+| Charts            | Recharts                                         | 3.x        |
+| Data tables       | TanStack Table                                   | 8.21.3     |
+| Billing           | Dexpay (cards and mobile money, via the backend) | —          |
+| Analytics         | Umami (optional, env-gated)                      | —          |
+| Database (auth)   | PostgreSQL via `pg`                              | 8.x        |
+| Testing           | Vitest + React Testing Library                   | 4.x / 16.x |
 
 ---
 
@@ -155,8 +155,8 @@ sequenceDiagram
 | `/projects`                  | `ProjectList`             | All projects in the active org; archived toggle; import CSV button                                                           |
 | `/projects/[id]`             | `ProjectDetail`           | Tabs: Overview, List, Board, Timeline, Activity                                                                              |
 | `/projects/[id]/settings`    | `ProjectSettingsForm`     | Project name, description, member-restriction, working calendar, delete                                                      |
-| `/billing`                   | `BillingPage`             | Subscription status + Polar customer portal (no-op UI when Polar isn't configured)                                           |
-| `/upgrade/success`           | —                         | Polar checkout return URL; confirms the subscription and links to `/billing`                                                 |
+| `/billing`                   | `BillingPage`             | Workspace plan, renewal or end date, change and cancel (Dexpay)                                                              |
+| `/upgrade/success`           | `UpgradeSuccess`          | Dexpay return page; waits for the plan to switch, then links to the dashboard and `/billing`                                 |
 | `/profile`                   | `ProfileForm`             | Name, avatar, sign-out                                                                                                       |
 | `/organization/members`      | `MemberList`              | Invite, role change, remove                                                                                                  |
 | `/organization/settings`     | `OrgSettingsForm`         | Org name + preferences, delete organisation                                                                                  |
@@ -189,10 +189,6 @@ Copy `.env.example` to `.env.local` for local development. Never commit `.env.lo
 | `GITHUB_CLIENT_SECRET`                                   | _(optional)_                              | GitHub OAuth app client secret                                                                                                                                                                                              |
 | `NEXT_PUBLIC_SITE_URL`                                   | `https://tum-app.vercel.app` (fallback)   | Canonical public URL — drives OpenGraph tags, `sitemap.xml`, `robots.txt`, and per-locale hreflang. **Must match your real domain and the domain verified in Google Search Console exactly** (protocol + no trailing slash) |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`                   | _(optional)_                              | Google Search Console per-property verification token. Omitted entirely (not just blank) when unset                                                                                                                         |
-| `POLAR_ACCESS_TOKEN`                                     | _(optional)_                              | Polar organization access token — the billing plugin only registers when this is set; leaving it blank is safe (Pro/Enterprise CTAs fall back to `/signup`)                                                                 |
-| `POLAR_PRO_PRODUCT_ID` / `POLAR_ENTERPRISE_PRODUCT_ID`   | _(optional)_                              | Polar product IDs for the two paid plans                                                                                                                                                                                    |
-| `POLAR_WEBHOOK_SECRET`                                   | _(optional)_                              | Verifies inbound Polar webhook signatures                                                                                                                                                                                   |
-| `POLAR_SERVER`                                           | `sandbox`                                 | `sandbox` for testing, `production` for real billing — use a _different_ Polar org/token for each, never share sandbox and production credentials                                                                           |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID` / `NEXT_PUBLIC_UMAMI_SRC` | _(optional)_                              | Umami analytics — both must be set or no tracking script is injected at all                                                                                                                                                 |
 
 > `NEXT_PUBLIC_*` variables are embedded in the client bundle at build time. Never put secrets in them.

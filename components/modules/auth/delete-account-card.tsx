@@ -25,9 +25,7 @@ import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
 /**
- * Danger-zone card on the profile page. Triggers Better Auth's `deleteUser` flow, which the
- * server-side {@code user.deleteUser.afterDelete} hook completes with the Polar customer cleanup
- * + backend assignee scrubbing.
+ * Danger-zone card on the profile page. Triggers Better Auth's `deleteUser` flow.
  *
  * <p>Requires the user to type their full email as confirmation — the dialog won't enable the
  * destructive button until the strings match exactly. Same UX pattern as Linear / GitHub.
@@ -73,9 +71,8 @@ export function DeleteAccountCard() {
         <CardTitle className="text-destructive">Delete account</CardTitle>
         <CardDescription>
           Permanently delete your Tûm account. This signs you out of every workspace, removes your
-          profile, and cancels the Polar customer record. Tasks you were assigned to stay in the
-          project but show &ldquo;Former member&rdquo; instead of your name. This action cannot be
-          undone.
+          profile. Tasks you were assigned to stay in the project but show &ldquo;Former
+          member&rdquo; instead of your name. This action cannot be undone.
         </CardDescription>
       </CardHeader>
       <CardContent>
