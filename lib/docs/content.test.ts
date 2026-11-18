@@ -27,7 +27,8 @@ describe("docs content", () => {
 
   it("lists every page in the sidebar order exactly once", () => {
     const slugs = englishPages.map((f) => f.replace(/\.mdx$/, "")).sort();
-    expect([...meta.pages].sort()).toEqual(slugs);
+    const pages = meta.pages.filter((entry) => !entry.startsWith("["));
+    expect([...pages].sort()).toEqual(slugs);
   });
 
   it("uses no em dashes, matching the house style", () => {

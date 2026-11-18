@@ -6,6 +6,7 @@ export const ROUTES = {
   TERMS: "/terms",
   PRIVACY: "/privacy",
   DOCS: "/docs",
+  API_REFERENCE: "/reference",
   HOW_IT_WORKS: "/#how-it-works",
   LOGIN: "/login",
   SIGNUP: "/signup",
@@ -66,6 +67,7 @@ export const PUBLIC_MARKETING_PATHS = [
   ROUTES.TERMS,
   ROUTES.PRIVACY,
   ROUTES.DOCS,
+  ROUTES.API_REFERENCE,
 ] as const;
 
 /** Hostnames that used to serve the site and now only redirect to the production domain. */
