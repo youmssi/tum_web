@@ -12,7 +12,7 @@ export default function AdminSubscriptionsPage() {
       <div>
         <h1 className="text-xl font-semibold">Subscriptions</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Active, past-due, and cancelled Polar subscriptions across all workspaces.
+          Active, past-due and cancelled subscriptions across all workspaces.
         </p>
       </div>
       <AdminSubscriptions />
