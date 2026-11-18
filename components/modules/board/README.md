@@ -4,11 +4,11 @@ Kanban board with drag-and-drop task cards using `@dnd-kit`.
 
 ## Exports
 
-| Export | Type | Description |
-|--------|------|-------------|
+| Export        | Type      | Description                              |
+| ------------- | --------- | ---------------------------------------- |
 | `KanbanBoard` | Component | Full board with columns and drag overlay |
 | `BoardColumn` | Component | Single status column with sortable cards |
-| `TaskCard` | Component | Draggable task card |
+| `TaskCard`    | Component | Draggable task card                      |
 
 ## Key patterns
 

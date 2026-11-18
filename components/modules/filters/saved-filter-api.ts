@@ -42,17 +42,13 @@ export const savedFilterApi = {
   list: (projectId?: string) => {
     const params: Record<string, string> = {};
     if (projectId) params.projectId = projectId;
-    return api
-      .get("api/saved-filters", { searchParams: params })
-      .json<SavedFilter[]>();
+    return api.get("api/saved-filters", { searchParams: params }).json<SavedFilter[]>();
   },
 
   create: (data: CreateSavedFilterPayload, projectId?: string) => {
     const params: Record<string, string> = {};
     if (projectId) params.projectId = projectId;
-    return api
-      .post("api/saved-filters", { searchParams: params, json: data })
-      .json<SavedFilter>();
+    return api.post("api/saved-filters", { searchParams: params, json: data }).json<SavedFilter>();
   },
 
   update: (id: string, data: UpdateSavedFilterPayload) =>
@@ -62,8 +58,7 @@ export const savedFilterApi = {
     await api.delete(`api/saved-filters/${id}`);
   },
 
-  setDefault: (id: string) =>
-    api.patch(`api/saved-filters/${id}/default`).json<SavedFilter>(),
+  setDefault: (id: string) => api.patch(`api/saved-filters/${id}/default`).json<SavedFilter>(),
 
   unsetDefault: async (id: string) => {
     await api.delete(`api/saved-filters/${id}/default`);

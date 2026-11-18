@@ -29,7 +29,6 @@ vi.mock("@/components/modules/billing", async () => {
   const price = await import("@/components/modules/billing/dexpay-price");
   return {
     findDexpayPlan: price.findDexpayPlan,
-    useBillingState: () => ({ data: undefined }),
     useEntitlements: () => ({ data: { plan: "FREE" } }),
     useDexpayPlans: () => ({ data: state.plans }),
     DexpayCheckoutDialog: ({ price }: { price: { usdAmount: number } | null }) =>

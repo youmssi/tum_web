@@ -21,7 +21,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { useBillingState } from "@/components/modules/billing";
+import { useDexpaySubscription } from "@/components/modules/billing";
 import { authClient } from "@/lib/auth-client";
 import { ROUTES } from "@/lib/constants";
 
@@ -40,11 +40,12 @@ export function DeleteOrgCard() {
   const router = useRouter();
   const { data: activeOrg } = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
-  const billing = useBillingState();
+  const subscription = useDexpaySubscription();
   const currentRole =
     activeOrg?.members?.find((m) => m.userId === session?.user?.id)?.role ?? "member";
   const isOwner = currentRole === "owner";
-  const hasActiveSubscription = billing.data?.kind === "subscription";
+  // Dexpay only asks for each renewal by email, so an uncancelled plan keeps sending reminders.
+  const hasActiveSubscription = !!subscription.data && !subscription.data.cancelAtPeriodEnd;
 
   const organizationId = activeOrg?.id ?? "";
   const organizationName = activeOrg?.name ?? "";
@@ -82,9 +83,8 @@ export function DeleteOrgCard() {
         <CardTitle className="text-destructive">Delete organisation</CardTitle>
         <CardDescription>
           Permanently delete <span className="font-medium">{organizationName}</span>. Every member
-          loses access immediately, every project and task is unreachable, and any active Polar
-          subscription for this workspace is canceled at the end of the current billing period. This
-          action cannot be undone.
+          loses access immediately and every project and task becomes unreachable. This action
+          cannot be undone.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -94,11 +94,11 @@ export function DeleteOrgCard() {
             <div className="space-y-1">
               <p className="font-medium">This workspace has an active subscription.</p>
               <p className="text-muted-foreground">
-                Cancel it first in the billing portal so Polar stops billing your card. Deleting the
+                Cancel it first on the billing page so renewal reminders stop. Deleting the
                 workspace doesn&rsquo;t cancel the subscription automatically.
               </p>
               <Button variant="link" className="h-auto p-0 text-sm" asChild>
-                <Link href={ROUTES.BILLING}>Open billing portal →</Link>
+                <Link href={ROUTES.BILLING}>Open billing →</Link>
               </Button>
             </div>
           </div>

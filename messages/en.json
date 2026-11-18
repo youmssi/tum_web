@@ -137,22 +137,48 @@
   },
   "billing": {
     "title": "Billing",
-    "subtitle": "Manage your subscription, payment method and invoices.",
-    "activePlan": "Active plan",
-    "amount": "Amount",
-    "renewsOn": "Renews on",
-    "openPortal": "Open billing portal",
-    "openingPortal": "Opening portal…",
+    "subtitle": "Your workspace plan, when it renews, and cancellation.",
     "loadFailed": "Could not load your billing details.",
-    "portalFailed": "Could not open the billing portal.",
+    "ownerOnly": "Only the workspace owner or an admin can change or cancel the plan.",
+    "status": {
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment due",
+      "CANCELED": "Cancelled",
+      "REVOKED": "Ended",
+      "CANCELLING": "Ends soon"
+    },
+    "current": {
+      "title": "{plan} plan",
+      "description": "Paid through Dexpay, by card or mobile money.",
+      "renewsOn": "Renews on",
+      "endsOn": "Ends on",
+      "renewalNote": "Before each renewal, Dexpay emails a payment link to the billing contact.",
+      "pastDue": "Your renewal is unpaid. Pay it from the link Dexpay emailed you within 7 days of the due date to keep the plan.",
+      "cancelledNote": "Renewals are stopped. The workspace keeps the {plan} plan until {date}, then returns to the Free plan.",
+      "changePlan": "Change plan",
+      "cancel": "Cancel subscription"
+    },
+    "cancelDialog": {
+      "title": "Cancel the {plan} plan?",
+      "description": "Renewals stop now. Your workspace keeps the {plan} plan until {date}, then returns to the Free plan. Your data is kept.",
+      "keep": "Keep my plan",
+      "confirm": "Cancel subscription",
+      "done": "Subscription cancelled.",
+      "failed": "Could not cancel the subscription. Please try again."
+    },
+    "success": {
+      "title": "Payment received",
+      "pending": "Waiting for Dexpay to confirm the payment…",
+      "active": "Your workspace is on the {plan} plan.",
+      "description": "The plan switches as soon as Dexpay confirms the payment, usually within a minute. You will also receive a confirmation email.",
+      "dashboard": "Go to dashboard",
+      "billing": "View billing"
+    },
     "noPlan": {
       "title": "You're on the free plan",
       "description": "Upgrade to Pro for unlimited projects and members, critical path, baselines, workload, analytics and the portfolio dashboard.",
       "viewPlans": "View plans"
-    },
-    "unconfigured": {
-      "title": "Billing is temporarily unavailable",
-      "description": "We can't reach the billing provider with the current credentials. An admin needs to regenerate the Polar access token with the full scope set (customers, subscriptions, customer_sessions, checkouts). Your account and workspace data are unaffected."
     },
     "upgrade": {
       "title": "{feature} is part of the {plan} plan",
@@ -199,10 +225,6 @@
       "submit": "Continue to payment",
       "ownerOnly": "Only a workspace owner or admin can subscribe.",
       "failed": "The payment page could not be opened. Please try again."
-    },
-    "otherProvider": {
-      "title": "Your workspace is on the {plan} plan",
-      "description": "This subscription is paid through Dexpay. Before each renewal you receive an email with a payment link; the plan stays active for 7 days after the due date."
     }
   },
   "dashboard": {

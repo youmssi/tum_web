@@ -25,7 +25,13 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import type { SavedFilter, SavedFilterConfig } from "./saved-filter-api";
-import { useCreateSavedFilter, useDeleteSavedFilter, useSavedFilters, useSetDefaultFilter, useUpdateSavedFilter } from "./use-saved-filters";
+import {
+  useCreateSavedFilter,
+  useDeleteSavedFilter,
+  useSavedFilters,
+  useSetDefaultFilter,
+  useUpdateSavedFilter,
+} from "./use-saved-filters";
 
 interface SavedFilterDialogProps {
   projectId?: string;
@@ -160,7 +166,15 @@ export function SavedFilterDialog({
           </DialogHeader>
 
           {activeFilterName && (
-            <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => { onClearFilter(); setOpen(false); }}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start"
+              onClick={() => {
+                onClearFilter();
+                setOpen(false);
+              }}
+            >
               <CheckIcon className="mr-2 size-3.5" />
               Clear filter — show all tasks
             </Button>
@@ -195,7 +209,12 @@ export function SavedFilterDialog({
                         className="h-8 text-sm"
                         autoFocus
                       />
-                      <Button size="sm" variant="ghost" className="h-8" onClick={() => handleRename(filter.id)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8"
+                        onClick={() => handleRename(filter.id)}
+                      >
                         Save
                       </Button>
                     </div>
@@ -205,16 +224,16 @@ export function SavedFilterDialog({
                         className="flex flex-1 items-center gap-2 text-left text-sm"
                         onClick={() => handleApply(filter)}
                       >
-                        {filter.isDefault && (
-                          <CheckIcon className="size-3.5 text-primary" />
-                        )}
-                        <span className={filter.isDefault ? "font-medium" : ""}>
-                          {filter.name}
-                        </span>
+                        {filter.isDefault && <CheckIcon className="size-3.5 text-primary" />}
+                        <span className={filter.isDefault ? "font-medium" : ""}>{filter.name}</span>
                       </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 opacity-0 group-hover:opacity-100"
+                          >
                             <MoreHorizontalIcon className="size-3.5" />
                           </Button>
                         </DropdownMenuTrigger>

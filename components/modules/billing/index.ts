@@ -29,7 +29,15 @@ export {
   type DexpayInterval,
   type DexpayPlan,
   type DexpayPlanPrice,
+  type DexpaySubscription,
+  type DexpaySubscriptionStatus,
 } from "./dexpay-api";
 export { findDexpayPlan, formatDexpayPrice, formatUsd } from "./dexpay-price";
-export { DEXPAY_KEYS, useDexpayPlans, useStartDexpayCheckout } from "./use-dexpay";
+export {
+  DEXPAY_KEYS,
+  useCancelDexpaySubscription,
+  useDexpayPlans,
+  useDexpaySubscription,
+  useStartDexpayCheckout,
+} from "./use-dexpay";
 export { DexpayCheckoutDialog, type DexpayCheckoutOption } from "./dexpay-checkout-dialog";

@@ -84,9 +84,7 @@ export function WorkloadView({ projectId }: WorkloadViewProps) {
                 <UserIcon />
               </EmptyMedia>
               <EmptyTitle>No workload data</EmptyTitle>
-              <EmptyDescription>
-                No assigned tasks with dates to show.
-              </EmptyDescription>
+              <EmptyDescription>No assigned tasks with dates to show.</EmptyDescription>
             </EmptyHeader>
           </Empty>
         </CardContent>

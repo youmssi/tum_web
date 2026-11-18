@@ -83,9 +83,7 @@ export function useUpdateChecklistItem(taskId: string) {
       if (previous) {
         qc.setQueryData(
           CHECKLIST_KEYS.items(taskId),
-          previous.map((item) =>
-            item.id === itemId ? { ...item, ...data } : item,
-          ),
+          previous.map((item) => (item.id === itemId ? { ...item, ...data } : item)),
         );
         // Recalculate progress optimistically
         if (data.checked !== undefined) {
@@ -132,9 +130,7 @@ export function useDeleteChecklistItem(taskId: string) {
           const prevProgress = qc.getQueryData<ChecklistProgress>(CHECKLIST_KEYS.progress(taskId));
           if (prevProgress) {
             qc.setQueryData(CHECKLIST_KEYS.progress(taskId), {
-              checked: deletedItem.checked
-                ? prevProgress.checked - 1
-                : prevProgress.checked,
+              checked: deletedItem.checked ? prevProgress.checked - 1 : prevProgress.checked,
               total: prevProgress.total - 1,
             });
           }
