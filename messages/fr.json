@@ -214,22 +214,16 @@
       "workspaceLimit": "Vous possédez déjà un espace de travail sur l’offre gratuite. Changez son offre pour en créer un autre."
     },
     "dexpay": {
-      "title": "Payer par mobile money ou carte",
+      "title": "Une dernière information",
       "summaryMonthly": "{price} par mois pour cet espace de travail. Vous réglez ce montant en dollars américains sur la page sécurisée Dexpay, par carte (Visa, Mastercard) ou mobile money.",
       "summaryYearly": "{price} par an pour cet espace de travail. Vous réglez ce montant en dollars américains sur la page sécurisée Dexpay, par carte (Visa, Mastercard) ou mobile money.",
-      "nameLabel": "Nom complet",
-      "nameRequired": "Saisissez votre nom.",
-      "emailLabel": "E-mail",
-      "emailInvalid": "Saisissez une adresse e-mail valide.",
-      "emailHint": "Les reçus et les rappels de renouvellement sont envoyés à cette adresse.",
       "phoneLabel": "Numéro de téléphone",
-      "phoneInvalid": "Utilisez le format international, par exemple +237650000000.",
-      "phoneHint": "Format international. Les paiements mobile money sont validés sur ce téléphone.",
+      "phoneInvalid": "Utilisez le format international, par exemple +224621234567.",
+      "phoneHint": "Demandé une seule fois pour cet espace de travail. Dexpay s’en sert pour vous identifier et le pré-remplit sur sa page de paiement.",
       "cancel": "Annuler",
       "submit": "Continuer vers le paiement",
       "ownerOnly": "Seul un propriétaire ou un administrateur de l’espace de travail peut souscrire.",
       "failed": "La page de paiement n’a pas pu être ouverte. Veuillez réessayer.",
-      "changeNote": "Votre nouvelle offre démarre dès que Dexpay confirme le paiement. L’offre actuelle cesse alors d’être renouvelée ; ses jours restants ne sont pas remboursés.",
       "alreadyOnPlan": "Cet espace de travail est déjà sur cette offre."
     }
   },
@@ -848,6 +842,7 @@
       "intro": "Commencez gratuitement sur Tûm Cloud et changez d’offre pour la planification avancée et les rapports. Tûm est aussi open source sous licence GNU AGPLv3 : vous pouvez l’auto-héberger sans frais.",
       "monthly": "Mensuel",
       "annual": "Annuel",
+      "annualToggle": "Facturation annuelle",
       "annualSavings": "Économisez 15 %",
       "perWorkspace": "/mois par espace de travail",
       "custom": "Sur mesure",
@@ -921,6 +916,7 @@
       "checkoutUnavailable": "Le paiement en ligne n’est pas encore disponible pour cette offre. Écrivez à contact@mrvin100.de et nous mettrons en place votre abonnement.",
       "currentPlan": "Offre actuelle",
       "switchTo": "Passer à l’offre {plan}",
+      "switchNote": "La nouvelle offre démarre dès que Dexpay confirme le paiement ; l’actuelle cesse d’être renouvelée, sans remboursement des jours restants.",
       "ownerOnly": "Seul le propriétaire de l’espace de travail ou un administrateur peut changer l’offre."
     },
     "testimonials": {

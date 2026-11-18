@@ -10,22 +10,26 @@ import { DexpayCheckoutDialog, type DexpayCheckoutOption } from "./dexpay-checko
 
 // A plain holder rather than vi.fn(): Vitest reports a rejected promise returned by a mock as a
 // test error, which would fail the refusal cases even though the dialog handles them.
+type Respond = (input: DexpayCheckoutInput) => Promise<{ paymentUrl: string }>;
 const dexpay = vi.hoisted(() => ({
-  calls: [] as unknown[],
-  respond: (): Promise<{ paymentUrl: string }> => Promise.resolve({ paymentUrl: "" }),
+  calls: [] as DexpayCheckoutInput[],
+  respond: (() => Promise.resolve({ paymentUrl: "" })) as Respond,
 }));
+const toastError = vi.hoisted(() => vi.fn());
 
 vi.mock("./dexpay-api", () => ({
   dexpayApi: {
     startCheckout: (input: DexpayCheckoutInput) => {
       dexpay.calls.push(input);
-      return dexpay.respond();
+      return dexpay.respond(input);
     },
   },
 }));
+vi.mock("sonner", () => ({ toast: { error: toastError } }));
 
 const price: DexpayCheckoutOption = { plan: "PRO", interval: "MONTHLY", usdAmount: 20 };
 const assign = vi.fn();
+const onClose = vi.fn();
 
 function renderDialog() {
   const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
@@ -33,74 +37,82 @@ function renderDialog() {
     <QueryClientProvider client={client}>
       <DexpayCheckoutDialog
         price={price}
-        defaultName="Ada Owner"
-        defaultEmail="ada@example.test"
-        onClose={() => {}}
+        name="Ada Owner"
+        email="ada@example.test"
+        onClose={onClose}
       />
     </QueryClientProvider>,
   );
 }
 
+const phoneRequired = () =>
+  Promise.reject(new ApiError(422, { status: 422, code: "phone_required" }));
+
 describe("DexpayCheckoutDialog", () => {
   beforeEach(() => {
     dexpay.calls.length = 0;
     assign.mockClear();
+    onClose.mockClear();
+    toastError.mockClear();
     vi.stubGlobal("location", { ...window.location, assign });
   });
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it("shows the price in US dollars, the payment methods, and prefills the billing contact", () => {
-    renderDialog();
-
-    expect(screen.getByText(/\$20 per month/)).toBeInTheDocument();
-    expect(
-      screen.getByText(/in US dollars .* by card \(Visa, Mastercard\) or mobile money/),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/XAF/)).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Full name")).toHaveValue("Ada Owner");
-    expect(screen.getByLabelText("Email")).toHaveValue("ada@example.test");
-  });
-
-  it("refuses a phone number that is not in international format", async () => {
-    renderDialog();
-
-    await userEvent.type(screen.getByLabelText("Phone number"), "650000000");
-    await userEvent.click(screen.getByRole("button", { name: "Continue to payment" }));
-
-    expect(await screen.findByText(/Use the international format/)).toBeInTheDocument();
-    expect(dexpay.calls).toHaveLength(0);
-  });
-
-  it("starts the checkout and sends the buyer to the payment page", async () => {
+  it("goes straight to Dexpay with the account's name and email when no phone is needed", async () => {
     dexpay.respond = () => Promise.resolve({ paymentUrl: "https://pay.example.test/sub-1" });
     renderDialog();
 
-    await userEvent.type(screen.getByLabelText("Phone number"), "+237650000000");
-    await userEvent.click(screen.getByRole("button", { name: "Continue to payment" }));
-
     await waitFor(() => expect(assign).toHaveBeenCalledWith("https://pay.example.test/sub-1"));
     expect(dexpay.calls).toEqual([
-      {
-        plan: "PRO",
-        interval: "MONTHLY",
-        name: "Ada Owner",
-        email: "ada@example.test",
-        phone: "+237650000000",
-      },
+      { plan: "PRO", interval: "MONTHLY", name: "Ada Owner", email: "ada@example.test" },
     ]);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("explains that only an owner or admin can subscribe when the backend refuses", async () => {
-    dexpay.respond = () => Promise.reject(new ApiError(403, { title: "Forbidden" }));
+  it("asks only for the phone number on the workspace's first payment", async () => {
+    dexpay.respond = (input) =>
+      input.phone
+        ? Promise.resolve({ paymentUrl: "https://pay.example.test/sub-2" })
+        : phoneRequired();
     renderDialog();
 
-    await userEvent.type(screen.getByLabelText("Phone number"), "+237650000000");
+    expect(await screen.findByRole("dialog")).toHaveTextContent(/\$20 per month/);
+    expect(screen.queryByLabelText("Full name")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Email")).not.toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText("Phone number"), "+224621234567");
     await userEvent.click(screen.getByRole("button", { name: "Continue to payment" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Only a workspace owner or admin can subscribe.",
+    await waitFor(() => expect(assign).toHaveBeenCalledWith("https://pay.example.test/sub-2"));
+    expect(dexpay.calls.at(-1)).toEqual({
+      plan: "PRO",
+      interval: "MONTHLY",
+      name: "Ada Owner",
+      email: "ada@example.test",
+      phone: "+224621234567",
+    });
+  });
+
+  it("refuses a phone number that is not in international format", async () => {
+    dexpay.respond = phoneRequired;
+    renderDialog();
+
+    await userEvent.type(await screen.findByLabelText("Phone number"), "621234567");
+    await userEvent.click(screen.getByRole("button", { name: "Continue to payment" }));
+
+    expect(await screen.findByText(/Use the international format/)).toBeInTheDocument();
+    expect(dexpay.calls).toHaveLength(1);
+  });
+
+  it("reports a refusal without opening a form", async () => {
+    dexpay.respond = () => Promise.reject(new ApiError(403, { status: 403 }));
+    renderDialog();
+
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith(expect.stringMatching(/owner or admin/)),
     );
-    expect(assign).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

@@ -16,7 +16,8 @@ export interface DexpayCheckoutInput {
   interval: DexpayInterval;
   name: string;
   email: string;
-  phone: string;
+  /** Needed only for the workspace's first payment, to create its Dexpay customer. */
+  phone?: string;
 }
 
 export type DexpaySubscriptionStatus = "TRIALING" | "ACTIVE" | "PAST_DUE" | "CANCELED" | "REVOKED";

@@ -93,6 +93,7 @@ describe("PricingSection", () => {
     fireEvent.click(screen.getByRole("button", { name: /Switch to Enterprise/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $1008 (plan change)");
+    expect(screen.getByText(/remaining days/)).toBeInTheDocument();
   });
 
   it("sends the current plan's button to billing instead of a second checkout", () => {
@@ -119,5 +120,14 @@ describe("PricingSection", () => {
     fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $199");
+  });
+
+  it("exposes the billing period toggle as a named switch", () => {
+    render(<PricingSection />);
+
+    const toggle = screen.getByRole("switch", { name: "Bill yearly" });
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-checked", "false");
   });
 });

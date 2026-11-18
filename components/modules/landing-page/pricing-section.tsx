@@ -7,6 +7,7 @@ import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
 import { productMailto } from "@/lib/contact";
 import {
@@ -149,8 +150,12 @@ export function PricingSection() {
             {t("monthly")}
           </span>
           <button
+            type="button"
+            role="switch"
+            aria-checked={annual}
+            aria-label={t("annualToggle")}
             onClick={() => setAnnual(!annual)}
-            className="relative w-12 h-6 bg-foreground/15 rounded-full p-0.5 transition-colors hover:bg-foreground/25"
+            className="relative w-12 h-6 bg-foreground/15 rounded-full p-0.5 transition-colors hover:bg-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             <div
               className={`size-5 bg-foreground rounded-full transition-transform duration-300 ${
@@ -176,7 +181,7 @@ export function PricingSection() {
                 key={plan.key}
                 className={`relative p-6 rounded-2xl border transition-all ${
                   plan.popular
-                    ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
+                    ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10 [&_.text-muted-foreground]:text-foreground/70"
                     : "border-foreground/10 bg-card"
                 }`}
               >
@@ -239,16 +244,27 @@ export function PricingSection() {
                         <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     ) : (
-                      <Button
-                        variant={plan.popular ? "default" : "outline"}
-                        className="w-full rounded-full group"
-                        onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
-                      >
-                        {currentPlan === "FREE"
-                          ? plans(`${plan.key}.cta`)
-                          : t("switchTo", { plan: plans(`${plan.key}.name`) })}
-                        <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-                      </Button>
+                      <>
+                        <Button
+                          variant={plan.popular ? "default" : "outline"}
+                          className="w-full rounded-full group"
+                          onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
+                          disabled={dexpayCheckout !== null}
+                        >
+                          {dexpayCheckout?.plan === plan.key.toUpperCase() && (
+                            <Spinner data-icon="inline-start" />
+                          )}
+                          {currentPlan === "FREE"
+                            ? plans(`${plan.key}.cta`)
+                            : t("switchTo", { plan: plans(`${plan.key}.name`) })}
+                          <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                        {currentPlan !== "FREE" && (
+                          <p className="text-center text-xs text-muted-foreground">
+                            {t("switchNote")}
+                          </p>
+                        )}
+                      </>
                     )}
                     {plan.key === "enterprise" && (
                       <p className="text-center text-xs text-muted-foreground">
@@ -287,8 +303,8 @@ export function PricingSection() {
       </div>
       <DexpayCheckoutDialog
         price={dexpayCheckout}
-        defaultName={session?.user?.name ?? undefined}
-        defaultEmail={session?.user?.email ?? undefined}
+        name={session?.user?.name ?? ""}
+        email={session?.user?.email ?? ""}
         onClose={() => setDexpayCheckout(null)}
       />
     </section>

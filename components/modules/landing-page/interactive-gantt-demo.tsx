@@ -90,6 +90,25 @@ export function InteractiveGanttDemo() {
   const throttleRef = useRef(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const demoTasks = useMemo(() => buildDemoTasks(), []);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Frappe Gantt renders its own scrollable container; give it a keyboard stop and a name so the
+  // chart can be scrolled without a mouse.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const label = () => {
+      const container = wrapper.querySelector(".gantt-container");
+      if (!container || container.hasAttribute("tabindex")) return;
+      container.setAttribute("tabindex", "0");
+      container.setAttribute("role", "region");
+      container.setAttribute("aria-label", "Gantt chart demo");
+    };
+    label();
+    const observer = new MutationObserver(label);
+    observer.observe(wrapper, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
 
   // Clean up the throttle timer on unmount
   useEffect(() => {
@@ -130,7 +149,7 @@ export function InteractiveGanttDemo() {
       </div>
 
       {/* Interactive Gantt chart — fixed height so Frappe Gantt's SVG has room to render */}
-      <div className="demo-gantt-wrapper h-[260px] lg:h-[340px]">
+      <div ref={wrapperRef} className="demo-gantt-wrapper h-[260px] lg:h-[340px]">
         <GanttChart
           tasks={demoTasks}
           viewMode="Week"
