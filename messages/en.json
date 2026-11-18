@@ -215,8 +215,8 @@
     },
     "dexpay": {
       "title": "Pay with mobile money or card",
-      "summaryMonthly": "{price} per month for this workspace. On the secure Dexpay page you pay by card (Visa, Mastercard) or mobile money, in your local currency at the day's rate.",
-      "summaryYearly": "{price} per year for this workspace. On the secure Dexpay page you pay by card (Visa, Mastercard) or mobile money, in your local currency at the day's rate.",
+      "summaryMonthly": "{price} per month for this workspace. You pay this amount in US dollars on the secure Dexpay page, by card (Visa, Mastercard) or mobile money.",
+      "summaryYearly": "{price} per year for this workspace. You pay this amount in US dollars on the secure Dexpay page, by card (Visa, Mastercard) or mobile money.",
       "nameLabel": "Full name",
       "nameRequired": "Enter your name.",
       "emailLabel": "Email",
