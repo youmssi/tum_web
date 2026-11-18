@@ -29,6 +29,7 @@ Tûm is built and operated by ${COMPANY.NAME} (${COMPANY.URL}). The source code 
 ## Documentation
 
 ${docs}
+- [API reference](${env.siteUrl}${ROUTES.API_REFERENCE}): REST endpoints with request and response schemas
 
 ## Languages
 
