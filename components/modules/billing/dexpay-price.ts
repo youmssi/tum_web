@@ -18,7 +18,7 @@ export function formatDexpayPrice(price: DexpayPlanPrice, locale: string): strin
   }).format(price.amount);
 }
 
-/** Prices on the site and on the Dexpay products are in US dollars. */
+/** Prices on the site are shown in US dollars, whatever currency Dexpay charges. */
 export function formatUsd(amount: number, locale: string): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
