@@ -7,6 +7,7 @@ import { ArrowRight, Check, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { CONTACT, PLAN_PRICES, ROUTES } from "@/lib/constants";
 import { productMailto } from "@/lib/contact";
 import {
@@ -243,16 +244,27 @@ export function PricingSection() {
                         <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     ) : (
-                      <Button
-                        variant={plan.popular ? "default" : "outline"}
-                        className="w-full rounded-full group"
-                        onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
-                      >
-                        {currentPlan === "FREE"
-                          ? plans(`${plan.key}.cta`)
-                          : t("switchTo", { plan: plans(`${plan.key}.name`) })}
-                        <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-                      </Button>
+                      <>
+                        <Button
+                          variant={plan.popular ? "default" : "outline"}
+                          className="w-full rounded-full group"
+                          onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
+                          disabled={dexpayCheckout !== null}
+                        >
+                          {dexpayCheckout?.plan === plan.key.toUpperCase() && (
+                            <Spinner data-icon="inline-start" />
+                          )}
+                          {currentPlan === "FREE"
+                            ? plans(`${plan.key}.cta`)
+                            : t("switchTo", { plan: plans(`${plan.key}.name`) })}
+                          <ArrowRight className="size-4 ml-1.5 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                        {currentPlan !== "FREE" && (
+                          <p className="text-center text-xs text-muted-foreground">
+                            {t("switchNote")}
+                          </p>
+                        )}
+                      </>
                     )}
                     {plan.key === "enterprise" && (
                       <p className="text-center text-xs text-muted-foreground">
@@ -291,8 +303,8 @@ export function PricingSection() {
       </div>
       <DexpayCheckoutDialog
         price={dexpayCheckout}
-        defaultName={session?.user?.name ?? undefined}
-        defaultEmail={session?.user?.email ?? undefined}
+        name={session?.user?.name ?? ""}
+        email={session?.user?.email ?? ""}
         onClose={() => setDexpayCheckout(null)}
       />
     </section>

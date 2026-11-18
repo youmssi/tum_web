@@ -2,7 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { ApiError } from "@/lib/api-error";
@@ -31,34 +33,58 @@ export interface DexpayCheckoutOption {
 }
 
 interface DexpayCheckoutDialogProps {
-  /** The option being bought; the dialog is open while this is set. */
+  /** The option being bought; checkout starts as soon as this is set. */
   price: DexpayCheckoutOption | null;
-  defaultName?: string;
-  defaultEmail?: string;
+  /** Billing contact, taken from the signed-in account; Dexpay pre-fills its page with it. */
+  name: string;
+  email: string;
   onClose: () => void;
 }
 
-export function DexpayCheckoutDialog({
-  price,
-  defaultName,
-  defaultEmail,
-  onClose,
-}: DexpayCheckoutDialogProps) {
+const PHONE_REQUIRED = "phone_required";
+
+/**
+ * Sends the buyer straight to Dexpay, where they pay by card or mobile money. Dexpay needs a
+ * phone number to create the workspace's customer, so the first payment of a workspace asks for
+ * that one field; every later payment goes straight through.
+ */
+export function DexpayCheckoutDialog({ price, name, email, onClose }: DexpayCheckoutDialogProps) {
   const t = useTranslations("billing.dexpay");
   const locale = useLocale();
   const startCheckout = useStartDexpayCheckout();
+  const [needsPhone, setNeedsPhone] = useState(false);
+  const started = useRef<DexpayCheckoutOption | null>(null);
 
   const schema = z.object({
-    name: z.string().trim().min(1, t("nameRequired")).max(120),
-    email: z.string().trim().email(t("emailInvalid")),
     phone: z.string().trim().regex(INTERNATIONAL_PHONE, t("phoneInvalid")),
   });
   type Values = z.infer<typeof schema>;
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { phone: "" } });
 
-  const form = useForm<Values>({
-    resolver: zodResolver(schema),
-    values: { name: defaultName ?? "", email: defaultEmail ?? "", phone: "" },
-  });
+  function errorMessage(error: unknown) {
+    const status = error instanceof ApiError ? error.status : undefined;
+    if (status === 403) return t("ownerOnly");
+    if (status === 409) return t("alreadyOnPlan");
+    return t("failed");
+  }
+
+  useEffect(() => {
+    if (!price || started.current === price) return;
+    started.current = price;
+    setNeedsPhone(false);
+    startCheckout
+      .mutateAsync({ plan: price.plan, interval: price.interval, name, email })
+      .then(({ paymentUrl }) => window.location.assign(paymentUrl))
+      .catch((error: unknown) => {
+        if (error instanceof ApiError && error.problem.code === PHONE_REQUIRED) {
+          setNeedsPhone(true);
+          return;
+        }
+        toast.error(errorMessage(error));
+        onClose();
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start once per selected option
+  }, [price]);
 
   async function onSubmit(values: Values) {
     if (!price) return;
@@ -66,22 +92,27 @@ export function DexpayCheckoutDialog({
       const { paymentUrl } = await startCheckout.mutateAsync({
         plan: price.plan,
         interval: price.interval,
-        ...values,
+        name,
+        email,
+        phone: values.phone,
       });
       window.location.assign(paymentUrl);
     } catch (error) {
-      const status = error instanceof ApiError ? error.status : undefined;
-      form.setError("root", {
-        message:
-          status === 403 ? t("ownerOnly") : status === 409 ? t("alreadyOnPlan") : t("failed"),
-      });
+      form.setError("root", { message: errorMessage(error) });
     }
+  }
+
+  function close() {
+    started.current = null;
+    setNeedsPhone(false);
+    form.reset();
+    onClose();
   }
 
   const pending = form.formState.isSubmitting;
 
   return (
-    <Dialog open={price !== null} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={price !== null && needsPhone} onOpenChange={(open) => !open && close()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
@@ -91,60 +122,35 @@ export function DexpayCheckoutDialog({
                 price: formatUsd(price.usdAmount, locale),
               })}
           </DialogDescription>
-          {price?.change && <p className="text-sm text-muted-foreground">{t("changeNote")}</p>}
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-4">
-          <FieldGroup className="gap-4">
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="dexpay-name">{t("nameLabel")}</FieldLabel>
-                  <Input {...field} id="dexpay-name" autoComplete="name" />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="dexpay-email">{t("emailLabel")}</FieldLabel>
-                  <Input {...field} id="dexpay-email" type="email" autoComplete="email" />
-                  <FieldDescription>{t("emailHint")}</FieldDescription>
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-            <Controller
-              name="phone"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="dexpay-phone">{t("phoneLabel")}</FieldLabel>
-                  <Input
-                    {...field}
-                    id="dexpay-phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="+237650000000"
-                  />
-                  <FieldDescription>{t("phoneHint")}</FieldDescription>
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-          </FieldGroup>
+          <Controller
+            name="phone"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="dexpay-phone">{t("phoneLabel")}</FieldLabel>
+                <Input
+                  {...field}
+                  id="dexpay-phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  placeholder="+224621234567"
+                  autoFocus
+                />
+                <FieldDescription>{t("phoneHint")}</FieldDescription>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
           {form.formState.errors.root && (
             <p role="alert" className="text-sm text-destructive">
               {form.formState.errors.root.message}
             </p>
           )}
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={pending}>
+            <Button type="button" variant="outline" onClick={close} disabled={pending}>
               {t("cancel")}
             </Button>
             <Button type="submit" disabled={pending}>

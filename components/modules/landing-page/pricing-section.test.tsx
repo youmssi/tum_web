@@ -93,6 +93,7 @@ describe("PricingSection", () => {
     fireEvent.click(screen.getByRole("button", { name: /Switch to Enterprise/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $1008 (plan change)");
+    expect(screen.getByText(/remaining days/)).toBeInTheDocument();
   });
 
   it("sends the current plan's button to billing instead of a second checkout", () => {

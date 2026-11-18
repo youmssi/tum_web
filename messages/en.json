@@ -214,22 +214,16 @@
       "workspaceLimit": "You already own a workspace on the Free plan. Upgrade it to create another one."
     },
     "dexpay": {
-      "title": "Pay with mobile money or card",
+      "title": "One last detail",
       "summaryMonthly": "{price} per month for this workspace. You pay this amount in US dollars on the secure Dexpay page, by card (Visa, Mastercard) or mobile money.",
       "summaryYearly": "{price} per year for this workspace. You pay this amount in US dollars on the secure Dexpay page, by card (Visa, Mastercard) or mobile money.",
-      "nameLabel": "Full name",
-      "nameRequired": "Enter your name.",
-      "emailLabel": "Email",
-      "emailInvalid": "Enter a valid email address.",
-      "emailHint": "Receipts and renewal reminders are sent here.",
       "phoneLabel": "Phone number",
-      "phoneInvalid": "Use the international format, for example +237650000000.",
-      "phoneHint": "International format. Mobile money payments are approved on this phone.",
+      "phoneInvalid": "Use the international format, for example +224621234567.",
+      "phoneHint": "Asked once for this workspace. Dexpay uses it to identify you and fills it in on its payment page.",
       "cancel": "Cancel",
       "submit": "Continue to payment",
       "ownerOnly": "Only a workspace owner or admin can subscribe.",
       "failed": "The payment page could not be opened. Please try again.",
-      "changeNote": "Your new plan starts as soon as Dexpay confirms the payment. The current plan then stops renewing; its remaining days are not refunded.",
       "alreadyOnPlan": "This workspace is already on this plan."
     }
   },
@@ -922,6 +916,7 @@
       "checkoutUnavailable": "Online payment is not available for this plan yet. Write to contact@mrvin100.de and we will set up your subscription.",
       "currentPlan": "Current plan",
       "switchTo": "Switch to {plan}",
+      "switchNote": "The new plan starts once Dexpay confirms the payment; the current one stops renewing, without refund of its remaining days.",
       "ownerOnly": "Only the workspace owner or an admin can change the plan."
     },
     "testimonials": {
