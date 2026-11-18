@@ -44,7 +44,7 @@ interface DexpayCheckoutDialogProps {
 const PHONE_REQUIRED = "phone_required";
 
 /**
- * Sends the buyer straight to Dexpay, where they pay by card or mobile money. Dexpay needs a
+ * Sends the buyer straight to Dexpay, where they pay by mobile money. Dexpay needs a
  * phone number to create the workspace's customer, so the first payment of a workspace asks for
  * that one field; every later payment goes straight through.
  */

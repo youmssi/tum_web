@@ -122,6 +122,28 @@ describe("PricingSection", () => {
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $199");
   });
 
+  it("charges a Guinean franc product at the dollar list price", () => {
+    state.plans = [{ plan: "PRO", interval: "MONTHLY", amount: 174000, currency: "GNF" }];
+    render(<PricingSection />);
+
+    fireEvent.click(screen.getByRole("switch", { name: "Bill yearly" }));
+    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+
+    expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $20");
+    expect(screen.queryByText(/174/)).not.toBeInTheDocument();
+  });
+
+  it("explains mobile money payment in GNF and that cards are not available yet", () => {
+    render(<PricingSection />);
+
+    expect(
+      screen.getByText(/equivalent in Guinean francs \(GNF\) by mobile money/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Card payments \(Visa, Mastercard\) are coming soon/),
+    ).toBeInTheDocument();
+  });
+
   it("exposes the billing period toggle as a named switch", () => {
     render(<PricingSection />);
 
