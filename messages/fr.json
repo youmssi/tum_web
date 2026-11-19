@@ -224,7 +224,9 @@
       "submit": "Continuer vers le paiement",
       "ownerOnly": "Seul un propriétaire ou un administrateur de l’espace de travail peut souscrire.",
       "failed": "La page de paiement n’a pas pu être ouverte. Veuillez réessayer.",
-      "alreadyOnPlan": "Cet espace de travail est déjà sur cette offre."
+      "alreadyOnPlan": "Cet espace de travail est déjà sur cette offre.",
+      "rejected": "Dexpay n’a pas pu ouvrir la page de paiement : {reason}",
+      "slow": "Le service de paiement a mis trop de temps à répondre. Réessayez dans une minute."
     }
   },
   "dashboard": {

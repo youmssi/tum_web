@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { TimeoutError } from "ky";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -42,6 +43,8 @@ interface DexpayCheckoutDialogProps {
 }
 
 const PHONE_REQUIRED = "phone_required";
+const DEXPAY_REJECTED = "dexpay_rejected";
+const DEXPAY_UNREACHABLE = "dexpay_unreachable";
 
 /**
  * Sends the buyer straight to Dexpay, where they pay by mobile money. Dexpay needs a
@@ -62,9 +65,14 @@ export function DexpayCheckoutDialog({ price, name, email, onClose }: DexpayChec
   const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { phone: "" } });
 
   function errorMessage(error: unknown) {
-    const status = error instanceof ApiError ? error.status : undefined;
-    if (status === 403) return t("ownerOnly");
-    if (status === 409) return t("alreadyOnPlan");
+    if (error instanceof TimeoutError) return t("slow");
+    if (!(error instanceof ApiError)) return t("failed");
+    if (error.status === 403) return t("ownerOnly");
+    if (error.status === 409) return t("alreadyOnPlan");
+    if (error.problem.code === DEXPAY_UNREACHABLE) return t("slow");
+    if (error.problem.code === DEXPAY_REJECTED && error.problem.detail) {
+      return t("rejected", { reason: error.problem.detail });
+    }
     return t("failed");
   }
 
