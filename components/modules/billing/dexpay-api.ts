@@ -32,8 +32,12 @@ export interface DexpaySubscription {
 
 export const dexpayApi = {
   plans: () => api.get("api/billing/dexpay/plans").json<DexpayPlanPrice[]>(),
+  // The backend may be waking up (about a minute on the hosting plan) and then waits on Dexpay,
+  // so the default timeout would abandon a checkout that is about to succeed.
   startCheckout: (input: DexpayCheckoutInput) =>
-    api.post("api/billing/dexpay/checkout", { json: input }).json<{ paymentUrl: string }>(),
+    api
+      .post("api/billing/dexpay/checkout", { json: input, timeout: 90_000 })
+      .json<{ paymentUrl: string }>(),
   /** Null when the workspace has never subscribed through Dexpay (the API answers 204). */
   subscription: async (): Promise<DexpaySubscription | null> => {
     const response = await api.get("api/billing/dexpay/subscription");

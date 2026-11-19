@@ -224,7 +224,9 @@
       "submit": "Continue to payment",
       "ownerOnly": "Only a workspace owner or admin can subscribe.",
       "failed": "The payment page could not be opened. Please try again.",
-      "alreadyOnPlan": "This workspace is already on this plan."
+      "alreadyOnPlan": "This workspace is already on this plan.",
+      "rejected": "Dexpay could not open the payment page: {reason}",
+      "slow": "The payment service took too long to answer. Please try again in a minute."
     }
   },
   "dashboard": {

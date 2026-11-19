@@ -115,4 +115,32 @@ describe("DexpayCheckoutDialog", () => {
     expect(onClose).toHaveBeenCalled();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
+
+  it("shows Dexpay's reason when it refuses to open the payment page", async () => {
+    dexpay.respond = () =>
+      Promise.reject(
+        new ApiError(502, {
+          status: 502,
+          code: "dexpay_rejected",
+          detail: "Checkout session quota exceeded",
+        }),
+      );
+    renderDialog();
+
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith(
+        "Dexpay could not open the payment page: Checkout session quota exceeded",
+      ),
+    );
+  });
+
+  it("asks to retry later when the payment service is too slow", async () => {
+    dexpay.respond = () =>
+      Promise.reject(new ApiError(502, { status: 502, code: "dexpay_unreachable" }));
+    renderDialog();
+
+    await waitFor(() =>
+      expect(toastError).toHaveBeenCalledWith(expect.stringMatching(/took too long/)),
+    );
+  });
 });
