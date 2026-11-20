@@ -6,7 +6,7 @@ export const termsEn: LegalDocument = {
   description:
     "The terms that govern use of the Tûm website and the Tûm Cloud service operated by MRVIN100 SARLU.",
   updatedLabel: "Last updated:",
-  updated: "11 November 2026",
+  updated: "20 November 2026",
   intro: [
     `These Terms of Service (the "Terms") are a contract between you and ${COMPANY.NAME}, a company registered in the Republic of Guinea under number ${COMPANY.RCCM}, with its registered office at ${COMPANY.ADDRESS} ("MRVIN100", "we", "us").`,
     "Please read them carefully. By creating an account or using the service you accept these Terms. If you do not accept them, do not use the service.",
@@ -39,10 +39,9 @@ export const termsEn: LegalDocument = {
       ],
     },
     {
-      heading: "4. Plans, trial and fees",
+      heading: "4. Plans and fees",
       paragraphs: [
-        "The plans available and their prices are described on the pricing page. Prices are stated in United States dollars and are charged per Workspace.",
-        "Paid plans may begin with a free trial of 14 days. If you do not subscribe before the trial ends, the paid features stop being available.",
+        "The plans available and their prices are described on the pricing page. Prices are stated in United States dollars and are charged per Workspace. You pay the equivalent amount in the local currency offered on the payment page.",
         "Subscription fees are payable in advance for each monthly or annual period. Payments are processed by third-party payment providers, and their own terms apply to the payment itself. We do not store your card number or mobile money credentials.",
         "Prices do not include taxes, duties or bank and operator charges, which remain your responsibility unless we state otherwise.",
         "We may change our prices. We will give you at least 30 days' notice, and the new price will apply from the start of your next billing period.",

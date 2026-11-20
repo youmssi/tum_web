@@ -40,7 +40,7 @@ test("the first payment asks only for a phone number, then opens Dexpay", async 
   await expect(page.getByText(/equivalent in Guinean francs \(GNF\)/)).toBeVisible();
   await page.getByRole("switch", { name: "Bill yearly" }).click();
   await page
-    .getByRole("button", { name: /Start 14-day trial/ })
+    .getByRole("button", { name: /Upgrade to Pro/ })
     .first()
     .click();
 
@@ -68,7 +68,7 @@ test("a refused payment page shows Dexpay's reason", async ({ page }) => {
 
   await page.goto("/pricing");
   await page
-    .getByRole("button", { name: /Start 14-day trial/ })
+    .getByRole("button", { name: /Upgrade to Pro/ })
     .first()
     .click();
 
