@@ -78,6 +78,7 @@ export function PricingSection() {
   const dexpayPlans = useDexpayPlans();
   const entitlements = useEntitlements();
   const [dexpayCheckout, setDexpayCheckout] = useState<DexpayCheckoutOption | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<"PRO" | "ENTERPRISE" | null>(null);
 
   // Only an owner or admin may commit the workspace to a subscription; the backend enforces the
   // same rule. Members see the button disabled with an explanation.
@@ -94,7 +95,7 @@ export function PricingSection() {
    * signed-in owners open the Dexpay checkout. Prices are shown in US dollars; Dexpay only charges
    * XOF, XAF or GNF, so its products are priced in Guinean francs and paid by mobile money.
    */
-  function handlePaidPlanClick(plan: "pro" | "enterprise") {
+  async function handlePaidPlanClick(plan: "pro" | "enterprise") {
     trackEvent("pricing_cta_click", { plan, annual, signedIn: !!session });
     if (!session) {
       router.push(`${ROUTES.SIGNUP}?intent=upgrade-${plan}`);
@@ -111,7 +112,15 @@ export function PricingSection() {
       return;
     }
     const interval = annual ? "YEARLY" : "MONTHLY";
-    const dexpayPrice = findDexpayPlan(dexpayPlans.data, dexpayPlan, interval);
+    // On a slow connection the prices may still be loading when the buyer clicks; wait for them
+    // rather than reporting the plan as unavailable.
+    let available = dexpayPlans.data;
+    if (!available) {
+      setLoadingPlan(dexpayPlan);
+      available = (await dexpayPlans.refetch()).data;
+      setLoadingPlan(null);
+    }
+    const dexpayPrice = findDexpayPlan(available, dexpayPlan, interval);
     if (!dexpayPrice) {
       toast.error(t("checkoutUnavailable"));
       return;
@@ -249,9 +258,10 @@ export function PricingSection() {
                           variant={plan.popular ? "default" : "outline"}
                           className="w-full rounded-full group"
                           onClick={() => handlePaidPlanClick(plan.key as "pro" | "enterprise")}
-                          disabled={dexpayCheckout !== null}
+                          disabled={dexpayCheckout !== null || loadingPlan !== null}
                         >
-                          {dexpayCheckout?.plan === plan.key.toUpperCase() && (
+                          {(dexpayCheckout?.plan === plan.key.toUpperCase() ||
+                            loadingPlan === plan.key.toUpperCase()) && (
                             <Spinner data-icon="inline-start" />
                           )}
                           {currentPlan === "FREE"
