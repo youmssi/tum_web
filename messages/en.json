@@ -870,7 +870,7 @@
           "name": "Pro",
           "description": "Tûm Cloud, managed for you",
           "badge": "Most popular",
-          "cta": "Start 14-day trial",
+          "cta": "Upgrade to Pro",
           "features": [
             "Everything in Free",
             "Unlimited projects & members",
@@ -879,7 +879,7 @@
             "Workload & capacity view",
             "Analytics & portfolio dashboards",
             "Email support",
-            "14-day free trial · cancel anytime"
+            "Cancel anytime · no commitment"
           ]
         },
         "enterprise": {
@@ -1020,7 +1020,7 @@
       },
       "pricing": {
         "title": "Pricing: free plan, Pro and Enterprise, free self-hosting | Tûm",
-        "description": "Tûm pricing in USD: a free cloud plan for small teams, Pro and Enterprise with unlimited users per workspace and a 14-day trial, or free self-hosting under the AGPLv3.",
+        "description": "Tûm pricing in USD: a free cloud plan for small teams, Pro and Enterprise with unlimited users per workspace, or free self-hosting under the AGPLv3.",
         "heading": "Tûm pricing",
         "intro": "Free for small teams. Paid plans are billed per workspace, in US dollars, with unlimited users. Self-hosting is free."
       },

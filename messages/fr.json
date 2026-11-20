@@ -870,7 +870,7 @@
           "name": "Pro",
           "description": "Tûm Cloud, géré pour vous",
           "badge": "Le plus populaire",
-          "cta": "Essai gratuit de 14 jours",
+          "cta": "Passer à Pro",
           "features": [
             "Tout ce qui est inclus dans Gratuit",
             "Projets et membres illimités",
@@ -879,7 +879,7 @@
             "Vue de charge et de capacité",
             "Analyses et tableau de bord portefeuille",
             "Support par e-mail",
-            "Essai gratuit 14 jours · annulable à tout moment"
+            "Résiliable à tout moment · sans engagement"
           ]
         },
         "enterprise": {
@@ -1020,7 +1020,7 @@
       },
       "pricing": {
         "title": "Tarifs : offre gratuite, Pro et Enterprise, auto-hébergement gratuit | Tûm",
-        "description": "Tarifs de Tûm en USD : une offre cloud gratuite pour les petites équipes, Pro et Enterprise avec utilisateurs illimités par espace de travail et 14 jours d’essai, ou l’auto-hébergement gratuit sous AGPLv3.",
+        "description": "Tarifs de Tûm en USD : une offre cloud gratuite pour les petites équipes, Pro et Enterprise avec utilisateurs illimités par espace de travail, ou l’auto-hébergement gratuit sous AGPLv3.",
         "heading": "Tarifs de Tûm",
         "intro": "Gratuit pour les petites équipes. Les offres payantes sont facturées par espace de travail, en dollars américains, avec utilisateurs illimités. L’auto-hébergement est gratuit."
       },

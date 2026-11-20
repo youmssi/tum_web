@@ -6,7 +6,7 @@ export const termsFr: LegalDocument = {
   description:
     "Les conditions qui régissent l’utilisation du site Tûm et du service Tûm Cloud exploité par MRVIN100 SARLU.",
   updatedLabel: "Dernière mise à jour :",
-  updated: "11 novembre 2026",
+  updated: "20 novembre 2026",
   intro: [
     `Les présentes conditions générales d’utilisation (les « Conditions ») forment un contrat entre vous et ${COMPANY.NAME}, société immatriculée en République de Guinée sous le numéro ${COMPANY.RCCM}, dont le siège social est situé à ${COMPANY.ADDRESS} (« MRVIN100 », « nous »).`,
     "Nous vous invitons à les lire attentivement. En créant un compte ou en utilisant le service, vous acceptez les Conditions. Si vous ne les acceptez pas, n’utilisez pas le service.",
@@ -39,10 +39,9 @@ export const termsFr: LegalDocument = {
       ],
     },
     {
-      heading: "4. Offres, essai et prix",
+      heading: "4. Offres et prix",
       paragraphs: [
-        "Les offres disponibles et leurs prix sont décrits sur la page des tarifs. Les prix sont exprimés en dollars des États-Unis et s’entendent par Espace de travail.",
-        "Les offres payantes peuvent débuter par un essai gratuit de 14 jours. Si vous ne souscrivez pas avant la fin de l’essai, les fonctionnalités payantes cessent d’être disponibles.",
+        "Les offres disponibles et leurs prix sont décrits sur la page des tarifs. Les prix sont exprimés en dollars des États-Unis et s’entendent par Espace de travail. Vous réglez le montant équivalent dans la devise locale proposée sur la page de paiement.",
         "Le prix de l’Abonnement est payable d’avance pour chaque période mensuelle ou annuelle. Les paiements sont traités par des prestataires de paiement tiers, dont les conditions s’appliquent à l’opération de paiement. Nous ne conservons ni votre numéro de carte ni vos identifiants de mobile money.",
         "Les prix s’entendent hors taxes, droits et frais bancaires ou d’opérateur, qui restent à votre charge sauf indication contraire de notre part.",
         "Nous pouvons modifier nos prix. Nous vous en informons au moins 30 jours à l’avance et le nouveau prix s’applique à compter de votre période de facturation suivante.",

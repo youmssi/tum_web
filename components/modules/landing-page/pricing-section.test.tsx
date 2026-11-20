@@ -74,7 +74,7 @@ describe("PricingSection", () => {
     state.plans = [{ plan: "PRO", interval: "YEARLY", amount: 122400, currency: "XAF" }];
     render(<PricingSection />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Upgrade to Pro/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $204");
   });
@@ -82,7 +82,7 @@ describe("PricingSection", () => {
   it("never falls back to another provider when Dexpay does not sell the plan", () => {
     render(<PricingSection />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Upgrade to Pro/ }));
 
     expect(toastError).toHaveBeenCalledWith(expect.stringContaining("contact@mrvin100.de"));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -122,7 +122,7 @@ describe("PricingSection", () => {
     state.plans = [{ plan: "PRO", interval: "YEARLY", amount: 199, currency: "USD" }];
     render(<PricingSection />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Upgrade to Pro/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $199");
   });
@@ -132,7 +132,7 @@ describe("PricingSection", () => {
     render(<PricingSection />);
 
     fireEvent.click(screen.getByRole("switch", { name: "Bill yearly" }));
-    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Upgrade to Pro/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("Dexpay checkout for $20");
     expect(screen.queryByText(/174/)).not.toBeInTheDocument();
@@ -154,7 +154,7 @@ describe("PricingSection", () => {
     state.plansLoaded = false;
     render(<PricingSection />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Upgrade to Pro/ }));
 
     expect(await screen.findByRole("dialog")).toHaveTextContent("Dexpay checkout for $204");
     expect(toastError).not.toHaveBeenCalled();
