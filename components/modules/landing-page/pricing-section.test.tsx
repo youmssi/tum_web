@@ -6,6 +6,7 @@ import { renderWithIntl as render } from "@/components/modules/auth/test-utils";
 const { state, toastError, push } = vi.hoisted(() => ({
   state: {
     plans: [] as { plan: string; interval: string; amount: number; currency: string }[],
+    plansLoaded: true,
     currentPlan: "FREE",
     role: "owner",
   },
@@ -34,7 +35,10 @@ vi.mock("@/components/modules/billing", async () => {
   return {
     findDexpayPlan: price.findDexpayPlan,
     useEntitlements: () => ({ data: { plan: state.currentPlan } }),
-    useDexpayPlans: () => ({ data: state.plans }),
+    useDexpayPlans: () => ({
+      data: state.plansLoaded ? state.plans : undefined,
+      refetch: () => Promise.resolve({ data: state.plans }),
+    }),
     DexpayCheckoutDialog: ({ price }: { price: { usdAmount: number; change?: boolean } | null }) =>
       price ? (
         <div role="dialog">
@@ -52,6 +56,7 @@ describe("PricingSection", () => {
     toastError.mockClear();
     push.mockClear();
     state.plans = [];
+    state.plansLoaded = true;
     state.currentPlan = "FREE";
     state.role = "owner";
   });
@@ -142,6 +147,17 @@ describe("PricingSection", () => {
     expect(
       screen.getByText(/Card payments \(Visa, Mastercard\) are coming soon/),
     ).toBeInTheDocument();
+  });
+
+  it("waits for the prices instead of reporting the plan unavailable while they load", async () => {
+    state.plans = [{ plan: "PRO", interval: "YEARLY", amount: 1775000, currency: "GNF" }];
+    state.plansLoaded = false;
+    render(<PricingSection />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Start 14-day trial/ }));
+
+    expect(await screen.findByRole("dialog")).toHaveTextContent("Dexpay checkout for $204");
+    expect(toastError).not.toHaveBeenCalled();
   });
 
   it("exposes the billing period toggle as a named switch", () => {
