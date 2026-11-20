@@ -111,6 +111,21 @@ describe("buildGanttSvg", () => {
     expect(buildGanttSvg({ ...base, today: "2027-06-01" }).svg).not.toContain(">Today<");
   });
 
+  it("puts the workspace logo left of the title when one is given", () => {
+    const logo = "data:image/png;base64,iVBORw0KGgo=";
+    const { svg } = buildGanttSvg({ ...base, logo });
+
+    expect(svg).toContain(`<image href="${logo}"`);
+    expect(svg).toMatch(/<text x="92"[^>]*>Apollo launch<\/text>/);
+  });
+
+  it("ignores a logo that is not an inlined raster image", () => {
+    for (const logo of ["https://evil.example/logo.png", "data:image/svg+xml;base64,PHN2Zz4="]) {
+      const { svg } = buildGanttSvg({ ...base, logo });
+      expect(svg).not.toContain("<image");
+    }
+  });
+
   it("adds the footer only when one is given", () => {
     expect(buildGanttSvg(base).svg).toContain("Made with Tûm");
     const { svg, height } = buildGanttSvg({ ...base, footer: undefined });
