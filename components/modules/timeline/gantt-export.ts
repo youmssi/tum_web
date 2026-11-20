@@ -42,6 +42,11 @@ export interface GanttExportInput {
   stamp: string;
   /** Bottom line; on the Free plan it credits Tûm. */
   footer?: string;
+  /**
+   * Workspace logo as a data URI, drawn left of the title. It must be inlined: an image linked by
+   * URL is dropped when the SVG is rasterised to PNG or printed.
+   */
+  logo?: string;
   tasks: ExportTask[];
   dependencies: ExportDependency[];
   colors: Record<ExportTaskHealth, string>;
@@ -67,6 +72,8 @@ const ROW = 30;
 const BAR = 16;
 const LEGEND = 40;
 const FOOTER = 28;
+const LOGO = 48;
+const RASTER_DATA_URI = /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/;
 const NAME_COL = 260;
 const DATE_COL = 84;
 const PCT_COL = 44;
@@ -153,11 +160,19 @@ export function buildGanttSvg(input: GanttExportInput): GanttExport {
   parts.push(`<rect width="${width}" height="${height}" fill="#ffffff"/>`);
 
   // Title block
+  // Only an inlined raster image is accepted, so an export can never pull in a remote resource.
+  const logo = input.logo && RASTER_DATA_URI.test(input.logo) ? input.logo : undefined;
+  const titleX = logo ? MARGIN + LOGO + 12 : MARGIN;
+  if (logo) {
+    parts.push(
+      `<image href="${escapeXml(logo)}" x="${MARGIN}" y="${MARGIN}" width="${LOGO}" height="${LOGO}" preserveAspectRatio="xMidYMid meet"/>`,
+    );
+  }
   parts.push(
-    text(MARGIN, MARGIN + 22, input.title, `font-size="20" font-weight="700" fill="${INK}"`),
+    text(titleX, MARGIN + 22, input.title, `font-size="20" font-weight="700" fill="${INK}"`),
   );
   if (input.subtitle) {
-    parts.push(text(MARGIN, MARGIN + 44, input.subtitle, `font-size="12" fill="${MUTED}"`));
+    parts.push(text(titleX, MARGIN + 44, input.subtitle, `font-size="12" fill="${MUTED}"`));
   }
   parts.push(
     text(

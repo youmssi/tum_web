@@ -61,6 +61,7 @@ import {
   type GanttExportFormat,
   downloadPng,
   downloadSvg,
+  loadLogoDataUri,
   printPdf,
   timelineFilename,
 } from "./gantt-export-download";
@@ -264,14 +265,18 @@ export function ProjectTimeline({
 
   async function handleExport(format: GanttExportFormat) {
     const now = Date.now();
+    const freePlan = entitlements.data?.plan === "FREE";
+    // Paid plans brand their exports with the workspace logo; the Free plan credits Tûm instead.
+    const logo = freePlan ? undefined : await loadLogoDataUri(activeOrg?.logo);
     const gantt = buildGanttSvg({
       title: projectName,
       subtitle: activeOrg?.name,
+      logo,
       stamp: exportT("stamp", {
         date: new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(now),
       }),
       // The Free plan credits Tûm on exports; paid plans export without it.
-      footer: entitlements.data?.plan === "FREE" ? exportT("freeFooter") : undefined,
+      footer: freePlan ? exportT("freeFooter") : undefined,
       tasks: scheduledTasks.map((t) => ({
         id: t.id,
         name: t.title,

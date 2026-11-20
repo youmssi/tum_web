@@ -108,3 +108,29 @@ export function printPdf(gantt: GanttExport, title: string) {
   // Some browsers never fire afterprint for an iframe; do not leave it behind.
   setTimeout(() => frame.isConnected && frame.remove(), 60_000);
 }
+
+const LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+
+/**
+ * Reads the workspace logo into a data URI the export can embed. Any failure (expired link,
+ * blocked request, unsupported or oversized file) yields undefined: the export then goes out
+ * without a logo rather than not at all.
+ */
+export async function loadLogoDataUri(url: string | null | undefined): Promise<string | undefined> {
+  if (!url) return undefined;
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(5_000) });
+    if (!response.ok) return undefined;
+    const blob = await response.blob();
+    if (!LOGO_TYPES.has(blob.type) || blob.size > MAX_LOGO_BYTES) return undefined;
+    return await new Promise<string | undefined>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : undefined);
+      reader.onerror = () => resolve(undefined);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return undefined;
+  }
+}
