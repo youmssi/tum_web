@@ -5,6 +5,7 @@ on:
     branches: ["**"]
   pull_request:
     branches: ["**"]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -49,6 +50,93 @@ jobs:
         run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+
+  e2e:
+    name: End-to-end
+    # Needs read access to the private backend image; enabled with the E2E_ENABLED variable once
+    # the package grants it (see e2e/README.md).
+    if: vars.E2E_ENABLED == 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == 'main'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: tum
+          POSTGRES_PASSWORD: tum
+          POSTGRES_DB: tum
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U tum" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+      INTERNAL_API_URL: http://localhost:8080
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ${{ github.run_id }}-e2e-only-secret-not-used-elsewhere
+      DATABASE_URL: postgresql://tum:tum@localhost:5432/tum
+      INTERNAL_SERVICE_TOKEN: e2e-internal-token
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: 0
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start the backend
+        run: |
+          docker run -d --name app --network host \
+            -e DATABASE_URL=jdbc:postgresql://localhost:5432/tum \
+            -e TUM_CLOUD_ENABLED=true \
+            -e INTERNAL_SERVICE_TOKEN=e2e-internal-token \
+            -e AUTH_JWKS_URI=http://localhost:3000/api/auth/jwks \
+            -e CORS_ALLOWED_ORIGINS=http://localhost:3000 \
+            ghcr.io/youmssi/tum_app:staging
+          for i in $(seq 1 60); do curl -sf localhost:8080/actuator/health && break; sleep 2; done
+
+      - name: Create the auth tables
+        run: pnpm db:migrate -y
+
+      - name: Build and start the web app
+        run: |
+          pnpm build
+          cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+          PORT=3000 HOSTNAME=localhost node .next/standalone/server.js &
+          for i in $(seq 1 30); do curl -sf -o /dev/null localhost:3000/login && break; sleep 1; done
+
+      - name: Run end-to-end tests
+        run: pnpm exec playwright install --with-deps chromium && pnpm test:e2e
+
+      - name: Backend logs
+        if: failure()
+        run: docker logs app | tail -200
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
 
   publish:
     name: Build & push image
